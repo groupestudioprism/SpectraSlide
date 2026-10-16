@@ -59,7 +59,11 @@ async function insertImageFile(file, at){
     checkSize();
   } catch(e){ toast(e.message || 'Image impossible à ajouter'); }
 }
-function checkSize(){ const n = byteSize(); if (n > 820000) toast(`Présentation lourde (${Math.round(n / 1000)} Ko sur 950) : réduisez ou retirez des images.`); }
+function checkSize(){
+  if (window.SWMediaCloud?.()){ // dans le cloud, chaque image est rangée à part : seul le reste est limité
+    const j = JSON.parse(getJSON()); for (const k in j.media) if (j.media[k].length > 12000 && j.media[k].length < 990000) delete j.media[k];
+    const n = JSON.stringify(j).length; if (n > 820000) toast(`Présentation lourde (${Math.round(n / 1000)} Ko de texte et petites images sur 950).`); return; }
+  const n = byteSize(); if (n > 820000) toast(`Présentation lourde (${Math.round(n / 1000)} Ko sur 950) : réduisez ou retirez des images.`); }
 const byteSize = () => new TextEncoder().encode(getJSON()).length;
 /* ---------- Édition des éléments sélectionnés ---------- */
 function setProps(fn, label, inner = true){

@@ -1482,7 +1482,7 @@ const DTHEMES = [
   {id:'corail', name:'Corail', bg:'#FFF8F5', ink:'#2A1E22', mut:'#6E5A60', ac:'#E8505B', ac2:'#F9A26C', ac3:'#14B8A6', soft:'#FFFFFF', line:'#F3DEDA', tbg:'#E8505B', tink:'#FFFFFF', tmut:'#FFE1DC', fh:'Poppins', fb:'Poppins', hw:700, decor:'geo', r:24, up:0},
   {id:'pastel', name:'Pastel', bg:'#FDF9F3', ink:'#2D2A3E', mut:'#6C6880', ac:'#6E5FD8', ac2:'#E58AAE', ac3:'#3FB3A6', soft:'#FFFFFF', line:'#EDE6F5', tbg:'#EFE9FF', tink:'#2D2A3E', tmut:'#6C6880', fh:'Unbounded', fb:'DM Sans', hw:600, decor:'blobs', r:28, up:0},
   {id:'elegant', name:'Élégant', bg:'#FBF8F3', ink:'#2B2622', mut:'#6B6259', ac:'#9A7B4F', ac2:'#2E2A26', ac3:'#C9A96E', soft:'#FFFFFF', line:'#E7DED0', tbg:'#1F1B18', tink:'#F3EBDD', tmut:'#C9B79C', fh:'Playfair Display', fb:'Lora', hw:600, decor:'frame', r:2, up:1},
-  {id:'neon', name:'Néon', bg:'#0B0D17', ink:'#EFF3FF', mut:'#9AA3C7', ac:'#00E5FF', ac2:'#FF2BD6', ac3:'#C6FF3D', soft:'#141829', line:'#232946', tbg:'#05060D', tink:'#FFFFFF', tmut:'#9AA3C7', fh:'Syne', fb:'Space Grotesk', hw:800, decor:'grid', r:12, up:1},
+  {id:'neon', name:'Néon', bg:'#0B0D17', ink:'#EFF3FF', mut:'#9AA3C7', ac:'#00E5FF', ac2:'#FF2BD6', ac3:'#C6FF3D', soft:'#141829', line:'#232946', tbg:'#05060D', tink:'#FFFFFF', tmut:'#9AA3C7', fh:'Space Grotesk', fb:'Inter', hw:800, decor:'grid', r:12, up:1},
   {id:'craie', name:'Tableau noir', bg:'#23382F', ink:'#F2F0E6', mut:'#C3CBBE', ac:'#FFD166', ac2:'#8ECAE6', ac3:'#F28482', soft:'#2C463B', line:'#3C5A4D', tbg:'#1C2E26', tink:'#F2F0E6', tmut:'#C3CBBE', fh:'Caveat', fb:'Nunito', hw:700, decor:'chalk', r:10, up:0},
   {id:'sable', name:'Sable', bg:'#F4EDE3', ink:'#2F2A24', mut:'#6E655A', ac:'#C2410C', ac2:'#7C9473', ac3:'#D4A373', soft:'#FBF7F1', line:'#E2D6C6', tbg:'#2F2A24', tink:'#F4EDE3', tmut:'#CDBFAD', fh:'Instrument Serif', fb:'DM Sans', hw:400, decor:'arch', r:16, up:1},
   {id:'bauhaus', name:'Bauhaus', bg:'#F5F1E8', ink:'#111111', mut:'#4B4B4B', ac:'#E63946', ac2:'#1D4ED8', ac3:'#F4B400', soft:'#FFFFFF', line:'#DDD6C8', tbg:'#111111', tink:'#F5F1E8', tmut:'#BDB6A7', fh:'Space Grotesk', fb:'Space Grotesk', hw:700, decor:'bauhaus', r:0, up:1},
@@ -2484,7 +2484,11 @@ async function insertImageFile(file, at){
     checkSize();
   } catch(e){ toast(e.message || 'Image impossible à ajouter'); }
 }
-function checkSize(){ const n = byteSize(); if (n > 820000) toast(`Présentation lourde (${Math.round(n / 1000)} Ko sur 950) : réduisez ou retirez des images.`); }
+function checkSize(){
+  if (window.SWMediaCloud?.()){ // dans le cloud, chaque image est rangée à part : seul le reste est limité
+    const j = JSON.parse(getJSON()); for (const k in j.media) if (j.media[k].length > 12000 && j.media[k].length < 990000) delete j.media[k];
+    const n = JSON.stringify(j).length; if (n > 820000) toast(`Présentation lourde (${Math.round(n / 1000)} Ko de texte et petites images sur 950).`); return; }
+  const n = byteSize(); if (n > 820000) toast(`Présentation lourde (${Math.round(n / 1000)} Ko sur 950) : réduisez ou retirez des images.`); }
 const byteSize = () => new TextEncoder().encode(getJSON()).length;
 /* ---------- Édition des éléments sélectionnés ---------- */
 function setProps(fn, label, inner = true){
@@ -4971,8 +4975,27 @@ function makeLocalCloud(keyFn, local){
 const DemoCloud = makeLocalCloud(() => 'sp.demo.sscloud', false);
 const LocalCloud = makeLocalCloud(() => 'ss.local.' + (me?.uid || 'anon'), true);
 
+/* ---------- Images des présentations : une image = un document Firestore (ssDocs/{id}/media/{image}) ----------
+   Le contenu principal garde « @ » à la place de chaque image ; elles sont envoyées une seule fois, puis retirées
+   quand on les supprime de la présentation. Leur poids compte dans l'espace cloud (champ size de la présentation). */
+const MEDIA_MIN = 12000, MEDIA_MAX = 990000;
+function splitMedia(data){
+  try { const j = JSON.parse(data), media = j.media || {}, out = {}; let n = 0;
+    for (const [k, v] of Object.entries(media)) if (typeof v === 'string' && v.length > MEDIA_MIN && v.length < MEDIA_MAX && /^[A-Za-z0-9_-]{4,40}$/.test(k) && /^data:image\//.test(v)){ out[k] = v; media[k] = '@'; n++; }
+    return n ? {data:JSON.stringify(j), media:out} : {data, media:{}};
+  } catch(e){ return {data, media:{}}; }
+}
+const sizeOf = parts => byteLen(parts.data) + Object.values(parts.media).reduce((a, v) => a + v.length, 0);
 /* ---------- Firebase ---------- */
 const FirebaseCloud = {
+  mediaUp:{},
+  M(pid){ return this.P(pid).collection('media'); },
+  async syncMedia(pid, media){
+    const up = this.mediaUp[pid] || (this.mediaUp[pid] = new Set());
+    for (const [k, v] of Object.entries(media)) if (!up.has(k)){ await this.M(pid).doc(k).set({data:v, updatedAt:this.ts()}); up.add(k); }
+    const gone = [...up].filter(k => !(k in media));
+    for (const k of gone){ try { await this.M(pid).doc(k).delete(); up.delete(k); } catch(e){} }
+  },
   get db(){ return FirebaseAuth.db; },
   ts(){ return FirebaseAuth.ts(); },
   inc(n){ return firebase.firestore.FieldValue.increment(n); },
@@ -5023,27 +5046,35 @@ const FirebaseCloud = {
   async open(pid){
     const p = await this.P(pid).get(); if (!p.exists) throw {code:'app/not-found'};
     const m = this.meta(p); const [c, role] = await Promise.all([this.C(pid).get(), this.roleOf(m)]);
-    return {meta:m, data:c.exists ? c.data().data : '', role};
+    let data = c.exists ? c.data().data : '';
+    if (data.includes('"@"')){ try { const j = JSON.parse(data), ms = await this.M(pid).get(), up = new Set(); ms.docs.forEach(d => { if (j.media && j.media[d.id] === '@'){ j.media[d.id] = d.data().data; } up.add(d.id); }); this.mediaUp[pid] = up; data = JSON.stringify(j); } catch(e){ console.warn('[SPECTRA Slide] images', e); } }
+    else this.mediaUp[pid] = new Set();
+    return {meta:m, data, role};
   },
   async create({name, folderId = '', data, meta = {}}){
+    const parts = splitMedia(data), full = data; data = parts.data; const total = sizeOf(parts);
     if (byteLen(data) > MAX_DATA) throw {code:'app/too-big'};
     let owner = this.uid(), oEmail = this.email(), oName = fullName();
     if (folderId){ const f = await this.F(folderId).get(); if (!f.exists) throw {code:'app/not-found'}; owner = f.data().ownerUid; oEmail = f.data().ownerEmail || ''; oName = f.data().ownerName || ''; }
     if (owner === this.uid()) await this.usage();
     const ref = this.db.collection('ssDocs').doc(), u = this.user();
-    const m = {ownerUid:owner, ownerEmail:oEmail, ownerName:oName.slice(0, 160), name:name.slice(0, 120), folderId, size:byteLen(data), ...cleanMeta(meta), starred:false,
+    const m = {ownerUid:owner, ownerEmail:oEmail, ownerName:oName.slice(0, 160), name:name.slice(0, 120), folderId, size:total, ...cleanMeta(meta), starred:false,
       linkMode:'off', linkKey:'', linkToken:'', linkPw:false, createdAt:this.ts(), updatedAt:this.ts(), updatedBy:u.uid, updatedByName:fullName().slice(0, 160)};
     const b = this.db.batch(); b.set(ref, m); b.set(ref.collection('content').doc('main'), {data, updatedAt:this.ts()});
-    b.set(this.U(owner), {bytes:this.inc(byteLen(data)), lastPid:ref.id, updatedAt:this.ts()}, {merge:true});
+    b.set(this.U(owner), {bytes:this.inc(total), lastPid:ref.id, updatedAt:this.ts()}, {merge:true});
     if (folderId) b.update(this.F(folderId), {pids:this.aU(ref.id), updatedAt:this.ts()});
     try { await b.commit(); } catch(e){ throw e?.code === 'permission-denied' ? {code:'app/quota-or-denied'} : e; }
+    this.mediaUp[ref.id] = new Set(); await this.syncMedia(ref.id, parts.media); void full;
     return {...m, id:ref.id, createdAt:Date.now(), updatedAt:Date.now()};
   },
   async save(pid, data, extra = {}, prevSize, ownerUid){
+    const parts = splitMedia(data), total = sizeOf(parts); data = parts.data;
     if (byteLen(data) > MAX_DATA) throw {code:'app/too-big'};
-    const delta = byteLen(data) - (prevSize ?? byteLen(data)), b = this.db.batch();
+    if (!this.mediaUp[pid]){ try { this.mediaUp[pid] = new Set((await this.M(pid).get()).docs.map(d => d.id)); } catch(e){ this.mediaUp[pid] = new Set(); } }
+    try { await this.syncMedia(pid, parts.media); } catch(e){ throw e?.code === 'permission-denied' ? {code:'app/quota-or-denied'} : e; }
+    const delta = total - (prevSize ?? total), b = this.db.batch();
     b.set(this.C(pid), {data, updatedAt:this.ts()});
-    const up = {size:byteLen(data), updatedAt:this.ts(), updatedBy:this.uid(), updatedByName:fullName().slice(0, 160), ...cleanMeta(extra)};
+    const up = {size:total, updatedAt:this.ts(), updatedBy:this.uid(), updatedByName:fullName().slice(0, 160), ...cleanMeta(extra)};
     if (extra.name) up.name = extra.name.slice(0, 120);
     b.update(this.P(pid), up);
     if (delta !== 0) b.set(this.U(ownerUid || this.uid()), {bytes:this.inc(delta), lastPid:pid, updatedAt:this.ts()}, {merge:true});
@@ -5060,6 +5091,7 @@ const FirebaseCloud = {
     const pd = await this.P(pid).get(); if (!pd.exists) return; const p = pd.data();
     const sh = await this.db.collection('ssShares').where('ownerUid', '==', this.uid()).where('pid', '==', pid).get();
     const us = await this.U(this.uid()).get().catch(() => null);
+    try { const ms = await this.M(pid).get(); for (const d of ms.docs) await d.ref.delete().catch(() => {}); } catch(e){}
     const b = this.db.batch(); sh.docs.forEach(d => b.delete(d.ref)); b.delete(this.C(pid)); b.delete(this.P(pid));
     if (us?.exists && (p.size || 0) > 0 && (us.data().bytes || 0) >= p.size) b.update(this.U(this.uid()), {bytes:this.inc(-p.size), lastPid:pid, updatedAt:this.ts()});
     if (p.folderId) b.update(this.F(p.folderId), {pids:this.aR(pid), updatedAt:this.ts()});
@@ -5177,13 +5209,14 @@ const Save = {
     const name = window.SWEditor.title();
     if (data === this.last && name === meta.name && !force){ this.set('saved'); return; }
     if (data === this.last && name === meta.name){ this.set('saved'); return; }
-    if (byteLen(data) > MAX_DATA){ this.set('big'); return; }
-    if (meta.ownerUid === me.uid && H.usage != null && byteLen(data) - (meta.size || 0) > 0 && H.usage + byteLen(data) - (meta.size || 0) > PLANS[planKey()].bytes){ this.set('quota'); return; }
+    const parts = cloudMode === 'firebase' ? splitMedia(data) : {data, media:{}}, total = sizeOf(parts);
+    if (byteLen(parts.data) > MAX_DATA){ this.set('big'); return; }
+    if (meta.ownerUid === me.uid && H.usage != null && total - (meta.size || 0) > 0 && H.usage + total - (meta.size || 0) > PLANS[planKey()].bytes){ this.set('quota'); return; }
     this.busy = true; this.set('saving');
     try {
       const extra = window.SWEditor.meta(); if (name && name !== meta.name && this.role === 'owner') extra.name = name;
       await withTimeout(Cloud().save(pid, data, extra, meta.size || 0, meta.ownerUid), 20000);
-      if (this.pid === pid){ if (meta.ownerUid === me.uid && H.usage != null) H.usage += byteLen(data) - (meta.size || 0); meta.size = byteLen(data); Object.assign(meta, pickMeta(extra)); if (extra.name) meta.name = extra.name; meta.updatedAt = Date.now(); this.last = data; this.err = 0; this.set('saved'); syncHomeMeta(meta); }
+      if (this.pid === pid){ if (meta.ownerUid === me.uid && H.usage != null) H.usage += total - (meta.size || 0); meta.size = total; Object.assign(meta, pickMeta(extra)); if (extra.name) meta.name = extra.name; meta.updatedAt = Date.now(); this.last = data; this.err = 0; this.set('saved'); syncHomeMeta(meta); }
     } catch(e){
       if (this.pid === pid){ this.err++; const c = e?.code; this.set(c === 'app/quota' || c === 'app/quota-or-denied' ? 'quota' : c === 'permission-denied' ? 'denied' : c === 'app/device-full' ? 'device' : 'error'); if (!['permission-denied', 'app/quota', 'app/quota-or-denied', 'app/device-full'].includes(c)) this.timer = setTimeout(() => this.flush(), Math.min(60000, 5000 * this.err)); }
     } finally { this.busy = false; if (this.again){ this.again = false; this.flush(); } }
@@ -5426,6 +5459,7 @@ async function newDoc(tplId, opts = {}){
     if (!opts.data) setTimeout(() => window.SWEditor.focusTitle?.(tplId === 'blank'), 60);
   } catch(e){ hideBusy(); toastA(e?.code === 'app/too-big' ? 'Présentation trop volumineuse pour le cloud.' : e?.code === 'app/quota' || e?.code === 'app/quota-or-denied' ? 'Espace cloud plein (ou accès refusé) : libérez de la place.' : e?.code === 'permission-denied' ? 'Création refusée.' : errMsg(e)); }
 }
+window.SWMediaCloud = () => cloudMode === 'firebase';
 window.SWHome = {newDoc, show:showHome, publishCurrent:() => publishCurrent(), saveTemplate, flush:() => Save.flush(true), canExport:() => fullAccess(), licence:reason => show('licence', {reason}), duplicateCurrent};
 function showBusy(t){ const b = $a('#homeBusy'); b.querySelector('span').textContent = t; b.hidden = false; }
 function hideBusy(){ $a('#homeBusy').hidden = true; }

@@ -32,7 +32,7 @@ Même compte que le site Studio Prism, SPECTRA Writer, SPECTRA Calc, ARCHIPLAN e
 | Licence SPECTRA Slide (`licenses/{uid}_spectraslide`) | 50 Mo | 5 + 3 | Tous (.pptx…) |
 | Administrateur | 1 Go | 5 + 3 | Tous |
 
-Les images sont compressées à l'import ; une présentation est limitée à environ 950 Ko dans le cloud (quelques photos), un message prévient quand on s'en approche.
+Les images sont compressées à l'import. Dans le cloud, chaque image est rangée dans son propre document (sous-collection `media` de la présentation) : une présentation peut contenir autant de photos que l'espace cloud le permet (10 Mo gratuit, 50 Mo avec licence).
 
 ## Contenu du dépôt
 
