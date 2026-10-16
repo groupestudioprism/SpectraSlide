@@ -946,7 +946,7 @@ body.ro .ray:not([data-panel="outline"]):not([data-panel="templates"]){opacity:.
 .th-hid svg{width:13px;height:13px}.th-note{right:auto;left:5px}
 .th.drop-b::before,.th.drop-a::after{content:"";position:absolute;left:22px;right:0;height:3px;border-radius:3px;background:var(--prism)}
 .th.drop-b::before{top:-8px}.th.drop-a::after{bottom:-8px}
-.rl-add{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 12px 100px 26px;height:40px;border:1.5px dashed var(--line2);border-radius:11px;background:transparent;color:var(--ink2);font-weight:650;font-size:13px}
+.rl-add{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 12px 92px 26px;height:40px;border:1.5px dashed var(--line2);border-radius:11px;background:transparent;color:var(--ink2);font-weight:650;font-size:13px}
 .rl-add:hover{border-color:var(--accent);color:var(--accent-ink);background:var(--accent-soft)}
 .rl-add svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
 .stage{position:relative;overflow:auto;outline:none;background:var(--canvas);background-image:radial-gradient(var(--canvas-dot) 1px,transparent 1px);background-size:22px 22px}
@@ -1179,6 +1179,8 @@ body.ro .ray:not([data-panel="outline"]):not([data-panel="templates"]){opacity:.
   .notes-bar{left:8px;right:8px;bottom:140px;grid-template-columns:1fr}
   .prism{left:8px;right:8px;max-width:none;transform:none}
   .tb-font{min-width:64px}
+  #shareBtn{display:none}
+  .ed-title{width:min(40vw,240px)}
   #present.with-notes .pv-stage{right:0;bottom:40vh}#present.with-notes .pv-notes{left:0;top:auto;width:auto;height:40vh;border-left:0;border-top:1px solid #2A2540}
   #present.with-notes .pv-bar{left:50%}
 }
@@ -1275,7 +1277,7 @@ body.ro .ray:not([data-panel="outline"]):not([data-panel="templates"]){opacity:.
       <div class="stage-in" id="stageIn"><div class="slide-host" id="slideHost"><div class="slide-view" id="slideView"></div><div class="ovl" id="ovl"></div></div></div>
     </main>
   </div>
-  <div class="ed-chips"><div class="ed-chip" id="slideStat"></div><div class="ed-chip zoom"><button type="button" data-z="-" aria-label="Dézoomer">−</button><button type="button" id="zoomVal" data-z="fit" title="Ajuster à la fenêtre">100 %</button><button type="button" data-z="+" aria-label="Zoomer">+</button></div><button type="button" class="ed-chip nbtn" id="notesBtn" aria-pressed="false" title="Notes de l'orateur">✎ Notes</button></div>
+  <div class="ed-chips"><div class="ed-chip" id="slideStat"></div><button type="button" class="ed-chip nbtn" id="notesBtn" aria-pressed="false" title="Notes de l'orateur">✎ Notes</button><div class="ed-chip zoom"><button type="button" data-z="-" aria-label="Dézoomer">−</button><button type="button" id="zoomVal" data-z="fit" title="Ajuster à la fenêtre">100 %</button><button type="button" data-z="+" aria-label="Zoomer">+</button></div></div>
   <section class="notes-bar" id="notesBar" hidden><label for="notesIn">Notes de l'orateur</label><textarea id="notesIn" placeholder="Ce que vous voulez dire sur cette diapositive. Vous seul les voyez pendant la présentation (touche S)."></textarea></section>
   <footer class="prism" id="prismBar">
     <div class="pr-tools" id="edBar" role="toolbar" aria-label="Outils"></div>
@@ -1498,6 +1500,7 @@ function dtheme(spec){
   if (spec.bg && spec.bg !== base.bg){ t.line = mix(t.bg, t.ink, .12); if (!spec.ink) { t.ink = onColor(t.bg) === '#FFFFFF' ? '#F4F2FF' : '#16122B'; } t.mut = mix(t.ink, t.bg, .38); }
   return t;
 }
+const FONT_W = {'Syne':.66, 'Unbounded':.68, 'Montserrat':.6, 'Space Grotesk':.57, 'Poppins':.6, 'Sora':.58, 'Manrope':.55, 'Outfit':.52, 'Bricolage Grotesque':.53, 'Inter':.55, 'Fraunces':.52, 'Playfair Display':.5, 'DM Serif Display':.5, 'Instrument Serif':.43, 'Caveat':.42, 'Nunito':.54, 'DM Sans':.54, 'IBM Plex Sans':.55, 'Lora':.52, 'Source Serif 4':.5};
 const VARIANT_DARK = {title:1, section:1, end:1};
 /* couleurs effectives d'une diapositive (titre/section : palette « t* ») */
 function slideVars(t, v){
@@ -1523,7 +1526,7 @@ function rng(seed){ let s = seed >>> 0 || 1; return () => (s = (s * 1664525 + 10
 let DEC_N = 0;
 function decorSVG(t, v, W, H, sv){
   const sx = (++DEC_N).toString(36);
-  const ttl = !!VARIANT_DARK[v], d = t.decor, A = sv.ac, B = sv.ac2, C = sv.ac3;
+  const d = t.decor, ttl = v === 'title' || v === 'section' || (v === 'end' && !['band', 'arch', 'bauhaus', 'geo'].includes(d)), A = sv.ac, B = sv.ac2, C = sv.ac3;
   let g = '', defs = '';
   const blob = (id, cx, cy, r, col, op) => { id += sx; defs += `<radialGradient id="${id}" cx="${cx / W}" cy="${cy / H}" r="${r / Math.max(W, H)}" gradientUnits="objectBoundingBox"><stop offset="0" stop-color="${col}" stop-opacity="${op}"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></radialGradient>`; g += `<rect width="${W}" height="${H}" fill="url(#${id})"/>`; };
   const prismLine = (y, h, op = 1) => { defs += `<linearGradient id="dpl${sx}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7B2FF7"/><stop offset=".3" stop-color="#2D6BFF"/><stop offset=".5" stop-color="#00C2FF"/><stop offset=".68" stop-color="#22D39A"/><stop offset=".84" stop-color="#FFC83D"/><stop offset="1" stop-color="#FF5E62"/></linearGradient>`; g += `<rect x="0" y="${y}" width="${W}" height="${h}" fill="url(#dpl${sx})" opacity="${op}"/>`; };
@@ -1536,7 +1539,7 @@ function decorSVG(t, v, W, H, sv){
     const r = rng(7); let s = ''; for (let i = 0; i < (ttl ? 90 : 45); i++) s += `<circle cx="${(r() * W).toFixed(0)}" cy="${(r() * H).toFixed(0)}" r="${(r() * 1.6 + .4).toFixed(1)}"/>`;
     g += `<g fill="#fff" opacity="${ttl ? .5 : .28}">${s}</g>`; blob('ds1', W * .85, H * .2, W * .5, A, ttl ? .35 : .16);
   } else if (d === 'band'){
-    if (ttl){ g += `<path d="M${W * .62} 0H${W}V${H}H${W * .48}Z" fill="${B}" opacity=".9"/><path d="M${W * .72} 0H${W}V${H}H${W * .58}Z" fill="${A}" opacity=".85"/>`; }
+    if (ttl){ g += `<path d="M${W * .78} 0H${W}V${H}H${W * .66}Z" fill="${B}" opacity=".9"/><path d="M${W * .86} 0H${W}V${H}H${W * .74}Z" fill="${A}" opacity=".85"/>`; }
     else g += `<rect x="0" y="0" width="12" height="${H}" fill="${A}"/><rect x="0" y="0" width="12" height="${H * .3}" fill="${B}"/>`;
   } else if (d === 'grid'){
     const st = 48; let s = ''; for (let x = st; x < W; x += st) s += `M${x} 0V${H}`; for (let y = st; y < H; y += st) s += `M0 ${y}H${W}`;
@@ -1557,10 +1560,10 @@ function decorSVG(t, v, W, H, sv){
     const r = rng(3); let s = ''; for (let i = 0; i < 6; i++){ const y = 20 + r() * 12; s += `M${18 + r() * 10} ${y + i * .7}L${W - 20 - r() * 10} ${y + i}`; }
     g += `<path d="${s}" stroke="#fff" stroke-opacity=".12" stroke-width="2" fill="none"/><rect x="18" y="18" width="${W - 36}" height="${H - 36}" fill="none" stroke="#fff" stroke-opacity=".14" stroke-width="3" rx="6"/>`;
   } else if (d === 'arch'){
-    if (ttl) g += `<path d="M${W * .6} ${H}V${H * .42}A${W * .17} ${W * .17} 0 0 1 ${W * .94} ${H * .42}V${H}Z" fill="${A}"/><circle cx="${W * .9}" cy="${H * .2}" r="34" fill="${C}"/>`;
+    if (ttl) g += `<path d="M${W * .74} ${H}V${H * .5}A${W * .1} ${W * .1} 0 0 1 ${W * .94} ${H * .5}V${H}Z" fill="${A}"/><circle cx="${W * .92}" cy="${H * .22}" r="30" fill="${C}"/>`;
     else g += `<path d="M${W - 150} ${H}V${H - 80}A75 75 0 0 1 ${W} ${H - 80}V${H}Z" fill="${B}" opacity=".35"/>`;
   } else if (d === 'bauhaus'){
-    if (ttl) g += `<circle cx="${W * .8}" cy="${H * .36}" r="${H * .24}" fill="${A}"/><path d="M${W * .62} ${H}A${H * .22} ${H * .22} 0 0 1 ${W * .62 + H * .44} ${H}Z" fill="${C}"/><rect x="${W * .88}" y="${H * .62}" width="${H * .22}" height="${H * .22}" fill="${B}"/>`;
+    if (ttl) g += `<circle cx="${W * .86}" cy="${H * .3}" r="${Math.min(W, H) * .2}" fill="${A}"/><path d="M${W * .7} ${H}A${Math.min(W, H) * .18} ${Math.min(W, H) * .18} 0 0 1 ${W * .7 + Math.min(W, H) * .36} ${H}Z" fill="${C}"/><rect x="${W * .9}" y="${H * .62}" width="${Math.min(W, H) * .2}" height="${Math.min(W, H) * .2}" fill="${B}"/>`;
     else g += `<rect x="${W - 64}" y="0" width="64" height="64" fill="${B}"/><circle cx="${W - 64}" cy="64" r="32" fill="${A}"/><rect x="0" y="${H - 10}" width="${W * .33}" height="10" fill="${C}"/>`;
   }
   if (!g) return '';
@@ -1680,7 +1683,7 @@ function ICO(n, x, y, s, col = 't:ac', ex = {}){ return {id:nid(), t:'icon', n:I
 function CHART(x, y, w, h, ct, labels, series, ex = {}){ return {id:nid(), t:'chart', ct, x:Math.round(x), y:Math.round(y), w:Math.round(w), h:Math.round(h), labels, series, legend:series.length > 1 || ct === 'pie' || ct === 'donut', vals:true, ...ex}; }
 function TABLE(x, y, w, rows, ex = {}){ const fs = rows.length > 7 ? 16 : 19; return {id:nid(), t:'table', x:Math.round(x), y:Math.round(y), w:Math.round(w), h:Math.round(rows.length * (fs * 2.3 + 2)), rows:rows.map(r => r.map(c => escT(c))), fs, head:true, band:true, ...ex}; }
 /* hauteur estimée d'un texte (avant mesure réelle dans la page) */
-function estH(text, fs, w, lh = 1.25){ const s = String(text || '').replace(/<[^>]+>/g, ' '); const lines = s.split('\n').reduce((n, l) => n + Math.max(1, Math.ceil(l.length * fs * .53 / Math.max(40, w))), 0); return Math.ceil(lines * fs * lh + 6); }
+function estH(text, fs, w, lh = 1.25){ const s = String(text || '').replace(/<[^>]+>/g, ' '), cw = Math.max(.5, FONT_W[dtheme(D?.theme).fh] || .55) * 1.04; const lines = s.split('\n').reduce((n, l) => n + Math.max(1, Math.ceil(l.length * fs * cw / Math.max(40, w))), 0); return Math.ceil(lines * fs * lh + 6); }
 
 /* ---------- Mises en page : une description (spec) → une diapositive complète ----------
    spec : {layout, title, subtitle, kicker, bullets[], text, left{title,bullets}, right{…}, items[{title,text,icon,value,date}], stat, label,
@@ -1695,7 +1698,7 @@ const LAYOUTS = [
   ['photo', 'Photo pleine page', 'Image et titre par-dessus'], ['end', 'Fin', 'Merci et contact'], ['blank', 'Vide', 'Une page blanche'],
 ];
 function buildSlide(spec = {}, size){
-  const [W, H] = SIZES[size || D?.size] || SIZES['16:9'], k = Math.min(W / 1280, H / 720), M = Math.round(80 * W / 1280), f = n => Math.round(n * k);
+  const [W, H] = SIZES[size || D?.size] || SIZES['16:9'], k = W / H < 1.5 ? W / 1280 * 1.22 : Math.min(W / 1280, H / 720), M = Math.round(80 * W / 1280), f = n => Math.round(n * k);
   const L = spec.layout || 'bullets', els = [], s = {id:sid(), v:'content', lay:L, els, notes:String(spec.notes || '')};
   const items = (spec.items || []).filter(Boolean).slice(0, 6);
   const titleTop = (y = Math.round(64 * H / 720), w = W - 2 * M, fs = f(44)) => {
@@ -1741,8 +1744,8 @@ function buildSlide(spec = {}, size){
   } else if (L === 'photo'){
     els.push(IMG(0, 0, W, H, {hint:spec.image || ''}));
     els.push(SH('rect', 0, 0, W, H, '#0B0816', {op:.45}));
-    const w = Math.round(W * .7), th = estH(spec.title, f(68), w, 1.05);
-    els.push(T(M, H - M - th - (spec.subtitle ? f(60) : 0), w, th, escT(spec.title || 'Titre'), {f:'h', fs:f(68), b:1, lh:1.05, fc:'#FFFFFF'}, {ph:'title'}));
+    const w = Math.round(W * .7), top = Math.round(H * .3), bot = H - M - (spec.subtitle ? f(60) : 0);
+    els.push(T(M, top, w, bot - top, escT(spec.title || 'Titre'), {f:'h', fs:f(68), b:1, lh:1.05, fc:'#FFFFFF', va:'b'}, {ph:'title'}));
     if (spec.subtitle) els.push(T(M, H - M - f(44), w, f(40), escT(spec.subtitle), {fs:f(24), fc:'#E9E6F5'}));
   } else if (L === 'cards'){
     const y0 = titleTop() + f(44), n = Math.max(1, items.length || 3), rows = n > 4 ? 2 : 1, per = Math.ceil(n / rows), gap = f(24);
@@ -1753,7 +1756,9 @@ function buildSlide(spec = {}, size){
       els.push(SH('ellipse', x + p, y + p, ic, ic, i % 3 === 1 ? 't:ac2' : i % 3 === 2 ? 't:ac3' : 't:ac'));
       els.push(ICO(it.icon || ['idea', 'target', 'rocket', 'users', 'chart', 'shield'][i % 6], x + p + ic * .22, y + p + ic * .22, Math.round(ic * .56), i % 3 === 1 ? 't:on2' : 't:on'));
       let ty = y + p + ic + f(rows > 1 ? 14 : 22);
-      els.push(T(x + p, ty, cw - 2 * p, f(34), escT(it.title || ''), {f:'h', fs:f(rows > 1 ? 21 : 25), b:1, lh:1.15})); ty += f(rows > 1 ? 34 : 44);
+      if (it.value){ els.push(T(x + p, ty, cw - 2 * p, f(rows > 1 ? 34 : 46), escT(it.value), {f:'h', fs:f(rows > 1 ? 28 : 38), b:1, fc:'t:ac', lh:1.1})); ty += f(rows > 1 ? 38 : 52); }
+      const tfs = f(rows > 1 || per > 3 ? 21 : 25), tth = estH(it.title, tfs, cw - 2 * p, 1.15);
+      els.push(T(x + p, ty, cw - 2 * p, tth, escT(it.title || ''), {f:'h', fs:tfs, b:1, lh:1.15})); ty += tth + f(rows > 1 ? 8 : 12);
       if (it.text) els.push(T(x + p, ty, cw - 2 * p, Math.max(f(30), y + ch - ty - p), escT(it.text), {fs:f(rows > 1 ? 15 : 18), fc:'t:mut', lh:1.4}));
     });
   } else if (L === 'stats'){
@@ -1762,7 +1767,7 @@ function buildSlide(spec = {}, size){
       const x = M + i * (cw + gap); let y = y0;
       els.push(SH('rect', x, y, f(56), f(6), ['t:ac', 't:ac2', 't:ac3', 't:ac'][i], {r:3})); y += f(30);
       const vf = f(n > 3 ? 64 : 84); els.push(T(x, y, cw, Math.round(vf * 1.1), escT(it.value || ''), {f:'h', fs:vf, b:1, fc:'t:ac', lh:1})); y += Math.round(vf * 1.1) + f(14);
-      els.push(T(x, y, cw, f(32), escT(it.title || it.label || ''), {fs:f(23), b:1, lh:1.2})); y += f(38);
+      const sth = estH(it.title || it.label, f(23), cw, 1.2); els.push(T(x, y, cw, sth, escT(it.title || it.label || ''), {fs:f(23), b:1, lh:1.2})); y += sth + f(8);
       if (it.text) els.push(T(x, y, cw, estH(it.text, f(18), cw, 1.4), escT(it.text), {fs:f(18), fc:'t:mut', lh:1.4}));
     });
   } else if (L === 'stat'){
@@ -1786,8 +1791,8 @@ function buildSlide(spec = {}, size){
       const x = M + i * cw;
       els.push(SH('ellipse', x, y - f(13), f(26), f(26), i % 2 ? 't:ac2' : 't:ac', {stroke:'t:bg', sw:f(5)}));
       els.push(T(x, y - f(70), cw - f(20), f(40), escT(it.date || it.value || ''), {f:'h', fs:f(30), b:1, fc:'t:ac'}));
-      els.push(T(x, y + f(34), cw - f(24), f(34), escT(it.title || ''), {fs:f(22), b:1, lh:1.2}));
-      if (it.text) els.push(T(x, y + f(72), cw - f(24), estH(it.text, f(17), cw - f(24), 1.4), escT(it.text), {fs:f(17), fc:'t:mut', lh:1.4}));
+      const tlh = estH(it.title, f(22), cw - f(24), 1.2); els.push(T(x, y + f(34), cw - f(24), tlh, escT(it.title || ''), {fs:f(22), b:1, lh:1.2}));
+      if (it.text) els.push(T(x, y + f(44) + tlh, cw - f(24), estH(it.text, f(17), cw - f(24), 1.4), escT(it.text), {fs:f(17), fc:'t:mut', lh:1.4}));
     });
   } else if (L === 'chart'){
     const y0 = titleTop() + f(30), cw = Math.round((W - 2 * M) * .62), c = spec.chart || {};
@@ -2027,7 +2032,7 @@ function renderSlide(s, o = {}){
   if (bi) h += `<div class="sl-bgi" style="background-image:url('${bi.replace(/'/g, '%27')}');${s.bg.dim ? '' : ''}"></div>${s.bg.dim ? `<div class="sl-bgi" style="background:#000;opacity:${s.bg.dim}"></div>` : ''}`;
   if (!s.nodeco && !s.bg?.img) h += decorSVG(th, s.v || 'content', W, H, sv);
   for (const e of s.els){
-    if (o.present && e.t === 'img' && !mediaSrc(e.src) && e.hide !== false) continue;
+    if (o.present && e.t === 'img' && !mediaSrc(e.src) && e.w * e.h > W * H * .15) continue;
     h += `<div class="el el-${e.t}${e.lock ? ' lk' : ''}" ${o.edit || o.present ? `data-id="${e.id}" ` : ''}style="${boxCss(e)}">${elInner(e, sv, o)}</div>`;
   }
   return h + '</div>';
@@ -2601,12 +2606,21 @@ function specOf(s){
   const texts = s.els.filter(e => e.t === 'text' || (e.t === 'shape' && e.html)).map(e => ({e, t:txt(e), fs:e.st?.fs || 0}));
   const title = texts.find(x => x.e.ph === 'title') || [...texts].sort((a, b) => b.fs - a.fs)[0];
   const rest = texts.filter(x => x !== title && x.t);
-  const listEl = rest.find(x => /<li/.test(x.e.html)); const bullets = listEl ? listEl.t.split('\n').map(x => x.trim()).filter(Boolean) : rest.filter(x => x.fs <= 30 && x.t.length < 160).map(x => x.t).slice(0, 8);
+  const listEl = rest.find(x => /<li/.test(x.e.html)); const bullets = rest.filter(x => /<li/.test(x.e.html)).length > 1 ? rest.filter(x => /<li/.test(x.e.html)).flatMap(x => x.t.split('\n')).map(x => x.trim()).filter(Boolean) : listEl ? listEl.t.split('\n').map(x => x.trim()).filter(Boolean) : rest.filter(x => x.fs <= 30 && x.t.length < 160).map(x => x.t).slice(0, 8);
   const sub = rest.find(x => x !== listEl && x.e.ph === 'sub') || rest.find(x => x !== listEl && x.fs >= 18 && x.fs <= 34 && !bullets.includes(x.t));
   const chart = s.els.find(e => e.t === 'chart'), table = s.els.find(e => e.t === 'table');
+  // deux listes ou plus : colonnes gauche / droite, chacune avec le texte posé juste au-dessus
+  const lists = rest.filter(x => /<li/.test(x.e.html)).sort((a, b) => a.e.x - b.e.x);
+  const colOf = L => { const head = rest.filter(x => x !== L && !/<li/.test(x.e.html) && x.e.y < L.e.y && x.e.x < L.e.x + L.e.w && x.e.x + x.e.w > L.e.x).sort((a, b) => b.e.y - a.e.y)[0]; return {title:head?.t || '', bullets:L.t.split('\n').map(v => v.trim()).filter(Boolean)}; };
+  const cols = lists.length >= 2 ? [colOf(lists[0]), colOf(lists[1])] : null;
+  // éléments disposés en colonnes (cartes, chiffres, étapes, frise, équipe) : un élément par colonne
+  const loose = rest.filter(x => !/<li/.test(x.e.html) && x.t.length < 200 && !(x.e.st?.up && x.e.y < (title?.e.y ?? 0) + 5));
+  const clusters = []; for (const x of [...loose].sort((a, b) => a.e.x - b.e.x)){ const c = clusters.find(k => Math.abs(k.x - x.e.x) < 46); if (c) c.l.push(x); else clusters.push({x:x.e.x, l:[x]}); }
+  const isNum = t => /^[\d\s+\-−,.%€$£kKM×x/:h]+$/.test(t) && t.length < 12;
+  const colItems = clusters.filter(c => !c.l.every(x => /^\d{1,2}$/.test(x.t))).map(c => { const l = c.l.sort((a, b) => a.e.y - b.e.y); let v = ''; if (l.length > 1 && (isNum(l[0].t) || (l[0].fs >= 40 && l[0].t.length < 14))) v = l.shift().t; return {value:v || undefined, date:v || undefined, title:l[0]?.t || '', text:l.slice(1).map(x => x.t).join(' ')}; }).filter(x => x.title || x.value);
   return {title:title?.t || '', subtitle:sub?.t || '', bullets, text:rest.filter(x => x.t.length >= 160).map(x => x.t).join('\n') || '', notes:s.notes,
     chart:chart ? {type:chart.ct, labels:chart.labels, series:chart.series.map(x => ({name:x.n, values:x.v}))} : undefined, table:table ? table.rows.map(r => r.map(c => c.replace(/<[^>]+>/g, ''))) : undefined,
-    items:bullets.slice(0, 6).map(b => ({title:b}))};
+    left:cols?.[0], right:cols?.[1], items:colItems.length >= 2 && !cols ? colItems.slice(0, 6) : (cols ? [...cols[0].bullets, ...cols[1].bullets] : bullets).slice(0, 6).map(b => ({title:b}))};
 }
 function applyLayout(L){
   if (V.ro) return; const s = cur(), sp = {...specOf(s), layout:L};
@@ -3782,7 +3796,7 @@ function load(data, opts = {}){
   const sub = g$('docSub'); sub.textContent = opts.owner ? `Partagé par ${opts.owner}${V.ro ? ' · lecture seule' : ''}` : V.ro ? 'Lecture seule' : ''; sub.hidden = !sub.textContent;
   closePop(); if (panel) openPanel(null); g$('notesBar').hidden = !lsGet('ss.notes'); g$('notesBtn').setAttribute('aria-pressed', !g$('notesBar').hidden);
   ensureThemeFonts();
-  requestAnimationFrame(() => { renderAll(); document.fonts?.ready.then(() => { if (!g$('app').hidden){ if (fitTexts()) renderSel(); THUMB.clear(); renderRail(); } }); });
+  requestAnimationFrame(() => { renderAll(); setTimeout(() => { if (!g$('app').hidden){ layoutStage(); renderSel(); } }, 250); document.fonts?.ready.then(() => { if (!g$('app').hidden){ if (fitTexts()) renderSel(); THUMB.clear(); renderRail(); } }); });
 }
 function setReadOnly(ro){ V.ro = ro; document.body.classList.toggle('ro', ro); refreshToolbar(); }
 /* aperçus et métadonnées pour l'accueil et la Communauté */

@@ -181,12 +181,21 @@ function specOf(s){
   const texts = s.els.filter(e => e.t === 'text' || (e.t === 'shape' && e.html)).map(e => ({e, t:txt(e), fs:e.st?.fs || 0}));
   const title = texts.find(x => x.e.ph === 'title') || [...texts].sort((a, b) => b.fs - a.fs)[0];
   const rest = texts.filter(x => x !== title && x.t);
-  const listEl = rest.find(x => /<li/.test(x.e.html)); const bullets = listEl ? listEl.t.split('\n').map(x => x.trim()).filter(Boolean) : rest.filter(x => x.fs <= 30 && x.t.length < 160).map(x => x.t).slice(0, 8);
+  const listEl = rest.find(x => /<li/.test(x.e.html)); const bullets = rest.filter(x => /<li/.test(x.e.html)).length > 1 ? rest.filter(x => /<li/.test(x.e.html)).flatMap(x => x.t.split('\n')).map(x => x.trim()).filter(Boolean) : listEl ? listEl.t.split('\n').map(x => x.trim()).filter(Boolean) : rest.filter(x => x.fs <= 30 && x.t.length < 160).map(x => x.t).slice(0, 8);
   const sub = rest.find(x => x !== listEl && x.e.ph === 'sub') || rest.find(x => x !== listEl && x.fs >= 18 && x.fs <= 34 && !bullets.includes(x.t));
   const chart = s.els.find(e => e.t === 'chart'), table = s.els.find(e => e.t === 'table');
+  // deux listes ou plus : colonnes gauche / droite, chacune avec le texte posé juste au-dessus
+  const lists = rest.filter(x => /<li/.test(x.e.html)).sort((a, b) => a.e.x - b.e.x);
+  const colOf = L => { const head = rest.filter(x => x !== L && !/<li/.test(x.e.html) && x.e.y < L.e.y && x.e.x < L.e.x + L.e.w && x.e.x + x.e.w > L.e.x).sort((a, b) => b.e.y - a.e.y)[0]; return {title:head?.t || '', bullets:L.t.split('\n').map(v => v.trim()).filter(Boolean)}; };
+  const cols = lists.length >= 2 ? [colOf(lists[0]), colOf(lists[1])] : null;
+  // éléments disposés en colonnes (cartes, chiffres, étapes, frise, équipe) : un élément par colonne
+  const loose = rest.filter(x => !/<li/.test(x.e.html) && x.t.length < 200 && !(x.e.st?.up && x.e.y < (title?.e.y ?? 0) + 5));
+  const clusters = []; for (const x of [...loose].sort((a, b) => a.e.x - b.e.x)){ const c = clusters.find(k => Math.abs(k.x - x.e.x) < 46); if (c) c.l.push(x); else clusters.push({x:x.e.x, l:[x]}); }
+  const isNum = t => /^[\d\s+\-−,.%€$£kKM×x/:h]+$/.test(t) && t.length < 12;
+  const colItems = clusters.filter(c => !c.l.every(x => /^\d{1,2}$/.test(x.t))).map(c => { const l = c.l.sort((a, b) => a.e.y - b.e.y); let v = ''; if (l.length > 1 && (isNum(l[0].t) || (l[0].fs >= 40 && l[0].t.length < 14))) v = l.shift().t; return {value:v || undefined, date:v || undefined, title:l[0]?.t || '', text:l.slice(1).map(x => x.t).join(' ')}; }).filter(x => x.title || x.value);
   return {title:title?.t || '', subtitle:sub?.t || '', bullets, text:rest.filter(x => x.t.length >= 160).map(x => x.t).join('\n') || '', notes:s.notes,
     chart:chart ? {type:chart.ct, labels:chart.labels, series:chart.series.map(x => ({name:x.n, values:x.v}))} : undefined, table:table ? table.rows.map(r => r.map(c => c.replace(/<[^>]+>/g, ''))) : undefined,
-    items:bullets.slice(0, 6).map(b => ({title:b}))};
+    left:cols?.[0], right:cols?.[1], items:colItems.length >= 2 && !cols ? colItems.slice(0, 6) : (cols ? [...cols[0].bullets, ...cols[1].bullets] : bullets).slice(0, 6).map(b => ({title:b}))};
 }
 function applyLayout(L){
   if (V.ro) return; const s = cur(), sp = {...specOf(s), layout:L};

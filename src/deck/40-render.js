@@ -160,7 +160,7 @@ function renderSlide(s, o = {}){
   if (bi) h += `<div class="sl-bgi" style="background-image:url('${bi.replace(/'/g, '%27')}');${s.bg.dim ? '' : ''}"></div>${s.bg.dim ? `<div class="sl-bgi" style="background:#000;opacity:${s.bg.dim}"></div>` : ''}`;
   if (!s.nodeco && !s.bg?.img) h += decorSVG(th, s.v || 'content', W, H, sv);
   for (const e of s.els){
-    if (o.present && e.t === 'img' && !mediaSrc(e.src) && e.hide !== false) continue;
+    if (o.present && e.t === 'img' && !mediaSrc(e.src) && e.w * e.h > W * H * .15) continue;
     h += `<div class="el el-${e.t}${e.lock ? ' lk' : ''}" ${o.edit || o.present ? `data-id="${e.id}" ` : ''}style="${boxCss(e)}">${elInner(e, sv, o)}</div>`;
   }
   return h + '</div>';

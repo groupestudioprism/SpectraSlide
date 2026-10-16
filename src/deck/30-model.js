@@ -22,7 +22,7 @@ function ICO(n, x, y, s, col = 't:ac', ex = {}){ return {id:nid(), t:'icon', n:I
 function CHART(x, y, w, h, ct, labels, series, ex = {}){ return {id:nid(), t:'chart', ct, x:Math.round(x), y:Math.round(y), w:Math.round(w), h:Math.round(h), labels, series, legend:series.length > 1 || ct === 'pie' || ct === 'donut', vals:true, ...ex}; }
 function TABLE(x, y, w, rows, ex = {}){ const fs = rows.length > 7 ? 16 : 19; return {id:nid(), t:'table', x:Math.round(x), y:Math.round(y), w:Math.round(w), h:Math.round(rows.length * (fs * 2.3 + 2)), rows:rows.map(r => r.map(c => escT(c))), fs, head:true, band:true, ...ex}; }
 /* hauteur estimée d'un texte (avant mesure réelle dans la page) */
-function estH(text, fs, w, lh = 1.25){ const s = String(text || '').replace(/<[^>]+>/g, ' '); const lines = s.split('\n').reduce((n, l) => n + Math.max(1, Math.ceil(l.length * fs * .53 / Math.max(40, w))), 0); return Math.ceil(lines * fs * lh + 6); }
+function estH(text, fs, w, lh = 1.25){ const s = String(text || '').replace(/<[^>]+>/g, ' '), cw = Math.max(.5, FONT_W[dtheme(D?.theme).fh] || .55) * 1.04; const lines = s.split('\n').reduce((n, l) => n + Math.max(1, Math.ceil(l.length * fs * cw / Math.max(40, w))), 0); return Math.ceil(lines * fs * lh + 6); }
 
 /* ---------- Mises en page : une description (spec) → une diapositive complète ----------
    spec : {layout, title, subtitle, kicker, bullets[], text, left{title,bullets}, right{…}, items[{title,text,icon,value,date}], stat, label,
@@ -37,7 +37,7 @@ const LAYOUTS = [
   ['photo', 'Photo pleine page', 'Image et titre par-dessus'], ['end', 'Fin', 'Merci et contact'], ['blank', 'Vide', 'Une page blanche'],
 ];
 function buildSlide(spec = {}, size){
-  const [W, H] = SIZES[size || D?.size] || SIZES['16:9'], k = Math.min(W / 1280, H / 720), M = Math.round(80 * W / 1280), f = n => Math.round(n * k);
+  const [W, H] = SIZES[size || D?.size] || SIZES['16:9'], k = W / H < 1.5 ? W / 1280 * 1.22 : Math.min(W / 1280, H / 720), M = Math.round(80 * W / 1280), f = n => Math.round(n * k);
   const L = spec.layout || 'bullets', els = [], s = {id:sid(), v:'content', lay:L, els, notes:String(spec.notes || '')};
   const items = (spec.items || []).filter(Boolean).slice(0, 6);
   const titleTop = (y = Math.round(64 * H / 720), w = W - 2 * M, fs = f(44)) => {
@@ -83,8 +83,8 @@ function buildSlide(spec = {}, size){
   } else if (L === 'photo'){
     els.push(IMG(0, 0, W, H, {hint:spec.image || ''}));
     els.push(SH('rect', 0, 0, W, H, '#0B0816', {op:.45}));
-    const w = Math.round(W * .7), th = estH(spec.title, f(68), w, 1.05);
-    els.push(T(M, H - M - th - (spec.subtitle ? f(60) : 0), w, th, escT(spec.title || 'Titre'), {f:'h', fs:f(68), b:1, lh:1.05, fc:'#FFFFFF'}, {ph:'title'}));
+    const w = Math.round(W * .7), top = Math.round(H * .3), bot = H - M - (spec.subtitle ? f(60) : 0);
+    els.push(T(M, top, w, bot - top, escT(spec.title || 'Titre'), {f:'h', fs:f(68), b:1, lh:1.05, fc:'#FFFFFF', va:'b'}, {ph:'title'}));
     if (spec.subtitle) els.push(T(M, H - M - f(44), w, f(40), escT(spec.subtitle), {fs:f(24), fc:'#E9E6F5'}));
   } else if (L === 'cards'){
     const y0 = titleTop() + f(44), n = Math.max(1, items.length || 3), rows = n > 4 ? 2 : 1, per = Math.ceil(n / rows), gap = f(24);
@@ -95,7 +95,9 @@ function buildSlide(spec = {}, size){
       els.push(SH('ellipse', x + p, y + p, ic, ic, i % 3 === 1 ? 't:ac2' : i % 3 === 2 ? 't:ac3' : 't:ac'));
       els.push(ICO(it.icon || ['idea', 'target', 'rocket', 'users', 'chart', 'shield'][i % 6], x + p + ic * .22, y + p + ic * .22, Math.round(ic * .56), i % 3 === 1 ? 't:on2' : 't:on'));
       let ty = y + p + ic + f(rows > 1 ? 14 : 22);
-      els.push(T(x + p, ty, cw - 2 * p, f(34), escT(it.title || ''), {f:'h', fs:f(rows > 1 ? 21 : 25), b:1, lh:1.15})); ty += f(rows > 1 ? 34 : 44);
+      if (it.value){ els.push(T(x + p, ty, cw - 2 * p, f(rows > 1 ? 34 : 46), escT(it.value), {f:'h', fs:f(rows > 1 ? 28 : 38), b:1, fc:'t:ac', lh:1.1})); ty += f(rows > 1 ? 38 : 52); }
+      const tfs = f(rows > 1 || per > 3 ? 21 : 25), tth = estH(it.title, tfs, cw - 2 * p, 1.15);
+      els.push(T(x + p, ty, cw - 2 * p, tth, escT(it.title || ''), {f:'h', fs:tfs, b:1, lh:1.15})); ty += tth + f(rows > 1 ? 8 : 12);
       if (it.text) els.push(T(x + p, ty, cw - 2 * p, Math.max(f(30), y + ch - ty - p), escT(it.text), {fs:f(rows > 1 ? 15 : 18), fc:'t:mut', lh:1.4}));
     });
   } else if (L === 'stats'){
@@ -104,7 +106,7 @@ function buildSlide(spec = {}, size){
       const x = M + i * (cw + gap); let y = y0;
       els.push(SH('rect', x, y, f(56), f(6), ['t:ac', 't:ac2', 't:ac3', 't:ac'][i], {r:3})); y += f(30);
       const vf = f(n > 3 ? 64 : 84); els.push(T(x, y, cw, Math.round(vf * 1.1), escT(it.value || ''), {f:'h', fs:vf, b:1, fc:'t:ac', lh:1})); y += Math.round(vf * 1.1) + f(14);
-      els.push(T(x, y, cw, f(32), escT(it.title || it.label || ''), {fs:f(23), b:1, lh:1.2})); y += f(38);
+      const sth = estH(it.title || it.label, f(23), cw, 1.2); els.push(T(x, y, cw, sth, escT(it.title || it.label || ''), {fs:f(23), b:1, lh:1.2})); y += sth + f(8);
       if (it.text) els.push(T(x, y, cw, estH(it.text, f(18), cw, 1.4), escT(it.text), {fs:f(18), fc:'t:mut', lh:1.4}));
     });
   } else if (L === 'stat'){
@@ -128,8 +130,8 @@ function buildSlide(spec = {}, size){
       const x = M + i * cw;
       els.push(SH('ellipse', x, y - f(13), f(26), f(26), i % 2 ? 't:ac2' : 't:ac', {stroke:'t:bg', sw:f(5)}));
       els.push(T(x, y - f(70), cw - f(20), f(40), escT(it.date || it.value || ''), {f:'h', fs:f(30), b:1, fc:'t:ac'}));
-      els.push(T(x, y + f(34), cw - f(24), f(34), escT(it.title || ''), {fs:f(22), b:1, lh:1.2}));
-      if (it.text) els.push(T(x, y + f(72), cw - f(24), estH(it.text, f(17), cw - f(24), 1.4), escT(it.text), {fs:f(17), fc:'t:mut', lh:1.4}));
+      const tlh = estH(it.title, f(22), cw - f(24), 1.2); els.push(T(x, y + f(34), cw - f(24), tlh, escT(it.title || ''), {fs:f(22), b:1, lh:1.2}));
+      if (it.text) els.push(T(x, y + f(44) + tlh, cw - f(24), estH(it.text, f(17), cw - f(24), 1.4), escT(it.text), {fs:f(17), fc:'t:mut', lh:1.4}));
     });
   } else if (L === 'chart'){
     const y0 = titleTop() + f(30), cw = Math.round((W - 2 * M) * .62), c = spec.chart || {};

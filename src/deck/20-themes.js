@@ -67,6 +67,7 @@ function dtheme(spec){
   if (spec.bg && spec.bg !== base.bg){ t.line = mix(t.bg, t.ink, .12); if (!spec.ink) { t.ink = onColor(t.bg) === '#FFFFFF' ? '#F4F2FF' : '#16122B'; } t.mut = mix(t.ink, t.bg, .38); }
   return t;
 }
+const FONT_W = {'Syne':.66, 'Unbounded':.68, 'Montserrat':.6, 'Space Grotesk':.57, 'Poppins':.6, 'Sora':.58, 'Manrope':.55, 'Outfit':.52, 'Bricolage Grotesque':.53, 'Inter':.55, 'Fraunces':.52, 'Playfair Display':.5, 'DM Serif Display':.5, 'Instrument Serif':.43, 'Caveat':.42, 'Nunito':.54, 'DM Sans':.54, 'IBM Plex Sans':.55, 'Lora':.52, 'Source Serif 4':.5};
 const VARIANT_DARK = {title:1, section:1, end:1};
 /* couleurs effectives d'une diapositive (titre/section : palette « t* ») */
 function slideVars(t, v){
@@ -92,7 +93,7 @@ function rng(seed){ let s = seed >>> 0 || 1; return () => (s = (s * 1664525 + 10
 let DEC_N = 0;
 function decorSVG(t, v, W, H, sv){
   const sx = (++DEC_N).toString(36);
-  const ttl = !!VARIANT_DARK[v], d = t.decor, A = sv.ac, B = sv.ac2, C = sv.ac3;
+  const d = t.decor, ttl = v === 'title' || v === 'section' || (v === 'end' && !['band', 'arch', 'bauhaus', 'geo'].includes(d)), A = sv.ac, B = sv.ac2, C = sv.ac3;
   let g = '', defs = '';
   const blob = (id, cx, cy, r, col, op) => { id += sx; defs += `<radialGradient id="${id}" cx="${cx / W}" cy="${cy / H}" r="${r / Math.max(W, H)}" gradientUnits="objectBoundingBox"><stop offset="0" stop-color="${col}" stop-opacity="${op}"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></radialGradient>`; g += `<rect width="${W}" height="${H}" fill="url(#${id})"/>`; };
   const prismLine = (y, h, op = 1) => { defs += `<linearGradient id="dpl${sx}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7B2FF7"/><stop offset=".3" stop-color="#2D6BFF"/><stop offset=".5" stop-color="#00C2FF"/><stop offset=".68" stop-color="#22D39A"/><stop offset=".84" stop-color="#FFC83D"/><stop offset="1" stop-color="#FF5E62"/></linearGradient>`; g += `<rect x="0" y="${y}" width="${W}" height="${h}" fill="url(#dpl${sx})" opacity="${op}"/>`; };
@@ -105,7 +106,7 @@ function decorSVG(t, v, W, H, sv){
     const r = rng(7); let s = ''; for (let i = 0; i < (ttl ? 90 : 45); i++) s += `<circle cx="${(r() * W).toFixed(0)}" cy="${(r() * H).toFixed(0)}" r="${(r() * 1.6 + .4).toFixed(1)}"/>`;
     g += `<g fill="#fff" opacity="${ttl ? .5 : .28}">${s}</g>`; blob('ds1', W * .85, H * .2, W * .5, A, ttl ? .35 : .16);
   } else if (d === 'band'){
-    if (ttl){ g += `<path d="M${W * .62} 0H${W}V${H}H${W * .48}Z" fill="${B}" opacity=".9"/><path d="M${W * .72} 0H${W}V${H}H${W * .58}Z" fill="${A}" opacity=".85"/>`; }
+    if (ttl){ g += `<path d="M${W * .78} 0H${W}V${H}H${W * .66}Z" fill="${B}" opacity=".9"/><path d="M${W * .86} 0H${W}V${H}H${W * .74}Z" fill="${A}" opacity=".85"/>`; }
     else g += `<rect x="0" y="0" width="12" height="${H}" fill="${A}"/><rect x="0" y="0" width="12" height="${H * .3}" fill="${B}"/>`;
   } else if (d === 'grid'){
     const st = 48; let s = ''; for (let x = st; x < W; x += st) s += `M${x} 0V${H}`; for (let y = st; y < H; y += st) s += `M0 ${y}H${W}`;
@@ -126,10 +127,10 @@ function decorSVG(t, v, W, H, sv){
     const r = rng(3); let s = ''; for (let i = 0; i < 6; i++){ const y = 20 + r() * 12; s += `M${18 + r() * 10} ${y + i * .7}L${W - 20 - r() * 10} ${y + i}`; }
     g += `<path d="${s}" stroke="#fff" stroke-opacity=".12" stroke-width="2" fill="none"/><rect x="18" y="18" width="${W - 36}" height="${H - 36}" fill="none" stroke="#fff" stroke-opacity=".14" stroke-width="3" rx="6"/>`;
   } else if (d === 'arch'){
-    if (ttl) g += `<path d="M${W * .6} ${H}V${H * .42}A${W * .17} ${W * .17} 0 0 1 ${W * .94} ${H * .42}V${H}Z" fill="${A}"/><circle cx="${W * .9}" cy="${H * .2}" r="34" fill="${C}"/>`;
+    if (ttl) g += `<path d="M${W * .74} ${H}V${H * .5}A${W * .1} ${W * .1} 0 0 1 ${W * .94} ${H * .5}V${H}Z" fill="${A}"/><circle cx="${W * .92}" cy="${H * .22}" r="30" fill="${C}"/>`;
     else g += `<path d="M${W - 150} ${H}V${H - 80}A75 75 0 0 1 ${W} ${H - 80}V${H}Z" fill="${B}" opacity=".35"/>`;
   } else if (d === 'bauhaus'){
-    if (ttl) g += `<circle cx="${W * .8}" cy="${H * .36}" r="${H * .24}" fill="${A}"/><path d="M${W * .62} ${H}A${H * .22} ${H * .22} 0 0 1 ${W * .62 + H * .44} ${H}Z" fill="${C}"/><rect x="${W * .88}" y="${H * .62}" width="${H * .22}" height="${H * .22}" fill="${B}"/>`;
+    if (ttl) g += `<circle cx="${W * .86}" cy="${H * .3}" r="${Math.min(W, H) * .2}" fill="${A}"/><path d="M${W * .7} ${H}A${Math.min(W, H) * .18} ${Math.min(W, H) * .18} 0 0 1 ${W * .7 + Math.min(W, H) * .36} ${H}Z" fill="${C}"/><rect x="${W * .9}" y="${H * .62}" width="${Math.min(W, H) * .2}" height="${Math.min(W, H) * .2}" fill="${B}"/>`;
     else g += `<rect x="${W - 64}" y="0" width="64" height="64" fill="${B}"/><circle cx="${W - 64}" cy="64" r="32" fill="${A}"/><rect x="0" y="${H - 10}" width="${W * .33}" height="10" fill="${C}"/>`;
   }
   if (!g) return '';

@@ -97,7 +97,7 @@
 .th-hid svg{width:13px;height:13px}.th-note{right:auto;left:5px}
 .th.drop-b::before,.th.drop-a::after{content:"";position:absolute;left:22px;right:0;height:3px;border-radius:3px;background:var(--prism)}
 .th.drop-b::before{top:-8px}.th.drop-a::after{bottom:-8px}
-.rl-add{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 12px 100px 26px;height:40px;border:1.5px dashed var(--line2);border-radius:11px;background:transparent;color:var(--ink2);font-weight:650;font-size:13px}
+.rl-add{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 12px 92px 26px;height:40px;border:1.5px dashed var(--line2);border-radius:11px;background:transparent;color:var(--ink2);font-weight:650;font-size:13px}
 .rl-add:hover{border-color:var(--accent);color:var(--accent-ink);background:var(--accent-soft)}
 .rl-add svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
 .stage{position:relative;overflow:auto;outline:none;background:var(--canvas);background-image:radial-gradient(var(--canvas-dot) 1px,transparent 1px);background-size:22px 22px}
@@ -330,6 +330,8 @@
   .notes-bar{left:8px;right:8px;bottom:140px;grid-template-columns:1fr}
   .prism{left:8px;right:8px;max-width:none;transform:none}
   .tb-font{min-width:64px}
+  #shareBtn{display:none}
+  .ed-title{width:min(40vw,240px)}
   #present.with-notes .pv-stage{right:0;bottom:40vh}#present.with-notes .pv-notes{left:0;top:auto;width:auto;height:40vh;border-left:0;border-top:1px solid #2A2540}
   #present.with-notes .pv-bar{left:50%}
 }

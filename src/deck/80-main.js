@@ -15,7 +15,7 @@ function load(data, opts = {}){
   const sub = g$('docSub'); sub.textContent = opts.owner ? `Partagé par ${opts.owner}${V.ro ? ' · lecture seule' : ''}` : V.ro ? 'Lecture seule' : ''; sub.hidden = !sub.textContent;
   closePop(); if (panel) openPanel(null); g$('notesBar').hidden = !lsGet('ss.notes'); g$('notesBtn').setAttribute('aria-pressed', !g$('notesBar').hidden);
   ensureThemeFonts();
-  requestAnimationFrame(() => { renderAll(); document.fonts?.ready.then(() => { if (!g$('app').hidden){ if (fitTexts()) renderSel(); THUMB.clear(); renderRail(); } }); });
+  requestAnimationFrame(() => { renderAll(); setTimeout(() => { if (!g$('app').hidden){ layoutStage(); renderSel(); } }, 250); document.fonts?.ready.then(() => { if (!g$('app').hidden){ if (fitTexts()) renderSel(); THUMB.clear(); renderRail(); } }); });
 }
 function setReadOnly(ro){ V.ro = ro; document.body.classList.toggle('ro', ro); refreshToolbar(); }
 /* aperçus et métadonnées pour l'accueil et la Communauté */
