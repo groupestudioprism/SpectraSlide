@@ -1,0 +1,130 @@
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="swg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8B3CF7"/><stop offset=".28" stop-color="#3D63FF"/><stop offset=".46" stop-color="#14C2EC"/><stop offset=".6" stop-color="#78DD6A"/><stop offset=".72" stop-color="#FFD43F"/><stop offset=".85" stop-color="#FF8A3D"/><stop offset="1" stop-color="#FF3F86"/></linearGradient>
+    <radialGradient id="swg2" cx=".22" cy=".18" r=".75"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".55" stop-color="#fff" stop-opacity=".06"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+    <linearGradient id="swg3" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF3F86" stop-opacity=".0"/><stop offset=".6" stop-color="#7B2FF7" stop-opacity=".22"/><stop offset="1" stop-color="#2D1A6E" stop-opacity=".35"/></linearGradient>
+    <linearGradient id="ssg" x1="0" y1=".2" x2="1" y2=".8"><stop offset="0" stop-color="#3D63FF"/><stop offset=".4" stop-color="#14C2EC"/><stop offset=".7" stop-color="#FFC83D"/><stop offset="1" stop-color="#FF3F86"/></linearGradient><linearGradient id="ssh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".38"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient><symbol id="swMark" viewBox="0 0 64 64"><g transform="translate(32 32) skewY(-8) scale(.86) translate(-32 -32)"><rect width="64" height="64" rx="10" fill="url(#ssg)"/><rect width="64" height="64" rx="10" fill="url(#ssh)"/><rect x="12" y="15" width="26" height="5" rx="2.5" fill="#fff" opacity=".92"/><rect x="12" y="25" width="40" height="3.4" rx="1.7" fill="#fff" opacity=".6"/><rect x="12" y="32" width="33" height="3.4" rx="1.7" fill="#fff" opacity=".6"/></g></symbol>
+  </defs>
+</svg>
+<div id="splash" role="status" aria-live="polite">
+  <div class="sp-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="sp-center">
+    <div class="sp-mark"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#swMark"/></svg><i class="sp-shine"></i></div>
+    <div class="sp-word"><b>SPECTRA</b><span>Slide</span></div>
+    <p class="sp-tag">Raconter, montrer, convaincre.</p>
+  </div>
+  <div class="sp-bar" aria-hidden="true"><i></i></div>
+  <p class="sp-msg" id="spMsg">Préparation de votre studio de présentation…</p>
+</div>
+
+<div id="auth" hidden>
+  <aside class="ap-side">
+    <div class="ap-aurora" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <div class="ap-brand"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#swMark"/></svg><div><b>SPECTRA</b><span>Slide</span></div></div>
+    <div class="ap-pitch"><h1>Des présentations qui marquent.</h1><p>Choisissez un thème, écrivez vos idées : SPECTRA Slide met en page, anime et présente. Ouverture et export PowerPoint, et une IA qui construit vos diapositives avec vous.</p></div>
+    <ul class="ap-apps">
+      <li><a class="ap-ic w" href="https://groupestudioprism.github.io/SpectraWriter/" aria-label="SPECTRA Writer"></a><b>SPECTRA Writer</b><span>Traitement de texte</span><em>Disponible</em></li>
+      <li><a class="ap-ic c" href="https://groupestudioprism.github.io/SpectraCalc/" aria-label="SPECTRA Calc"></a><b>SPECTRA Calc</b><span>Tableur</span><em>Disponible</em></li>
+      <li><span class="ap-ic s"></span><b>SPECTRA Slide</b><span>Présentations</span><em>Vous êtes ici</em></li>
+    </ul>
+    <p class="ap-foot">Un seul compte Studio Prism pour SPECTRA, ARCHIPLAN, Archi Vision et toutes les apps du studio.</p>
+  </aside>
+  <main class="ap-main"><div class="ap-card" id="apCard" aria-live="polite"></div></main>
+</div>
+<script>setTimeout(function(){if(!window.__swReady){var m=document.getElementById('spMsg');if(m){m.textContent="L'éditeur de présentations n'a pas pu se charger. Vérifiez la connexion, puis rechargez la page.";m.classList.add('err');}}},15000);</script>
+
+<section id="home" hidden aria-label="Accueil SPECTRA Slide">
+  <header class="hm-top">
+    <div class="hm-brand"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#swMark"/></svg><span>SPECTRA <em>Slide</em></span></div>
+    <nav class="hm-tabs" id="homeNav" aria-label="Navigation">
+      <button type="button" data-htab="home">Accueil</button>
+      <button type="button" data-htab="mine">Mes présentations</button>
+      <button type="button" data-htab="shared">Partagés avec moi</button>
+      <button type="button" data-htab="templates">Modèles</button>
+    </nav>
+    <span class="hm-sp"></span>
+    <button type="button" id="homeLic" class="hm-lic" hidden>Offre gratuite</button>
+    <button type="button" class="avatar" id="homeUser" aria-haspopup="true" aria-label="Mon compte"></button>
+  </header>
+  <div class="hm-main" id="homeMain">
+    <section class="hm-start" id="homeHero">
+      <h1 id="homeHello">Bonjour</h1>
+      <div class="hm-ask" id="homeAskBox">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        <input id="homeAsk" type="text" autocomplete="off" spellcheck="false" placeholder="Que voulez-vous présenter ? Un pitch, un rapport, un cours…" aria-label="Que voulez-vous présenter ?">
+        <kbd>Entrée</kbd>
+        <div class="hm-ask-res" id="homeAskRes" hidden role="listbox"></div>
+      </div>
+      <div class="hm-quick">
+        <button type="button" data-tpl="blank"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M12 10v6M9 13h6"/></svg>Présentation vierge</button>
+        <button type="button" data-hact="import"><svg viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5M5 21h14"/></svg>Ouvrir un PowerPoint</button>
+      </div>
+    </section>
+    <div class="hm-title" id="homeTitle" hidden></div>
+    <div class="h-offer" id="homeOffer" hidden></div>
+    <main class="h-body" id="homeBody"></main>
+    <footer class="hm-foot"><aside class="h-quota" id="homeQuota" aria-live="polite"></aside></footer>
+    <div class="h-dropzone" aria-hidden="true"><div><svg viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5M5 21h14"/></svg><b>Déposez le fichier pour l'ouvrir</b><span>PowerPoint (.pptx), image ou sauvegarde SPECTRA Slide</span></div></div>
+  </div>
+  <div class="h-busy" id="homeBusy" hidden><div class="ap-spin" aria-hidden="true"></div><span></span></div>
+  <input type="file" id="homeFile" accept=".pptx,.spectraslide,.json,image/png,image/jpeg,image/webp" hidden>
+</section>
+
+<div id="app" hidden>
+  <header class="ed-top">
+    <button type="button" class="ed-home" id="homeBtn" title="Retour à l'accueil" aria-label="Retour à l'accueil"><svg viewBox="0 0 64 64"><use href="#swMark"/></svg></button>
+    <div class="ed-doc"><input id="docTitle" class="ed-title" value="Présentation sans titre" aria-label="Titre de la présentation" spellcheck="false" maxlength="120"><div class="ed-meta"><button type="button" class="ed-menu" id="fileBtn" aria-haspopup="true">Fichier</button><span id="docSub" hidden></span><span id="cloudState" class="cs" hidden></span></div></div>
+    <span class="ed-sp"></span>
+    <button type="button" class="ed-spectre" id="spectreBtn" aria-haspopup="dialog"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><span>Demander ou chercher…</span><kbd id="spectreKbd">Ctrl K</kbd></button>
+    <button type="button" class="btn-ghost btn-play" id="presentBtn" title="Présenter (F5)"><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg><span class="hide-s">Présenter</span></button>
+    <button type="button" class="btn-ghost" id="shareBtn"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.2 10.8 7.6-4.4M8.2 13.2l7.6 4.4"/></svg><span class="hide-s">Partager</span></button>
+    <button type="button" class="btn-prism" id="exportBtn" aria-haspopup="true"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span class="hide-s">Exporter</span></button>
+    <button type="button" id="licBadge" hidden title="Offre gratuite">Gratuit</button>
+    <button type="button" class="avatar" id="userBtn" hidden aria-haspopup="true" aria-label="Mon compte"></button>
+  </header>
+  <div class="ed-main">
+    <aside class="rail" id="rail" aria-label="Diapositives"><div class="rl-list" id="rlList" role="listbox" aria-label="Diapositives"></div><button type="button" class="rl-add" id="rlAdd"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>Diapositive</span></button></aside>
+    <main class="stage" id="stage" tabindex="0" aria-label="Diapositive en cours">
+      <div class="stage-in" id="stageIn"><div class="slide-host" id="slideHost"><div class="slide-view" id="slideView"></div><div class="ovl" id="ovl"></div></div></div>
+    </main>
+  </div>
+  <div class="ed-chips"><div class="ed-chip" id="slideStat"></div><div class="ed-chip zoom"><button type="button" data-z="-" aria-label="Dézoomer">−</button><button type="button" id="zoomVal" data-z="fit" title="Ajuster à la fenêtre">100 %</button><button type="button" data-z="+" aria-label="Zoomer">+</button></div><button type="button" class="ed-chip nbtn" id="notesBtn" aria-pressed="false" title="Notes de l'orateur">✎ Notes</button></div>
+  <section class="notes-bar" id="notesBar" hidden><label for="notesIn">Notes de l'orateur</label><textarea id="notesIn" placeholder="Ce que vous voulez dire sur cette diapositive. Vous seul les voyez pendant la présentation (touche S)."></textarea></section>
+  <footer class="prism" id="prismBar">
+    <div class="pr-tools" id="edBar" role="toolbar" aria-label="Outils"></div>
+    <div class="pr-rays" id="edRail" role="toolbar" aria-label="Insérer, design, mises en page, animer, modèles"></div>
+  </footer>
+  <section class="drawer" id="edPanel" hidden aria-labelledby="edPanelTitle"><header><b id="edPanelTitle"></b><span class="dr-sub" id="edPanelSub"></span><button type="button" class="ib" id="edPanelClose" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header><div class="dr-body" id="edPanelBody"></div></section>
+  <div class="spectre" id="spectre" hidden role="dialog" aria-modal="true" aria-label="Chercher une action"><div class="sp-box"><div class="sp-in"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="spQ" placeholder="Que voulez-vous faire ? « nouvelle diapo en deux colonnes », « thème océan », « présente »…" autocomplete="off" spellcheck="false"><kbd>Échap</kbd></div><div class="sp-list" id="spList" role="listbox"></div></div></div>
+  <input type="file" id="edInsFile" accept=".pptx,.spectraslide,.json" hidden>
+  <input type="file" id="edImgFile" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" hidden>
+</div>
+<div id="present" hidden tabindex="-1" aria-label="Présentation">
+  <div class="pv-stage" id="pvStage"></div>
+  <aside class="pv-notes" id="pvNotes"><div class="pn-top"><b>Notes</b><span id="pvClock">0:00</span></div><p class="pn-txt"></p><div class="pn-next"></div></aside>
+  <div class="pv-bar" id="pvBar">
+    <button type="button" data-pv="prev" aria-label="Précédente"><svg viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg></button><span id="pvNum">1 / 1</span><button type="button" data-pv="next" aria-label="Suivante"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button>
+    <i></i><button type="button" data-pv="notes" title="Notes et minuteur (S)"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 9h8M8 13h8M8 17h5"/></svg></button><button type="button" data-pv="grid" title="Vue d'ensemble (G)"><svg viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg></button><button type="button" data-pv="laser" title="Pointeur laser (L)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></button><button type="button" data-pv="fs" title="Plein écran (F)"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button><button type="button" data-pv="exit" title="Quitter (Échap)"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="pv-prog"><i id="pvProg"></i></div>
+  <div class="pv-grid" id="pvGrid" hidden></div>
+  <div class="pv-black" id="pvBlack" hidden></div>
+  <i class="pv-laser" id="pvLaser" hidden></i>
+</div>
+
+<div class="pop" id="edPop" hidden></div>
+<div class="menu" id="userMenu" hidden>
+  <div class="who"><span class="avatar big" id="umAv"></span><div><b id="umName"></b><span id="umMail"></span></div></div><span class="lic" id="umLic"></span><hr>
+  <button data-um="home"><b>Accueil</b><span>Mes présentations, modèles et partages</span></button>
+  <button data-um="licence"><b>Ma licence SPECTRA Slide</b><span>Droits liés à votre compte Studio Prism</span></button>
+  <button data-um="fiche"><b>Fiche client</b><span>Coordonnées partagées entre les apps Studio Prism</span></button>
+  <button data-um="security"><b>Code PIN et sécurité</b><span>Code PIN du compte, empreinte ou visage (facultatif)</span></button>
+  <button data-um="lock" id="umLock"><b>Verrouiller</b><span>Le code PIN sera demandé pour revenir</span></button>
+  <button data-um="theme"><b>Thème clair / sombre</b><span>Apparence de l'interface sur cet appareil</span></button>
+  <hr><button data-um="logout"><b>Se déconnecter</b><span>Sur cet appareil</span></button>
+  <button data-um="delete" class="danger"><b>Supprimer mon compte</b><span>Sur le site Studio Prism, avec mot de passe et code PIN</span></button>
+</div>
+<div class="menu" id="homeMenu" hidden></div>
+<div id="apDlg" hidden role="dialog" aria-modal="true"><div class="dlg-card"></div></div>
+<div id="toast" hidden role="status"></div>
