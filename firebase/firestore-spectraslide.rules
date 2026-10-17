@@ -243,10 +243,10 @@
     }
 
     match /ssShares/{sid} {
-      allow get, list: if isSignedIn() && (resource.data.ownerUid == request.auth.uid || resource.data.email == ssEmail() || isAdmin());
+      allow get, list: if isSignedIn() && (resource.data.ownerUid == request.auth.uid || (resource.data.email == ssEmail() && ssVerified()) || isAdmin());
       allow create: if isSignedIn() && isActiveUser() && ssValidShare(sid) && request.resource.data.createdAt == request.time;
       allow update: if isSignedIn() && isActiveUser() && resource.data.ownerUid == request.auth.uid && ssValidShare(sid);
-      allow delete: if isSignedIn() && (resource.data.ownerUid == request.auth.uid || resource.data.email == ssEmail() || isAdmin());
+      allow delete: if isSignedIn() && (resource.data.ownerUid == request.auth.uid || (resource.data.email == ssEmail() && ssVerified()) || isAdmin());
     }
 
     function ssValidGrant(gid) {
