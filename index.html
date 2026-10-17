@@ -5648,6 +5648,7 @@ async function verifyEmailFlow(){
 
 /* Liens : #/p/<présentation>?k=<jeton>&pw=1 · #/d/<dossier>?k=… · #/doc/<id> (réouverture après rechargement) */
 function readLinkFromUrl(){
+  const im = location.hash.match(/^#\/importer\/([a-z0-9-]{2,60})$/); if (im) return {kind:'import', pid:im[1], token:'', pw:false, own:true};
   const d = location.hash.match(/^#\/doc\/([\w-]{4,60})$/); if (d) return {kind:'doc', pid:d[1], token:'', pw:false, own:true};
   const m = location.hash.match(/^#\/([pd])\/([\w-]{4,60})(?:\?(.*))?$/); if (!m) return null;
   const q = new URLSearchParams(m[3] || ''); return {kind:m[1] === 'd' ? 'folder' : 'doc', pid:decodeURIComponent(m[2]), token:q.get('k') || '', pw:q.get('pw') === '1'};
@@ -5655,6 +5656,7 @@ function readLinkFromUrl(){
 async function openPendingLink(){
   const L = ctx.pendingLink; if (!L) return false; ctx.pendingLink = null;
   try { sessionStorage.removeItem('ss.pendingLink'); history.replaceState(null, '', location.pathname + location.search); } catch(e){}
+  if (L.kind === 'import') return importExample(L.pid);
   const folder = L.kind === 'folder';
   const tryOpen = async () => {
     if (folder){ await loadHome(); const f = (H.shared?.folders || []).find(x => x.id === L.pid); if (!f) throw {code:'permission-denied'}; H.tab = 'shared'; H.sharedFolder = f.id; renderHome(); toastA(`Dossier « ${f.name} » ouvert`); return; }
@@ -5689,6 +5691,18 @@ async function importFile(f){
   catch(e){ hideBusy(); toastA(e?.message && !e.code ? e.message : errMsg(e)); }
 }
 window.SWImport = importFile;
+/* Présentations publiées avec l'app (dossier exemples/) : #/importer/<nom> l'ajoute au compte, une seule fois */
+async function importExample(name){
+  showBusy('Récupération de la présentation…');
+  try {
+    const r = await fetch(`exemples/${name}.spectraslide`, {cache:'no-cache'}); if (!r.ok) throw new Error('Présentation introuvable.');
+    const blob = await r.blob(); let title = ''; try { title = JSON.parse(await blob.text()).title || ''; } catch(e){}
+    await loadHome().catch(() => {}); hideBusy();
+    const have = title && (H.mine?.docs || []).find(d => d.name === title);
+    if (have){ await openDoc(have); toastA('Cette présentation est déjà dans votre compte'); return true; }
+    await importFile(new File([blob], name + '.spectraslide', {type:'application/json'})); return true;
+  } catch(e){ hideBusy(); toastA(e?.message || errMsg(e)); return false; }
+}
 
 /* Câblage de l'accueil */
 $a('#homeNav').addEventListener('click', e => { const b = e.target.closest('[data-htab]'); if (!b) return; H.tab = b.dataset.htab; H.sharedFolder = ''; H.q = ''; renderHome(); $a('#homeMain').scrollTop = 0; });

@@ -34,6 +34,11 @@ Même compte que le site Studio Prism, SPECTRA Writer, SPECTRA Calc, ARCHIPLAN e
 
 Les images sont compressées à l'import. Dans le cloud, chaque image est rangée dans son propre document (sous-collection `media` de la présentation) : une présentation peut contenir autant de photos que l'espace cloud le permet (10 Mo gratuit, 50 Mo avec licence).
 
+## Présentation Studio Prism
+
+`exemples/studio-prism.spectraslide` : la présentation de l'entreprise (20 diapositives, captures réelles des apps, notes de l'orateur).
+Le lien **https://groupestudioprism.github.io/SpectraSlide/#/importer/studio-prism** l'ajoute au compte connecté (une seule fois : si elle y est déjà, elle s'ouvre). N'importe quel fichier `exemples/<nom>.spectraslide` peut être proposé de la même façon avec `#/importer/<nom>`.
+
 ## Contenu du dépôt
 
 | Fichier | Rôle |
