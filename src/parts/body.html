@@ -8,15 +8,47 @@
   </defs>
 </svg>
 <div id="splash" role="status" aria-live="polite">
-  <div class="sp-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="sp-grid" aria-hidden="true"></div>
+  <button type="button" class="sp-skip" id="spSkip">Passer l'animation</button>
   <div class="sp-center">
-    <div class="sp-mark"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#swMark"/></svg><i class="sp-shine"></i></div>
+    <div class="sp-markbox">
+      <div class="sp-scene" aria-hidden="true"><svg viewBox="0 0 640 360" focusable="false"><g class="sl sl-c"><rect class="fr" width="320" height="180" rx="8"/><g class="bc-in"><rect x="24" y="26" width="140" height="12" rx="6" fill="#fff" fill-opacity=".9"/><rect x="40" y="122" width="40" height="34" rx="4" fill="#14C2EC" fill-opacity=".9"/><rect x="100" y="94" width="40" height="62" rx="4" fill="#FFC83D" fill-opacity=".9"/><rect x="160" y="70" width="40" height="86" rx="4" fill="#FF3F86" fill-opacity=".9"/><rect x="220" y="104" width="76" height="6" rx="3" fill="#fff" fill-opacity=".45"/><rect x="220" y="116" width="56" height="6" rx="3" fill="#fff" fill-opacity=".45"/></g></g><g class="sl sl-b"><rect class="fr" width="320" height="180" rx="8"/><g class="bc-in"><rect x="24" y="26" width="110" height="12" rx="6" fill="#fff" fill-opacity=".9"/><rect x="24" y="52" width="120" height="6" rx="3" fill="#fff" fill-opacity=".45"/><rect x="24" y="64" width="96" height="6" rx="3" fill="#fff" fill-opacity=".45"/><rect x="24" y="76" width="108" height="6" rx="3" fill="#fff" fill-opacity=".45"/><rect x="170" y="52" width="126" height="104" rx="5" fill="url(#ssg)" fill-opacity=".85"/></g></g><g class="sl sl-a"><rect class="fr" width="320" height="180" rx="8"/><line class="gd gd-v" x1="24" y1="-16" x2="24" y2="196"/><line class="gd gd-h" x1="-16" y1="124" x2="336" y2="124"/><rect class="a-in a-title" x="24" y="26" width="150" height="14" rx="7" fill="#fff" fill-opacity=".92"/><rect class="a-in a-l1" x="24" y="50" width="250" height="6" rx="3" fill="#fff" fill-opacity=".5"/><rect class="a-in a-l2" x="24" y="62" width="196" height="6" rx="3" fill="#fff" fill-opacity=".5"/><rect class="a-in a-img" x="24" y="92" width="140" height="64" rx="5" fill="url(#ssg)"/><circle class="a-in a-dot" cx="244" cy="124" r="24" fill="#7B2FF7" fill-opacity=".9"/><rect class="a-in a-bar" x="196" y="160" width="100" height="6" rx="3" fill="#FFC83D" fill-opacity=".9"/></g><rect class="ring" x="36" y="126.5" width="184" height="107" rx="8"/></svg></div>
+      <div class="sp-mark" role="img" aria-label="SPECTRA Slide"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#swMark"/></svg></div>
+    </div>
     <div class="sp-word"><b>SPECTRA</b><span>Slide</span></div>
     <p class="sp-tag">Raconter, montrer, convaincre.</p>
   </div>
   <div class="sp-bar" aria-hidden="true"><i></i></div>
   <p class="sp-msg" id="spMsg">Préparation de votre studio de présentation…</p>
 </div>
+<script>
+/* Intro : scène jouée une fois par session (?intro=1 la rejoue) ; sans mouvement si l'utilisateur l'a demandé. */
+(function(){
+  var sp=document.getElementById('splash'); if(!sp) return;
+  var t0=performance.now(), play=true, END=2900;
+  try{ if(matchMedia('(prefers-reduced-motion: reduce)').matches) play=false; }catch(e){}
+  var forced=/[?&]intro=1(?:&|$)/.test(location.search);
+  try{ if(play && !forced && sessionStorage.getItem('prism-intro-slide')==='1') play=false; }catch(e){}
+  try{ if(play) sessionStorage.setItem('prism-intro-slide','1'); }catch(e){}
+  var skipped=false;
+  var api=window.SPIntro={
+    delay:function(){ if(skipped) return 250; if(!play) return Math.max(0,700-(performance.now()-t0)); return Math.max(0,END-(performance.now()-t0)); },
+    skip:function(){
+      if(skipped) return; skipped=true;
+      sp.classList.remove('sp-play'); sp.classList.add('sp-skip-now');
+      try{ sp.getAnimations({subtree:true}).forEach(function(a){ try{ a.cancel(); }catch(e){} }); }catch(e){}
+      document.dispatchEvent(new CustomEvent('sp-skip'));
+    }
+  };
+  if(play) sp.classList.add('sp-play');
+  var b=document.getElementById('spSkip');
+  if(b) b.addEventListener('click',api.skip);
+  document.addEventListener('keydown',function(e){
+    if(!document.getElementById('splash')||sp.classList.contains('done')||!play||skipped) return;
+    if(e.key==='Escape'||(e.key==='Enter'&&(e.target===document.body||sp.contains(e.target)))){ api.skip(); if(e.target!==b) e.preventDefault(); }
+  });
+})();
+</script>
 
 <div id="auth" hidden>
   <aside class="ap-side">

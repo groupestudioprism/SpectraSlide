@@ -713,8 +713,11 @@ function afterIntro(){ return new Promise(res => { const t0 = performance.now();
   if ((!sp || sp.classList.contains('done')) && ready) setTimeout(res, sp ? 700 : 250); else setTimeout(tick, 120); }; tick(); }); }
 function hideSplashSoon(){ // l'écran de compte n'attend pas l'éditeur
   if (splashT) return; const sp = $a('#splash'); if (!sp) return;
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  splashT = setTimeout(() => { sp.classList.add('done'); setTimeout(() => sp.remove(), 600); }, Math.max(0, (reduce ? 600 : 2900) - performance.now()));
+  const close = () => { sp.classList.add('done'); setTimeout(() => sp.remove(), 500); };
+  /* durée mesurée depuis l'affichage du splash (SPIntro, voir body.html) : la scène n'est jamais tronquée */
+  const wait = () => { try { return window.SPIntro ? window.SPIntro.delay() : 0; } catch(e){ return 0; } };
+  splashT = setTimeout(close, wait());
+  document.addEventListener('sp-skip', () => { clearTimeout(splashT); splashT = setTimeout(close, wait()); }, {once:true});
 }
 function show(name, opts = {}){
   if (name !== 'loading') hideSplashSoon();
@@ -729,7 +732,7 @@ function show(name, opts = {}){
   const g = $a('#apGoogle'); if (g) g.onclick = async () => { busy(g, true, 'Ouverture de Google…'); try { const u = await Auth.signInGoogle(); await afterLogin(u); } catch(err){ busy(g, false); setErr(errMsg(err)); } };
   (WIRE[name] || (() => {}))();
   r.scrollTop = 0;
-  if (matchMedia('(min-width: 861px)').matches){ const f = card().querySelector('input:not([readonly]):not([type="checkbox"])'); if (f && !f.value) setTimeout(() => f.focus({preventScroll:true}), 60); }
+  if (matchMedia('(min-width: 861px)').matches){ const f = card().querySelector('input:not([readonly]):not([type="checkbox"])'); if (f && !f.value){ const go = () => { if ($a('#splash') && !$a('#splash').classList.contains('done')) return setTimeout(go, 120); if (current === name) f.focus({preventScroll:true}); }; setTimeout(go, 60); } }   // pas de focus caché derrière l'intro : « Passer l'animation » reste atteignable au clavier
 }
 function dots(){ document.querySelectorAll('#apDots i').forEach((d, i) => d.classList.toggle('on', i < pinBuf.length)); }
 function shake(){ const d = $a('#apDots'); if (!d) return; d.classList.remove('shake'); void d.offsetWidth; d.classList.add('shake'); }
