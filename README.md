@@ -48,14 +48,14 @@ Le lien **https://groupestudioprism.github.io/SpectraSlide/#/importer/studio-pri
 | `src/deck/` | L'éditeur : thèmes et décors, icônes et formes, modèle et mises en page, rendu, modèles, scène, actions, film, barre Prisme, tiroirs, présentation, import/export, Spectre, démarrage |
 | `src/js/` | Compte (`auth.js`), cloud et accueil (`cloud.js`), Communauté (`community.js`), IA (`ai.js`), menu du compte (`auth-end.js`) |
 | `tools/build.py` | `python3 tools/build.py` → `index.html` (en ligne) et `dist/spectraslide-demo.html` |
-| `firebase/firestore.rules` | Règles Firestore complètes (site + SPECTRA Writer + Calc + Slide), à coller telles quelles dans la console |
-| `firebase/firestore-spectraslide.rules` | Le seul bloc SPECTRA Slide (pour mémoire) |
+| `Studio-Prism/firebase/firestore.rules` | Règles Firestore complètes (site + SPECTRA Writer + Calc + Slide), à coller telles quelles dans la console |
+| `les règles Firestore (dépôt Studio-Prism, firebase/rules)` | Le seul bloc SPECTRA Slide (pour mémoire) |
 
 On modifie `src/`, on lance `python3 tools/build.py`, on enregistre sur `main` : GitHub Pages publie en une minute.
 
 ## À faire côté Firebase (une fois)
 
-1. Copier **tout** `firebase/firestore.rules` dans Firebase → Firestore → Règles, en remplaçant l'existant, puis Publier.
+1. Copier **tout** `Studio-Prism/firebase/firestore.rules` dans Firebase → Firestore → Règles, en remplaçant l'existant, puis Publier.
 2. Créer le produit `spectraslide` (nom « SPECTRA Slide ») dans l'administration du site, pour attribuer licences et clés.
 3. L'IA est la même que pour Writer et Calc (Firebase AI Logic). Pour dépasser le quota gratuit de Gemini, passer le projet en formule Blaze.
 
