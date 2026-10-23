@@ -3151,13 +3151,19 @@ function ctxMenu(ev){
   const l = selEls(), has = l.length > 0;
   const it = (k, ic, t, kb = '', dis = false) => `<button type="button" data-cm="${k}"${dis ? ' disabled' : ''}>${ic}${t}${kb ? `<kbd>${kb}</kbd>` : ''}</button>`;
   const html = `<div class="pop-list">${has ? it('cut', '<svg viewBox="0 0 24 24"><circle cx="6" cy="18" r="3"/><circle cx="18" cy="18" r="3"/><path d="M8 16 19 4M16 16 5 4"/></svg>', 'Couper', 'Ctrl X') + it('copy', IC.copy, 'Copier', 'Ctrl C') : ''}${it('paste', '<svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2"/></svg>', 'Coller', 'Ctrl V', !CLIP.els)}
-    ${has ? '<hr>' + it('dup', IC.copy, 'Dupliquer', 'Ctrl D') + it('front', IC.up, 'Premier plan') + it('back', IC.down, 'Arrière-plan') + (l.length > 1 ? it('group', iconSVG('layers'), 'Grouper', 'Ctrl G') : '') + (l.some(e => e.g) ? it('ungroup', iconSVG('grid'), 'Dissocier') : '') + it('lock', iconSVG('lock'), l.every(e => e.lock) ? 'Déverrouiller' : 'Verrouiller') + it('anim', ICX.anim, 'Animation…') + '<hr>' + `<button type="button" data-cm="del" class="danger">${IC.trash}Supprimer<kbd>Suppr</kbd></button>`
-      : '<hr>' + it('layout', ICX.layout, 'Mise en page…') + it('bg', ICX.bg, 'Fond…') + it('newslide', ICX.slide, 'Nouvelle diapositive', 'Ctrl M') + it('dupslide', IC.copy, 'Dupliquer la diapositive')}</div>`;
+    ${has ? '<hr>' + it('dup', IC.copy, 'Dupliquer', 'Ctrl D') + it('front', IC.up, 'Premier plan') + it('back', IC.down, 'Arrière-plan') + (l.length > 1 ? it('group', iconSVG('layers'), 'Grouper', 'Ctrl G') : '') + (l.some(e => e.g) ? it('ungroup', iconSVG('grid'), 'Dissocier') : '') + it('lock', iconSVG('lock'), l.every(e => e.lock) ? 'Déverrouiller' : 'Verrouiller') + (l.length === 1 && l[0].t === 'img' ? it('rimg', IC.img, 'Remplacer l\'image…') : '') + it('align', IC.al, l.length > 1 ? 'Aligner et répartir…' : 'Aligner sur la diapositive…') + it('anim', ICX.anim, 'Animation…') + '<hr>' + `<button type="button" data-cm="del" class="danger">${IC.trash}Supprimer<kbd>Suppr</kbd></button>`
+      : '<hr>' + it('layout', ICX.layout, 'Mise en page…') + it('bg', ICX.bg, 'Fond…') + it('newslide', ICX.slide, 'Nouvelle diapositive', 'Ctrl M') + it('dupslide', IC.copy, 'Dupliquer la diapositive') + '<hr>' + it('present', ICX.slide, 'Présenter à partir d\'ici') + it('hideslide', iconSVG('eye'), D.slides[CUR]?.hide ? 'Afficher en présentation' : 'Masquer en présentation')}</div>`;
   const anchor = {getBoundingClientRect:() => ({left:ev.clientX, right:ev.clientX, top:ev.clientY, bottom:ev.clientY})};
   openPop(anchor, html, p => { p.onclick = e => { const b = e.target.closest('[data-cm]'); if (!b || b.disabled) return; closePop(); const k = b.dataset.cm;
     if (k === 'cut') copySel(null, true); else if (k === 'copy') copySel(); else if (k === 'paste') pasteEls(); else if (k === 'dup') dupSel(); else if (k === 'front' || k === 'back') layer(k);
     else if (k === 'group') groupSel(); else if (k === 'ungroup') ungroupSel(); else if (k === 'lock') lockSel(); else if (k === 'del') delSel(); else if (k === 'anim') animPop(anchor);
-    else if (k === 'layout') layoutPop(anchor); else if (k === 'bg') bgPop(anchor); else if (k === 'newslide') layoutPop(anchor, true); else if (k === 'dupslide') dupSlide(); }; }, 'menu');
+    else if (k === 'layout') layoutPop(anchor); else if (k === 'bg') bgPop(anchor); else if (k === 'newslide') layoutPop(anchor, true); else if (k === 'dupslide') dupSlide();
+    else if (k === 'rimg') pickImage(selEls()[0]?.id); else if (k === 'align') alignObjPop(anchor); else if (k === 'present') present(CUR); else if (k === 'hideslide') toggleHide(); }; }, 'menu');
+}
+/* aligner sur la diapositive (un élément) ou entre eux (plusieurs) ; répartir à partir de 3 éléments */
+function alignObjPop(anchor){
+  const n = selEls().length;
+  openPop(anchor, `<p class="pop-h">${n > 1 ? 'Aligner les éléments' : 'Aligner sur la diapositive'}</p><div class="pop-row4">${[['l', 'À gauche'], ['c', 'Centré'], ['r', 'À droite'], ['t', 'En haut'], ['m', 'Au milieu'], ['b', 'En bas']].map(([k, t]) => `<button type="button" data-al="${k}">${t}</button>`).join('')}</div>${n > 2 ? '<hr><button type="button" data-al="dh">Répartir horizontalement</button><button type="button" data-al="dv">Répartir verticalement</button>' : ''}`, p => { p.onclick = e => { const b = e.target.closest('[data-al]'); if (!b) return; closePop(); alignSel(b.dataset.al); }; }, 'menu');
 }
 
 /* ==== 62-panels.js ==== */
