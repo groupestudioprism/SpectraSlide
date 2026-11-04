@@ -1302,6 +1302,9 @@ body.ro .ray:not([data-panel="outline"]):not([data-panel="templates"]){opacity:.
 @keyframes tr-spin-in{from{opacity:0;transform:rotate(calc(var(--dir,1) * -30deg)) scale(.25)}}@keyframes tr-spin-out{to{opacity:0;transform:rotate(calc(var(--dir,1) * 30deg)) scale(1.6)}}
 @keyframes tr-fall-out{to{opacity:0;transform:translateY(110%) rotate(calc(var(--dir,1) * 14deg))}}
 @keyframes tr-roll-in{from{opacity:0;transform:perspective(1600px) rotateX(calc(var(--dir,1) * -75deg))}}@keyframes tr-roll-out{to{opacity:0;transform:perspective(1600px) rotateX(calc(var(--dir,1) * 75deg))}}
+/* vidéo */
+.sl .vidw{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000;display:block;border-radius:6px}
+.sl .vidw.ph{display:grid;place-items:center;align-content:center;gap:10px;background:linear-gradient(135deg,#1B1633,#0C0A16);color:#E9E6F5;font:600 15px system-ui}.sl .vidw.ph svg{width:22%;max-width:96px;height:auto}
 /* pied de page */
 .sl .sl-foot{position:absolute;display:flex;justify-content:space-between;gap:24px;color:var(--mut);font-weight:600;pointer-events:none;letter-spacing:.01em}
 .sl .sl-foot .ft0{flex:1}.sl .sl-foot .ft1{flex:none}.sl .sl-foot .ft2{flex:none;min-width:1.5em;text-align:right}
@@ -2138,6 +2141,7 @@ function maskCss(e){
   if (m === 'hex') return 'clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);';
   if (m === 'diamond') return 'clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);';
   if (m === 'blob') return 'border-radius:63% 37% 54% 46% / 55% 48% 52% 45%;';
+  if (SHAPES[m]?.[1]){ const u = `url('data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="${SHAPES[m][1]}"/></svg>`).replace(/'/g, '%27')}') 0 0/100% 100% no-repeat`; return `-webkit-mask:${u};mask:${u};`; }
   return e.r ? `border-radius:${e.r}px;` : '';
 }
 function txCss(st = {}){
@@ -2261,6 +2265,7 @@ function elInner(e, sv, o){
     case 'icon': return iconSVG(e.n, realCol(e.fc || 't:ac', sv), e.sw || 1.8);
     case 'table': return tableHTML(e, sv);
     case 'chart': return chartSVG(e, sv);
+    case 'video': return videoHTML(e, o);
     case 'img': {
       const src = o.preview ? '' : mediaSrc(e.src), f = IMG_FILTERS[e.filter]?.[1] || '';
       if (!src) return o.present || o.print ? `<div class="imgw" style="${maskCss(e)}background:${cssCol('t:soft')}"></div>` : `<div class="imgw ph-img" style="${maskCss(e)}">${o.preview ? '' : iconSVG('camera')}${o.preview || e.w < 160 ? '' : `<span>${escH(e.hint ? 'Image : ' + e.hint : 'Double-cliquez pour ajouter une image')}</span>`}</div>`;
@@ -2419,6 +2424,11 @@ function cleanFx(e){
   }
   return e;
 }
+
+/* formes de masque et filtres d'image supplémentaires */
+Object.assign(MASKS, {star5:'Étoile', heart:'Cœur', tri:'Triangle', pent:'Pentagone', cloud:'Nuage', drop:'Goutte', shield:'Bouclier', seal:'Sceau', burst:'Explosion', bolt:'Éclair', moon:'Lune', bubble2:'Bulle', gear:'Engrenage', leaf:'Feuille', petal:'Pétale', tag:'Étiquette', ring:'Anneau', frame:'Cadre'});
+Object.assign(IMG_FILTERS, {fade:['Délavé', 'contrast(.85) brightness(1.1) saturate(.8)'], noir:['Noir profond', 'grayscale(1) contrast(1.4) brightness(.85)'], vintage:['Vintage', 'sepia(.45) contrast(.9) saturate(1.3) hue-rotate(-8deg)'], drama:['Dramatique', 'contrast(1.35) saturate(1.25) brightness(.9)'],
+  pastel:['Pastel', 'saturate(.7) brightness(1.15) contrast(.9)'], dream:['Rêve', 'blur(1.2px) brightness(1.1) saturate(1.2)'], cinema:['Cinéma', 'contrast(1.15) saturate(.85) sepia(.15) hue-rotate(-6deg)'], neg:['Négatif', 'invert(1)']});
 
 /* ==== 44-anim.js ==== */
 /* ---------- Animations d'éléments (entrée, emphase, sortie), transitions et leur panneau ----------
@@ -2812,6 +2822,7 @@ function onStageDbl(ev){
   if (e.t === 'table') return startEdit(e.id, ev);
   if (e.t === 'img') return pickImage(e.id);
   if (e.t === 'chart') return chartDialog(e.id);
+  if (e.t === 'video') return askVideo(e.id);
   if (e.t === 'icon') return iconPop(g$('edBar'), e.id);
 }
 /* ---------- Édition du texte (dans la diapositive) ---------- */
@@ -3482,6 +3493,7 @@ function refreshToolbar(){
   else if (k === 'table'){ h += `<div class="tg">${tb('row+', ICX.rowp, 'Ajouter une ligne')}${tb('row-', ICX.rowm, 'Retirer la dernière ligne')}${tb('col+', ICX.colp, 'Ajouter une colonne')}${tb('col-', ICX.colm, 'Retirer la dernière colonne')}<button type="button" class="tb" data-k="thc" title="Couleur de l'en-tête">${colI('fill', e.hc || 't:ac')}</button>${tb('thead', IC.table, 'En-tête et lignes alternées')}</div>
       <div class="tg"><div class="tsz">${tb('fs-', IC.minus, 'Plus petit')}<input class="tsz-in" id="fsIn" value="${e.fs || 18}" aria-label="Taille du texte">${tb('fs+', IC.plus, 'Plus grand')}</div>${tb('font', '<span class="tb-aa">Aa</span>', 'Police')}</div>` + common; }
   else if (k === 'chart'){ h += `<div class="tg"><button type="button" class="tb tb-txt" data-k="cdata" title="Modifier les données">${ICX.data}<span>Données</span></button>${tb('ctype', iconSVG('chart'), 'Type de graphique')}${tb('cvals', '<span class="tb-aa">12</span>', 'Afficher les valeurs', e.vals !== false ? ' aria-pressed="true"' : '')}</div>` + common; }
+  else if (k === 'video'){ h += `<div class="tg"><button type="button" class="tb tb-txt" data-k="vurl" title="Changer la vidéo">${ICX.replace}<span>Changer</span></button></div>` + common; }
   else if (k === 'multi'){ const tx = l.filter(x => x.st); h += (tx.length ? `<div class="tg">${tb('font', '<span class="tb-aa">Aa</span>', 'Police')}<button type="button" class="tb" data-k="fc" title="Couleur du texte">${colI('fc', tx[0].st.fc || 't:ink')}</button>${tb('fs-', IC.minus, 'Plus petit')}${tb('fs+', IC.plus, 'Plus grand')}</div>` : '') + `<div class="tg">${tb('group', iconSVG('layers'), 'Grouper (Ctrl + G)')}</div>` + common; }
   bar.innerHTML = h; bar.dataset.ctx = k;
   const fi = g$('fsIn'); if (fi){ fi.onkeydown = ev => { ev.stopPropagation(); if (ev.key === 'Enter'){ ev.preventDefault(); const v = +fi.value.replace(',', '.'); if (v > 0) setSt({fs:clamp(v, 4, 600)}, 'Taille du texte'); fi.blur(); } }; fi.onmousedown = ev => ev.stopPropagation(); }
@@ -3502,7 +3514,7 @@ function onToolbar(ev){
     replace:() => pickImage(e.id), crop:() => imgPop(b, 'crop'), filter:() => imgPop(b, 'filter'), mask:() => imgPop(b, 'mask'),
     icol:() => colorPop(b, e.fc, v => setProps(x => { x.fc = v || 't:ac'; }, 'Couleur'), {none:false}), ichange:() => iconPop(b, e.id), 'isw-':() => setProps(x => { x.sw = Math.max(.6, (x.sw || 1.8) - .4); }, 'Trait'), 'isw+':() => setProps(x => { x.sw = Math.min(4, (x.sw || 1.8) + .4); }, 'Trait'),
     'row+':() => tableOp('row+'), 'row-':() => tableOp('row-'), 'col+':() => tableOp('col+'), 'col-':() => tableOp('col-'), thead:() => theadPop(b), thc:() => colorPop(b, e.hc, v => setProps(x => { x.hc = v || undefined; }, 'En-tête'), {noneLabel:'Couleur du thème'}),
-    cdata:() => chartDialog(e.id), ctype:() => chartTypePop(b), cvals:() => setProps(x => { x.vals = x.vals === false; }, 'Valeurs'),
+    vurl:() => askVideo(e.id), cdata:() => chartDialog(e.id), ctype:() => chartTypePop(b), cvals:() => setProps(x => { x.vals = x.vals === false; }, 'Valeurs'),
   };
   A[k]?.();
 }
@@ -3614,6 +3626,7 @@ function renderPanel(){
       <h4 class="pn-h">Schémas <small>façon SmartArt : groupes modifiables</small></h4><div class="fm-count">Éléments <button type="button" data-smartn="" aria-pressed="${SMART_N == null}">Auto</button>${[3, 4, 5, 6, 8].map(n => `<button type="button" data-smartn="${n}" aria-pressed="${SMART_N === n}">${n}</button>`).join('')}</div><div class="pn-smarts">${SMARTS.map(([k, t]) => `<button type="button" data-ins="smart:${k}" title="${t}">${smartMini(k)}<span>${t}</span></button>`).join('')}</div>
       <h4 class="pn-h">Formes <small>${SHAPE_ORDER.length} formes, remplissage et effets au choix</small></h4>${SHAPE_GROUPS.map(([t, ks]) => `<p class="pn-sub">${t}</p><div class="pn-shapes2">${ks.map(k => `<button type="button" data-ins="shape:${k}" title="${escH(SHAPES[k][0])}" style="color:${th.ac}">${shapeIcon(k)}</button>`).join('')}</div>`).join('')}
       <h4 class="pn-h">Images</h4><div class="pn-imgs2"><button type="button" class="pn-drop" data-ins="img">${IC.img}<b>Importer une image</b><span>ou glissez-la sur la diapositive · Ctrl + V</span></button>${Object.entries(D.media || {}).filter(([k]) => usedMedia().has(k)).slice(0, 12).map(([k, v]) => `<button type="button" class="pn-imgthumb" data-ins="media:${k}"><img src="${escH(v)}" alt=""></button>`).join('')}</div>
+      <h4 class="pn-h">Vidéo</h4><div class="pn-chips big"><button type="button" data-ins="video">▶ Insérer une vidéo (YouTube, Vimeo, .mp4)</button></div>
       <h4 class="pn-h">Tableaux et graphiques</h4><div class="pn-chips big"><button type="button" data-ins="table:3x3">Tableau 3 × 3</button><button type="button" data-ins="table:5x4">Tableau 4 × 5</button>${CHART_TYPES.map(([k, t]) => `<button type="button" data-ins="chart:${k}">${iconSVG(k === 'pie' || k === 'donut' ? 'pie' : k === 'line' || k === 'area' ? 'trend' : 'chart')} ${t}</button>`).join('')}</div>
       <h4 class="pn-h">Icônes <small>${Object.keys(ICONS).length} icônes, aux couleurs du thème</small></h4><label class="pn-search">${IC.search}<input id="pnIcQ" placeholder="Chercher : équipe, argent, idée, maison…"></label><div class="pn-icons" id="pnIc" style="color:${th.ac}">${Object.keys(ICONS).map(k => `<button type="button" data-ins="icon:${k}" title="${escH(ICONS[k][0].split(' ')[0])}">${iconSVG(k)}</button>`).join('')}</div>`;
   } else if (panel === 'design'){
@@ -3648,7 +3661,7 @@ function onPanelClick(ev){
   const t = ev.target.closest('button'); if (!t) return;
   const d = t.dataset;
   if (d.ins){ const [k, v] = d.ins.split(':');
-    if (k === 'text') addText(v); else if (k === 'shape') addShape(v); else if (k === 'icon') addIcon(v); else if (k === 'img') pickImage();
+    if (k === 'text') addText(v); else if (k === 'shape') addShape(v); else if (k === 'icon') addIcon(v); else if (k === 'img') pickImage(); else if (k === 'video') askVideo();
     else if (k === 'media'){ const src = D.media[v]; const im = new Image(); im.onload = () => { const [W, H] = dims(), kk = Math.min(1, W * .5 / im.width, H * .6 / im.height), w = Math.round(im.width * kk), h = Math.round(im.height * kk), p = centerBox(w, h); addEls([IMG(p.x, p.y, w, h, {src:'m:' + v})], 'Image'); }; im.src = src; }
     else if (k === 'table'){ const [c, r] = v.split('x'); addTable(+r, +c); } else if (k === 'chart') addChart(v); else if (k === 'block') addEls(blockEls(v), BLOCKS.find(x => x[0] === v)?.[1]); else if (k === 'smart') addSmart(v);
     if (innerWidth < 760) openPanel(null); return; }
@@ -3738,7 +3751,8 @@ function formatPanelHTML(){
   }
   const st = e.st || {}, hasTxt = e.t === 'text' || (e.t === 'shape' && e.html != null), f = e.fx || {}, one = l.length === 1;
   if (one) h += sec('pos', 'Position et taille', `<div class="fm-geo">${[['x', 'X'], ['y', 'Y'], ['w', 'L'], ['h', 'H'], ['rot', '°']].map(([k, t]) => `<label><span>${t}</span><input type="number" data-geo="${k}" value="${k === 'rot' ? fNum(e.rot || 0) : Math.round(e[k])}" step="${k === 'rot' ? 5 : 1}"></label>`).join('')}</div>
-      <div class="pn-chips"><button type="button" data-fv="fx.fh" data-v="${f.fh ? '' : 1}" aria-pressed="${!!f.fh}">${ICX.pos} Miroir horizontal</button><button type="button" data-fv="fx.fv" data-v="${f.fv ? '' : 1}" aria-pressed="${!!f.fv}">Miroir vertical</button></div>
+      <div class="pn-chips"><button type="button" data-fv="fx.fh" data-v="${f.fh ? '' : 1}" aria-pressed="${!!f.fh}">${ICX.pos} Miroir horizontal</button><button type="button" data-fv="fx.fv" data-v="${f.fv ? '' : 1}" aria-pressed="${!!f.fv}">Miroir vertical</button><button type="button" data-fa="cpstyle">Copier le style</button><button type="button" data-fa="pastestyle">Coller le style</button></div>
+      ${e.t === 'video' ? `<label class="fm-txt"><span>Adresse de la vidéo</span><input type="text" data-ft="url" maxlength="400" value="${escH(e.url || '')}"></label>` : ''}
       <label class="fm-txt"><span>Texte alternatif <small>description pour l'accessibilité</small></span><input type="text" data-ft="alt" maxlength="300" value="${escH(e.alt || '')}" placeholder="Décrivez cet élément"></label>
       <label class="fm-txt"><span>Lien <small>ouvert en cliquant en présentation</small></span><input type="text" data-ft="lk" maxlength="500" value="${escH(e.lk || '')}" placeholder="https://… ou #3 (diapositive 3)"></label>`, true);
   if (e.t === 'shape'){
@@ -3799,7 +3813,7 @@ function wireFormat(b){
   b.querySelectorAll('input[data-f]').forEach(i => { i.oninput = () => { const v = +i.value, bt = i.previousElementSibling?.querySelector('b'); if (bt) bt.textContent = fNum(v) + (i.dataset.u || ''); fmApply(i.dataset.f, v, true); }; i.onchange = () => fmCommit('Réglage'); });
   b.querySelectorAll('input[data-fg]').forEach(i => { i.onchange = () => fmGroupToggle(i.dataset.fg, i.checked); });
   b.querySelectorAll('input[data-geo]').forEach(i => { i.onchange = () => { const k = i.dataset.geo, v = +i.value; if (!isFinite(v)) return; setProps(e => { if (k === 'rot'){ if (v) e.rot = v; else delete e.rot; } else e[k] = k === 'w' || k === 'h' ? Math.max(8, v) : v; }, 'Position', true); renderPanel(); }; });
-  b.querySelectorAll('input[data-ft]').forEach(i => { i.onchange = () => { const k = i.dataset.ft; let v = i.value.trim(); if (k === 'lk' && v && !/^(https?:\/\/|#\d+$)/i.test(v)){ if (/^[\w.-]+\.[a-z]{2,}/i.test(v)) v = 'https://' + v; else { toast('Lien : une adresse https://… ou #3 pour une diapositive'); i.value = ''; v = ''; } } setProps(e => { if (v) e[k] = v; else delete e[k]; }, k === 'lk' ? 'Lien' : 'Texte alternatif', false); }; });
+  b.querySelectorAll('input[data-ft]').forEach(i => { i.onchange = () => { const k = i.dataset.ft; let v = i.value.trim(); if (k === 'lk' && v && !/^(https?:\/\/|#\d+$)/i.test(v)){ if (/^[\w.-]+\.[a-z]{2,}/i.test(v)) v = 'https://' + v; else { toast('Lien : une adresse https://… ou #3 pour une diapositive'); i.value = ''; v = ''; } } if (k === 'url' && !vidInfo(v)){ toast('Adresse non reconnue'); i.value = selEls()[0]?.url || ''; return; } setProps(e => { if (v) e[k] = v; else delete e[k]; }, k === 'lk' ? 'Lien' : k === 'url' ? 'Vidéo' : 'Texte alternatif', k === 'url'); }; });
   b.querySelectorAll('[data-fv]').forEach(x => { x.onclick = () => { fmApply(x.dataset.fv, fmVal(x.dataset.v)); fmCommit('Réglage'); }; });
   b.querySelectorAll('[data-fcol]').forEach(x => { x.onclick = () => {
     const p = x.dataset.fcol, isBgp = p.startsWith('bgp.'), path = isBgp ? p.slice(4) : p, root = isBgp ? (cur().bg || {}) : selEls()[0], none = path === 'fill' || path === 'g3' || path === 'stroke' || path === 'bg.c' || path === 'c' || path === 'pc' ? undefined : false;
@@ -3817,6 +3831,7 @@ function wireFormat(b){
   b.querySelectorAll('[data-bgg]').forEach(x => { x.onclick = () => bgSet({g:[...FM_GRADS[+x.dataset.bgg]], a:135}, 'Fond dégradé'); });
   b.querySelectorAll('[data-bgm]').forEach(x => { x.onclick = () => bgSet({mesh:[...MESHES[+x.dataset.bgm][1]]}, 'Fond ambiance'); });
   b.querySelectorAll('[data-fa]').forEach(x => { x.onclick = () => { const a = x.dataset.fa, s = cur();
+    if (a === 'cpstyle'){ copyStyle(); return; } if (a === 'pastestyle'){ pasteStyle(); renderPanel(); return; }
     if (a === 'bgimg'){ imgTarget = '@bg'; g$('edImgFile').click(); }
     else if (a === 'bgnoimg'){ delete s.bg.img; delete s.bg.dim; if (!Object.keys(s.bg).length) delete s.bg; renderAll(); fmCommit('Fond'); }
     else if (a === 'bgreset'){ delete s.bg; renderAll(); fmCommit('Fond du thème'); }
@@ -3946,7 +3961,7 @@ function wirePresent(){
   const p = g$('present');
   p.addEventListener('keydown', pvKey);
   p.addEventListener('mousemove', e => { wake(); if (INK.loupe) loupeMove(e); if (PV.laser){ const l = g$('pvLaser'); l.style.left = e.clientX + 'px'; l.style.top = e.clientY + 'px'; } });
-  g$('pvStage').addEventListener('click', e => { if (e.target.closest('a')) return; const lk = e.target.closest('[data-lk]'); if (lk){ pvLink(lk); return; } pvNext(); });
+  g$('pvStage').addEventListener('click', e => { if (e.target.closest('a,video,iframe')) return; const lk = e.target.closest('[data-lk]'); if (lk){ pvLink(lk); return; } pvNext(); });
   g$('pvBlack').addEventListener('click', () => { if (g$('pvBlack').classList.contains('end')) exitPresent(); else g$('pvBlack').hidden = true; });
   p.addEventListener('contextmenu', e => { e.preventDefault(); pvPrev(); });
   g$('pvGrid').addEventListener('click', e => { const b = e.target.closest('[data-k]'); if (!b) return; g$('pvGrid').hidden = true; const k = +b.dataset.k; showSlide(k, k > PV.i ? 1 : -1); });
@@ -4038,6 +4053,78 @@ function pvLink(el){
   if (/^https?:\/\//i.test(u)) window.open(u, '_blank', 'noopener,noreferrer');
 }
 
+/* ==== 67-tools.js ==== */
+/* ---------- Outils : rechercher et remplacer (Ctrl + H), copier / coller le style (Ctrl + Alt + C / V) ---------- */
+const reEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+/* applique fn à chaque morceau de texte d'un élément (le HTML reste intact) ; renvoie vrai si quelque chose a changé */
+function mapElText(e, fn){
+  const f = h => { const d = new DOMParser().parseFromString('<body>' + h, 'text/html'), w = document.createTreeWalker(d.body, NodeFilter.SHOW_TEXT), ns = []; let ch = false;
+    while (w.nextNode()) ns.push(w.currentNode); ns.forEach(n => { const t = fn(n.nodeValue); if (t !== n.nodeValue){ n.nodeValue = t; ch = true; } }); return ch ? d.body.innerHTML : h; };
+  let ch = false;
+  if (e.html != null){ const n = f(e.html); if (n !== e.html){ e.html = n; ch = true; } }
+  if (e.rows) e.rows = e.rows.map(r => r.map(c => { const n = f(c); if (n !== c) ch = true; return n; }));
+  return ch;
+}
+function findHits(q, cs){
+  if (!q) return []; const re = new RegExp(reEsc(q), cs ? 'g' : 'gi'), hits = [];
+  D.slides.forEach((s, si) => s.els.forEach(e => { if (e.html == null && !e.rows) return; const txt = e.rows ? e.rows.flat().map(plain).join(' ') : plain(e.html); const n = (txt.match(re) || []).length; if (n) hits.push({si, id:e.id, n}); }));
+  return hits;
+}
+const FR = {q:'', r:'', cs:false, i:-1};
+function findDlg(){
+  if (V.ro) return;
+  SWDlg.open(`<h3>Rechercher et remplacer</h3>
+    <label class="fm-txt"><span>Rechercher</span><input id="frQ" autocomplete="off" value="${escH(FR.q)}"></label>
+    <label class="fm-txt"><span>Remplacer par</span><input id="frR" autocomplete="off" value="${escH(FR.r)}"></label>
+    <label class="pop-toggle"><input type="checkbox" id="frC" ${FR.cs ? 'checked' : ''}><div><b>Respecter la casse</b></div></label>
+    <p class="dlg-p small" id="frN" aria-live="polite"></p>
+    <div class="dlg-acts"><button type="button" class="ap-btn alt" data-dlg="close">Fermer</button><button type="button" class="ap-btn alt" id="frNext">Suivant</button><button type="button" class="ap-btn alt" id="frOne">Remplacer</button><button type="button" class="ap-btn" id="frAll">Tout remplacer</button></div>`, d => {
+    const q = d.querySelector('#frQ'), r = d.querySelector('#frR'), c = d.querySelector('#frC'), n = d.querySelector('#frN');
+    const read = () => { FR.q = q.value; FR.r = r.value; FR.cs = c.checked; }, count = () => { read(); const h = findHits(FR.q, FR.cs), t = h.reduce((a, x) => a + x.n, 0); n.textContent = !FR.q ? '' : t ? `${t} occurrence${t > 1 ? 's' : ''} dans ${h.length} élément${h.length > 1 ? 's' : ''}` : 'Aucun résultat'; return h; };
+    const go = h => { if (!h.length) return; FR.i = (FR.i + 1) % h.length; const x = h[FR.i]; goSlide(x.si, true); select(x.id); };
+    const rep = all => { read(); const re = new RegExp(reEsc(FR.q), FR.cs ? 'g' : 'gi'); let tot = 0, hs = findHits(FR.q, FR.cs); if (!all) hs = hs.slice(FR.i >= 0 && FR.i < hs.length ? FR.i : 0, (FR.i >= 0 && FR.i < hs.length ? FR.i : 0) + 1); if (!FR.q || !hs.length) return;
+      hs.forEach(x => { const e = elById(x.id, D.slides[x.si]); if (e) mapElText(e, t => t.replace(re, () => { tot++; return FR.r; })); });
+      THUMB.clear(); renderAll(); commit('Remplacer'); count(); toast(`${tot} remplacement${tot > 1 ? 's' : ''}`); };
+    q.oninput = c.onchange = () => { FR.i = -1; count(); }; q.onkeydown = ev => { if (ev.key === 'Enter'){ ev.preventDefault(); go(count()); } };
+    d.querySelector('#frNext').onclick = () => go(count()); d.querySelector('#frOne').onclick = () => rep(false); d.querySelector('#frAll').onclick = () => rep(true); count();
+  });
+}
+/* style copié : remplissage, contour, effets, texte */
+const STYLE_KEYS = ['fill', 'g2', 'g3', 'gt', 'ga', 'gx', 'gy', 'pat', 'pc', 'po', 'ps', 'stroke', 'sw', 'sd', 'r', 'op', 'shadow', 'fx', 'lw', 'dash', 'fc', 'mask', 'filter'];
+let STYLE_CLIP = null;
+function copyStyle(){ const e = selEls()[0]; if (!e) return toast('Sélectionnez un élément'); STYLE_CLIP = {t:e.t, st:e.st ? JSON.parse(JSON.stringify(e.st)) : null, p:Object.fromEntries(STYLE_KEYS.filter(k => e[k] !== undefined).map(k => [k, JSON.parse(JSON.stringify(e[k]))]))}; toast('Style copié · Ctrl + Alt + V pour l\'appliquer'); }
+function pasteStyle(){
+  if (!STYLE_CLIP) return toast('Copiez d\'abord un style (Ctrl + Alt + C)'); if (!SEL.size) return toast('Sélectionnez un élément');
+  setProps(e => { STYLE_KEYS.forEach(k => { if (k === 'fc' && e.t !== 'icon') return; if (k in STYLE_CLIP.p && !(e.t === 'img' && ['fill', 'g2', 'g3'].includes(k))) e[k] = JSON.parse(JSON.stringify(STYLE_CLIP.p[k])); else if (!(k in STYLE_CLIP.p) && !['fc', 'lw', 'dash', 'mask', 'filter', 'r'].includes(k)) delete e[k]; });
+    if (STYLE_CLIP.st && (e.t === 'text' || e.t === 'shape')){ const keep = {ha:e.st?.ha, va:e.st?.va}; e.st = {...STYLE_CLIP.st, ...Object.fromEntries(Object.entries(keep).filter(([, v]) => v))}; if (e.html) e.html = stripInline(e.html, ['fc', 'b', 'i', 'u', 'f']); } tidyEl(e); }, 'Coller le style', true);
+}
+
+/* ==== 68-media.js ==== */
+/* ---------- Vidéo : YouTube, Vimeo ou fichier (.mp4, .webm) — jouée en présentation, vignette dans l'éditeur ---------- */
+function vidInfo(u){
+  u = String(u || '').trim(); if (!/^https:\/\//i.test(u)) return null;
+  let m = u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([\w-]{11})/i);
+  if (m) return {kind:'iframe', src:`https://www.youtube-nocookie.com/embed/${m[1]}?rel=0`, host:'YouTube', yt:m[1]};
+  m = u.match(/vimeo\.com\/(?:video\/)?(\d{5,12})/i); if (m) return {kind:'iframe', src:`https://player.vimeo.com/video/${m[1]}`, host:'Vimeo'};
+  if (/\.(mp4|webm|ogv|mov|m4v)(\?[^\s]*)?$/i.test(u)) return {kind:'file', src:u, host:(u.match(/^https:\/\/([^/]+)/i) || [])[1] || 'Fichier'};
+  return null;
+}
+function videoHTML(e, o){
+  const v = vidInfo(e.url), ph = `<div class="vidw ph"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="28" fill="rgb(0 0 0 / .55)"/><path d="M26 20v24l20-12z" fill="#fff"/></svg><span>${escH(v ? 'Vidéo · ' + v.host : e.url ? 'Adresse non reconnue' : 'Double-cliquez pour ajouter une vidéo')}</span></div>`;
+  if (!v || !o.present) return ph;
+  if (v.kind === 'file') return `<video class="vidw" src="${escH(v.src)}" controls playsinline preload="metadata"></video>`;
+  return `<iframe class="vidw" src="${escH(v.src)}" title="Vidéo" allow="accelerometer; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+}
+function askVideo(id){
+  const e = id ? elById(id) : null;
+  SWAsk(e ? 'Changer la vidéo' : 'Insérer une vidéo', 'Adresse : YouTube, Vimeo ou lien direct vers un fichier .mp4 / .webm (https)', e?.url || '', e ? 'Appliquer' : 'Insérer', v => {
+    v = String(v || '').trim(); if (v && !/^https?:\/\//i.test(v) && /^[\w.-]+\.[a-z]{2,}\//i.test(v)) v = 'https://' + v;
+    if (!vidInfo(v)) return toast('Adresse non reconnue : collez un lien YouTube, Vimeo ou un fichier .mp4 en https');
+    if (e){ setProps(x => { x.url = v; }, 'Vidéo', true); return; }
+    const [W, H] = dims(), w = Math.round(W * .56), h = Math.round(w * 9 / 16), p = centerBox(w, h); addEls([{id:nid(), t:'video', x:p.x, y:p.y, w, h, url:v}], 'Vidéo');
+  });
+}
+
 /* ==== 70-io.js ==== */
 /* ---------- Fichiers : PDF, PowerPoint (.pptx), page web, sauvegarde .spectraslide ; import PowerPoint, images ---------- */
 const LIB_PPTX = 'https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js';
@@ -4069,9 +4156,10 @@ function svgToPng(svg, w, h, scale = 2){
 function imgCrop(e, scale = 1.5){
   return new Promise(res => { const src = mediaSrc(e.src); if (!src) return res(null); const im = new Image();
     im.onload = () => { const W = Math.round(e.w * scale), H = Math.round(e.h * scale), c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
-      const f = IMG_FILTERS[e.filter]?.[1]; if (f) x.filter = f;
+      const fx = e.fx || {}, f = [IMG_FILTERS[e.filter]?.[1], fx.br != null && fx.br !== 100 ? `brightness(${fx.br / 100})` : '', fx.ct != null && fx.ct !== 100 ? `contrast(${fx.ct / 100})` : '', fx.sa != null && fx.sa !== 100 ? `saturate(${fx.sa / 100})` : '', fx.hu ? `hue-rotate(${fx.hu}deg)` : ''].filter(Boolean).join(' '); if (f) x.filter = f;
       const m = e.mask || (e.r ? 'round' : 'none'), mask = m !== 'none';
-      if (mask){ x.beginPath(); if (m === 'circle') x.ellipse(W / 2, H / 2, W / 2, H / 2, 0, 0, Math.PI * 2); else if (m === 'hex') { x.moveTo(W * .25, 0); x.lineTo(W * .75, 0); x.lineTo(W, H / 2); x.lineTo(W * .75, H); x.lineTo(W * .25, H); x.lineTo(0, H / 2); } else if (m === 'diamond'){ x.moveTo(W / 2, 0); x.lineTo(W, H / 2); x.lineTo(W / 2, H); x.lineTo(0, H / 2); }
+      if (mask && SHAPES[m]?.[1] && !['circle', 'hex', 'diamond', 'arch', 'blob', 'round'].includes(m)){ x.save(); x.scale(W / 100, H / 100); x.clip(new Path2D(SHAPES[m][1])); x.restore(); }
+      else if (mask){ x.beginPath(); if (m === 'circle') x.ellipse(W / 2, H / 2, W / 2, H / 2, 0, 0, Math.PI * 2); else if (m === 'hex') { x.moveTo(W * .25, 0); x.lineTo(W * .75, 0); x.lineTo(W, H / 2); x.lineTo(W * .75, H); x.lineTo(W * .25, H); x.lineTo(0, H / 2); } else if (m === 'diamond'){ x.moveTo(W / 2, 0); x.lineTo(W, H / 2); x.lineTo(W / 2, H); x.lineTo(0, H / 2); }
         else { const r = m === 'arch' ? Math.min(W / 2, H) : m === 'blob' ? Math.min(W, H) * .4 : (e.r || Math.min(e.w, e.h) * .08) * scale; x.roundRect ? x.roundRect(0, 0, W, H, m === 'arch' ? [r, r, 0, 0] : r) : x.rect(0, 0, W, H); } x.clip(); }
       const iw = im.naturalWidth, ih = im.naturalHeight, cover = e.fit !== 'contain', k = cover ? Math.max(W / iw, H / ih) : Math.min(W / iw, H / ih), dw = iw * k, dh = ih * k;
       const dx = (W - dw) * (e.px ?? 50) / 100, dy = (H - dh) * (e.py ?? 50) / 100;
@@ -4154,6 +4242,7 @@ async function exportPptx(){
         }
         else if (e.t === 'line'){ const a2 = e.a2 || (e.k === 'arrowline' ? 'arrow' : ''); sl.addShape(p.ShapeType.line, {x:pos.x, y:pxIn(e.y + e.h / 2), w:pos.w, h:0, rotate:pos.rotate, line:{color:hx(realCol(e.stroke || 't:ink', sv)), width:pxPt(e.lw || 3), dashType:e.dash === 'dot' ? 'sysDot' : e.dash ? 'dash' : 'solid', beginArrowType:e.a1 === 'arrow' ? 'triangle' : e.a1 === 'dot' ? 'oval' : undefined, endArrowType:a2 === 'arrow' ? 'triangle' : a2 === 'dot' ? 'oval' : undefined}}); }
         else if (e.t === 'img'){ const data = await imgCrop(e); if (data) sl.addImage({data, ...pos, transparency:tr || undefined}); }
+        else if (e.t === 'video'){ const v = vidInfo(e.url); if (v?.yt) sl.addMedia({type:'online', link:`https://www.youtube.com/embed/${v.yt}`, x:pos.x, y:pos.y, w:pos.w, h:pos.h}); else sl.addText(e.url ? [{text:'▶ ' + e.url, options:{hyperlink:{url:e.url}}}] : '▶ Vidéo', {...pos, fill:{color:'16122B'}, color:'FFFFFF', align:'center', valign:'middle', fontFace:sv.fb, fontSize:16}); }
         else if (e.t === 'icon'){ const png = await svgToPng(iconSVG(e.n, realCol(e.fc || 't:ac', sv), e.sw || 1.8).replace('<svg ', `<svg width="${e.w}" height="${e.h}" `), e.w, e.h, 3); if (png) sl.addImage({data:png, ...pos}); }
         else if (e.t === 'table'){
           const hc = realCol(e.hc || 't:ac', sv), rows = e.rows.map((r, i) => r.map(c => { const head = i === 0 && e.head !== false; const t = c.replace(/<br\s*\/?>/g, '\n').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
@@ -4373,13 +4462,13 @@ function cleanDeck(j){
     const s = {id:String(s0.id || sid()), v:['title', 'section', 'content', 'end'].includes(s0.v) ? s0.v : 'content', lay:String(s0.lay || ''), els:[], notes:String(s0.notes || '').slice(0, 20000), tr:s0.tr ? String(s0.tr) : undefined, an:s0.an ? String(s0.an) : undefined, hide:!!s0.hide || undefined, nodeco:!!s0.nodeco || undefined};
     if (s0.bg && typeof s0.bg === 'object'){ const b = {}; if (okCol(s0.bg.c)) b.c = s0.bg.c; if (Array.isArray(s0.bg.g)) b.g = s0.bg.g.map(okCol).filter(Boolean).slice(0, 2); if (/^m:\w+$/.test(s0.bg.img || '')) b.img = s0.bg.img; if (+s0.bg.dim) b.dim = clamp(+s0.bg.dim, 0, .9); if (b.g && b.g.length < 2) delete b.g; if (b.g && ['rad', 'con'].includes(s0.bg.gt)) b.gt = s0.bg.gt; if (b.g && isFinite(+s0.bg.a)) b.a = numIn(s0.bg.a, -720, 720); if (Array.isArray(s0.bg.mesh) && s0.bg.mesh.length === 4 && s0.bg.mesh.every(isCol)) b.mesh = s0.bg.mesh; if (PATS[s0.bg.pat]){ b.pat = s0.bg.pat; if (isCol(s0.bg.pc)) b.pc = s0.bg.pc; b.po = numIn(s0.bg.po, .03, 1, .12); b.ps = numIn(s0.bg.ps, .5, 4, 1); } if (s0.adv) s.adv = numIn(s0.adv, 1, 600); if (s0.trd) s.trd = numIn(s0.trd, .2, 3); if (Object.keys(b).length) s.bg = b; }
     for (const e0 of s0.els.slice(0, 300)){
-      if (!e0 || !['text', 'shape', 'line', 'img', 'icon', 'table', 'chart'].includes(e0.t)) continue;
+      if (!e0 || !['text', 'shape', 'line', 'img', 'icon', 'table', 'chart', 'video'].includes(e0.t)) continue;
       const e = {...e0}; e.id = String(e.id || nid()); for (const k of ['x', 'y', 'w', 'h']) e[k] = +e[k] || 0; e.w = Math.max(1, e.w); e.h = Math.max(1, e.h);
       if (e.html != null) e.html = SAN(String(e.html)); if (e.rows) e.rows = (Array.isArray(e.rows) ? e.rows : []).slice(0, 60).map(r => (Array.isArray(r) ? r : []).slice(0, 20).map(c => SAN(String(c ?? ''))));
       for (const k of ['fill', 'g2', 'stroke', 'fc', 'hc']) if (k in e && okCol(e[k]) === undefined) delete e[k];
       if (e.st){ e.st = {...e.st}; for (const k of ['fc', 'bg', 'hl']) if (k in e.st && okCol(e.st[k]) === undefined) delete e.st[k]; if (e.st.f && !['h', 'b'].includes(e.st.f) && !FONTS.some(f => f[0] === e.st.f)) e.st.f = 'b'; }
       if (e.t === 'img' && e.src && !/^m:\w+$/.test(e.src)){ if (/^data:image\/(png|jpe?g|gif|webp);base64,/.test(e.src)){ const id = uidS(); d.media[id] = e.src; e.src = 'm:' + id; } else e.src = ''; }
-      if (e.t === 'icon' && !ICONS[e.n]) e.n = 'star'; if (e.t === 'shape' && !SHAPES[e.k]) e.k = 'rect'; cleanFx(e);
+      if (e.t === 'icon' && !ICONS[e.n]) e.n = 'star'; if (e.t === 'shape' && !SHAPES[e.k]) e.k = 'rect'; cleanFx(e); if (e.t === 'video'){ e.url = vidInfo(e.url) ? String(e.url).slice(0, 400) : ''; }
       if (e.t === 'chart'){ e.labels = (e.labels || []).map(String).slice(0, 60); e.series = (e.series || []).slice(0, 12).map(x => ({n:String(x.n || ''), v:(x.v || []).slice(0, 60).map(v => v == null || isNaN(+v) ? null : +v)})); }
       s.els.push(e);
     }
@@ -4401,7 +4490,7 @@ function spectreActions(){
   LAYOUTS.forEach(([k, t]) => add('Mise en page', 'Mise en page : ' + t.toLowerCase(), () => applyLayout(k), 'disposition')); LAYOUTS.forEach(([k, t]) => add('Nouvelle diapositive', 'Nouvelle diapositive : ' + t.toLowerCase(), () => addSlide({layout:k}), 'ajouter'));
   Object.entries(TEXT_STYLES).forEach(([k, [t]]) => add('Insérer', 'Ajouter : ' + t.toLowerCase(), () => addText(k), 'texte'));
   SHAPE_ORDER.forEach(k => add('Insérer', 'Forme : ' + SHAPES[k][0].toLowerCase(), () => addShape(k), 'forme'));
-  add('Insérer', 'Image…', () => pickImage(), 'photo'); add('Insérer', 'Icône…', () => iconPop(g$('edBar')), 'pictogramme'); add('Insérer', 'Tableau', () => addTable(4, 3)); CHART_TYPES.forEach(([k, t]) => add('Insérer', 'Graphique : ' + t.toLowerCase(), () => addChart(k), 'diagramme'));
+  add('Insérer', 'Image…', () => pickImage(), 'photo'); add('Insérer', 'Vidéo…', () => askVideo(), 'youtube vimeo mp4 film'); add('Insérer', 'Icône…', () => iconPop(g$('edBar')), 'pictogramme'); add('Insérer', 'Tableau', () => addTable(4, 3)); CHART_TYPES.forEach(([k, t]) => add('Insérer', 'Graphique : ' + t.toLowerCase(), () => addChart(k), 'diagramme'));
   SMARTS.forEach(([k, t]) => add('Schémas', 'Schéma : ' + t.toLowerCase(), () => addSmart(k), 'smartart diagramme organigramme cycle pyramide')); BLOCKS.forEach(([k, t]) => add('Insérer', 'Élément : ' + t.toLowerCase(), () => addEls(blockEls(k), t)));
   DTHEMES.forEach(t => add('Design', 'Thème ' + t.name, () => { D.theme = {id:t.id}; ensureThemeFonts(); THUMB.clear(); renderAll(); commit('Thème'); }, 'couleurs style'));
   Object.entries(SIZE_NAMES).forEach(([k, t]) => add('Design', 'Format ' + t, () => resizeDeck(k), 'taille'));
@@ -4416,6 +4505,7 @@ function spectreActions(){
   add('Animer', 'Animer toute la présentation', () => { openPanel('anim'); g$('edPanelBody').querySelector('[data-a="magic"]')?.click(); }, 'animation transition'); TRANS.slice(1).forEach(([k, t]) => add('Animer', 'Transition : ' + t.toLowerCase(), () => { cur().tr = k; commit('Transition'); previewTransition(); }));
   add('Fichier', 'Exporter en PDF', () => doExport('pdf'), 'imprimer'); add('Fichier', 'Exporter en PowerPoint (.pptx)', () => doExport('pptx'), 'ppt'); add('Fichier', 'Exporter en page web', () => doExport('html'));
   add('Fichier', 'Ouvrir un fichier PowerPoint…', () => g$('homeFile').click(), 'importer pptx'); add('Fichier', 'Enregistrer comme modèle', saveTplDlg); add('Fichier', 'Publier dans la Communauté', () => window.SWHome?.publishCurrent?.()); add('Fichier', 'Partager…', () => window.SWShareCurrent?.());
+  add('Édition', 'Rechercher et remplacer…', findDlg, 'chercher trouver texte'); add('Édition', 'Copier le style', copyStyle, 'pinceau format'); add('Édition', 'Coller le style', pasteStyle, 'pinceau format');
   add('Édition', 'Annuler', undo); add('Édition', 'Rétablir', redo); add('Édition', 'Tout sélectionner', () => select(cur().els.map(e => e.id))); add('Édition', 'Raccourcis clavier', shortcutsDlg, 'aide');
   if (SEL.size){ add('Sélection', 'Dupliquer', dupSel); add('Sélection', 'Supprimer', delSel); add('Sélection', 'Premier plan', () => layer('front')); add('Sélection', 'Arrière-plan', () => layer('back')); ['l', 'c', 'r', 't', 'm', 'b'].forEach((k, i) => add('Sélection', 'Aligner : ' + ['à gauche', 'au centre', 'à droite', 'en haut', 'au milieu', 'en bas'][i], () => alignSel(k))); add('Sélection', 'Grouper', groupSel); add('Sélection', 'Verrouiller', lockSel); }
   D.slides.forEach((s, i) => { if (i !== CUR) add('Aller à', `Diapositive ${i + 1}${slideTitle(s) ? ' · ' + slideTitle(s) : ''}`, () => goSlide(i)); });
@@ -4648,6 +4738,8 @@ function filePop(anchor){
 function shortcutsDlg(){
   const k = (a, b) => `<tr><td>${a}</td><td>${b}</td></tr>`;
   SWDlg.open(`<h3>Raccourcis et astuces</h3><div class="sc-wrap"><table class="sc">
+    ${k('<kbd>Ctrl</kbd> + <kbd>H</kbd>', 'Rechercher et remplacer dans toute la présentation')}
+    ${k('<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>C</kbd> / <kbd>V</kbd>', 'Copier le style d\'un élément · l\'appliquer à un autre')}
     ${k('Double-clic', 'Modifier un texte · choisir une image · saisir les données d\'un graphique')}
     ${k('<kbd>Entrée</kbd> · <kbd>Échap</kbd>', 'Modifier le texte sélectionné · terminer')}
     ${k('<kbd>T</kbd> · <kbd>R</kbd> · <kbd>C</kbd> · <kbd>L</kbd>', 'Ajouter un texte, un rectangle, un cercle, une ligne')}
@@ -4677,6 +4769,9 @@ function globalKeys(e){
     if (!g$('edPop').hidden) return closePop(); if (!g$('apDlg').hidden) return; if (EDT){ e.preventDefault(); const id = EDT.id; stopEdit(); select(id); return; } if (panel) return openPanel(panel); if (SEL.size) return clearSel();
   }
   if (mod && lk === 'p'){ e.preventDefault(); return doExport('pdf'); }
+  if (g$('spectre').hidden && g$('apDlg').hidden && !EDT && !(document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))){
+    if (mod && e.altKey && lk === 'c'){ e.preventDefault(); return copyStyle(); } if (mod && e.altKey && lk === 'v'){ e.preventDefault(); return pasteStyle(); }
+    if (mod && lk === 'h'){ e.preventDefault(); return findDlg(); } }
   if (mod && lk === 's'){ e.preventDefault(); window.SWHome?.flush?.(); return toast('Enregistré automatiquement'); }
   if (!g$('spectre').hidden || !g$('apDlg').hidden) return;
   const ae = document.activeElement;
