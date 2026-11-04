@@ -1,1 +1,2 @@
 firebase/firestore.rules
+tests/e2e/out/
