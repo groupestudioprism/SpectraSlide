@@ -66,7 +66,9 @@ function effectsPop(anchor){
     <label class="pop-toggle"><input type="checkbox" data-x="sh" ${st.sh ? 'checked' : ''}><div><b>Ombre du texte</b><small>Lisible sur une photo</small></div></label>
     <label class="pop-toggle"><input type="checkbox" data-x="bg" ${st.bg ? 'checked' : ''}><div><b>Étiquette</b><small>Un fond coloré derrière le texte</small></div></label>
     <label class="pop-toggle"><input type="checkbox" data-x="s" ${st.s ? 'checked' : ''}><div><b>Barré</b><small>Ligne au milieu du texte</small></div></label></div>
-    ${st.bg ? `<div class="pop-row"><span>Couleur de l'étiquette</span><button type="button" class="pop-link" id="bgCol">Choisir</button></div>` : ''}`, p => {
+    ${st.bg ? `<div class="pop-row"><span>Couleur de l'étiquette</span><button type="button" class="pop-link" id="bgCol">Choisir</button></div>` : ''}
+    <div class="pop-list"><hr><button type="button" id="moreFx">${ICX.fmt}Néon, contour, dégradé, 3D…<kbd>WordArt</kbd></button></div>`, p => {
+    p.querySelector('#moreFx').onclick = () => { closePop(); openPanel('format'); };
     p.onchange = ev => { const x = ev.target.dataset.x; if (!x) return; const on = ev.target.checked; closePop();
       setSt(x === 'bg' ? (on ? {bg:'t:soft', pad:12, r:10} : {bg:null}) : {[x]:on ? 1 : null}, 'Effet'); };
     p.querySelector('#bgCol')?.addEventListener('click', () => colorPop(anchor, st.bg, v => setSt({bg:v || null}, 'Étiquette')));

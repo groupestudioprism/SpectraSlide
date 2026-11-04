@@ -129,6 +129,7 @@ async function exportPptx(){
         }
       } catch(x){ console.warn('[SPECTRA Slide] export pptx', e, x); }
     }
+    const fp = footParts(s, D.slides.indexOf(s)); if (fp){ const fy = H - Math.round(22 * W / 1280) - 24, mx = Math.round(80 * W / 1280); [['left', 0], ['center', 1], ['right', 2]].forEach(([al, j]) => { if (fp[j]) sl.addText(fp[j], {x:pxIn(mx), y:pxIn(fy), w:pxIn(W - 2 * mx), h:pxIn(26), fontFace:sv.fb, fontSize:pxPt(14), color:hx(sv.mut), align:al, valign:'middle', margin:0}); }); }
     if (s.notes) sl.addNotes(s.notes);
   }
   const blob = await p.write({outputType:'blob'});
@@ -323,6 +324,7 @@ async function importPptx(file){
 function cleanDeck(j){
   const d = {v:1, app:'spectraslide', title:String(j.title || 'Présentation sans titre').slice(0, 120), theme:j.theme && typeof j.theme === 'object' ? j.theme : {id:'spectra'}, size:SIZES[j.size] ? j.size : '16:9', slides:[], media:{}};
   if (j.loop) d.loop = true;
+  if (j.foot && typeof j.foot === 'object'){ const f = {}; if (j.foot.num) f.num = true; if (j.foot.date) f.date = true; if (j.foot.text) f.text = String(j.foot.text).slice(0, 120); if (j.foot.skip === false) f.skip = false; if (f.num || f.date || f.text) d.foot = f; }
   for (const [k, v] of Object.entries(j.media || {})) if (/^data:image\/(png|jpe?g|gif|webp|svg\+xml);base64,/.test(String(v))) d.media[k] = v;
   const okCol = c => c == null || c === '' || /^t:[a-z0-9]+$/.test(c) || /^#[0-9a-f]{3,8}$/i.test(c) ? c : undefined;
   for (const s0 of (j.slides || []).slice(0, 400)){

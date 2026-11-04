@@ -44,7 +44,7 @@ function formatPanelHTML(){
     return h;
   }
   const st = e.st || {}, hasTxt = e.t === 'text' || (e.t === 'shape' && e.html != null), f = e.fx || {}, one = l.length === 1;
-  if (one) h += sec('pos', 'Position et taille', `<div class="fm-geo">${[['x', 'X'], ['y', 'Y'], ['w', 'L'], ['h', 'H'], ['rot', '°']].map(([k, t]) => `<label><span>${t}</span><input type="number" data-geo="${k}" value="${fNum(k === 'rot' ? e.rot || 0 : e[k])}" step="${k === 'rot' ? 5 : 1}"></label>`).join('')}</div>
+  if (one) h += sec('pos', 'Position et taille', `<div class="fm-geo">${[['x', 'X'], ['y', 'Y'], ['w', 'L'], ['h', 'H'], ['rot', '°']].map(([k, t]) => `<label><span>${t}</span><input type="number" data-geo="${k}" value="${k === 'rot' ? fNum(e.rot || 0) : Math.round(e[k])}" step="${k === 'rot' ? 5 : 1}"></label>`).join('')}</div>
       <div class="pn-chips"><button type="button" data-fv="fx.fh" data-v="${f.fh ? '' : 1}" aria-pressed="${!!f.fh}">${ICX.pos} Miroir horizontal</button><button type="button" data-fv="fx.fv" data-v="${f.fv ? '' : 1}" aria-pressed="${!!f.fv}">Miroir vertical</button></div>
       <label class="fm-txt"><span>Texte alternatif <small>description pour l'accessibilité</small></span><input type="text" data-ft="alt" maxlength="300" value="${escH(e.alt || '')}" placeholder="Décrivez cet élément"></label>
       <label class="fm-txt"><span>Lien <small>ouvert en cliquant en présentation</small></span><input type="text" data-ft="lk" maxlength="500" value="${escH(e.lk || '')}" placeholder="https://… ou #3 (diapositive 3)"></label>`, true);
@@ -66,7 +66,7 @@ function formatPanelHTML(){
   h += sec('adj', 'Ajustements', `${rg('fx.br', 'Luminosité', 30, 200, 1, f.br ?? 100, ' %')}${rg('fx.ct', 'Contraste', 30, 200, 1, f.ct ?? 100, ' %')}${rg('fx.sa', 'Saturation', 0, 250, 1, f.sa ?? 100, ' %')}${rg('fx.hu', 'Teinte', -180, 180, 1, f.hu || 0, '°')}`);
   if (hasTxt){
     const to = st.to, tl = st.tl, tsd = st.tsd, t3 = st.t3, tg = st.tg;
-    h += sec('txt', 'Effets de texte', `<p class="pn-sub">Styles prêts à l'emploi</p><div class="wa-grid">${WORDART.map(([t, x], i) => `<button type="button" data-wa="${i}" title="${t}"><span style="${txCss({f:'h', fs:26, b:1, fc:'#FFFFFF', ...x})}">Abc</span><em>${t}</em></button>`).join('')}</div>
+    h += sec('txt', 'Effets de texte', `<p class="pn-sub">Styles prêts à l'emploi</p><div class="wa-grid" style="${varsCss(sv)}">${WORDART.map(([t, x], i) => `<button type="button" data-wa="${i}" title="${t}"><span style="${txCss({f:'h', fs:26, b:1, fc:'#FFFFFF', ...x})}">Abc</span><em>${t}</em></button>`).join('')}</div>
       ${tog('st.to', 'Contour du texte', '', !!to)}${to ? `<div class="fm-box">${rg('st.to.w', 'Épaisseur', 0, 12, .5, to.w, ' px')}${sw('st.to.c', 'Couleur', to.c)}${tog('st.to.f0', 'Texte creux', 'Seul le contour reste visible', to.f === 0)}</div>` : ''}
       ${tog('st.tg', 'Dégradé dans le texte', '', !!tg)}${tg ? `<div class="fm-box">${sw('st.tg.0', 'Couleur 1', tg[0])}${sw('st.tg.1', 'Couleur 2', tg[1])}${rg('st.tg.2', 'Angle', 0, 360, 5, tg[2] ?? 90, '°')}</div>` : ''}
       ${tog('st.tl', 'Lueur du texte', '', !!tl)}${tl ? `<div class="fm-box">${rg('st.tl.b', 'Rayon', 2, 60, 1, tl.b, ' px')}${sw('st.tl.c', 'Couleur', tl.c)}</div>` : ''}
@@ -115,7 +115,7 @@ function wireFormat(b){
       if (path === 'fill' && !v){ fmApply('fill', ''); } else fmApply(path, v || null); fmCommit('Couleur');
     }, {none:none !== false, noneLabel:'Aucune'}); }; });
   b.querySelectorAll('[data-fshadow]').forEach(x => { x.onclick = () => { const v = FM_SHADOWS[+x.dataset.fshadow][1]; setProps(e => { delete e.shadow; if (!e.fx) e.fx = {}; if (v) e.fx.sh = {...v}; else delete e.fx.sh; tidyEl(e); }, 'Ombre', false); renderPanel(); }; });
-  b.querySelectorAll('[data-wa]').forEach(x => { x.onclick = () => { const w = WORDART[+x.dataset.wa][1]; setProps(e => { if (!e.st) e.st = {}; WORDART_KEYS.forEach(k => delete e.st[k]); Object.entries(w).forEach(([k, v]) => e.st[k] = JSON.parse(JSON.stringify(v))); if (e.html) e.html = stripInline(e.html, ['fc']); tidyEl(e); }, 'Style de texte', true); renderPanel(); }; });
+  b.querySelectorAll('[data-wa]').forEach(x => { x.onclick = () => { applyWordArt(+x.dataset.wa); renderPanel(); }; });
   b.querySelectorAll('[data-fv="fillkind"]').forEach(x => { x.onclick = () => { const k = x.dataset.v; setProps(e => { const c = e.fill || 't:ac';
     if (k === 'none'){ e.fill = ''; delete e.g2; delete e.g3; delete e.gt; } else if (k === 'solid'){ e.fill = c; delete e.g2; delete e.g3; delete e.gt; }
     else { e.fill = c; if (!e.g2) e.g2 = e.fill === 't:ac' ? 't:ac2' : 't:ac'; if (k === 'lin') delete e.gt; else e.gt = k; } }, 'Remplissage', true); renderPanel(); }; });
@@ -130,3 +130,13 @@ function wireFormat(b){
     else if (a === 'bgall'){ D.slides.forEach(q => { if (q !== s){ if (s.bg) q.bg = JSON.parse(JSON.stringify(s.bg)); else delete q.bg; q.nodeco = s.nodeco; } }); renderAll(); commit('Fond pour toutes'); toast('Fond appliqué à toutes les diapositives'); }
     else if (a === 'fxreset'){ setProps(e => { delete e.fx; delete e.shadow; delete e.pat; delete e.sd; if (e.st) WORDART_KEYS.forEach(k => delete e.st[k]); }, 'Effets réinitialisés', true); renderPanel(); } }; });
 }
+
+/* actions réutilisées par le Spectre (Ctrl + K) */
+function applyWordArt(i){
+  const w = WORDART[i][1]; if (!selEls().some(e => e.t === 'text' || (e.t === 'shape' && e.html != null))) return toast('Sélectionnez un texte');
+  setProps(e => { if (!(e.t === 'text' || e.t === 'shape')) return; if (!e.st) e.st = {}; WORDART_KEYS.forEach(k => delete e.st[k]); Object.entries(w).forEach(([k, v]) => e.st[k] = JSON.parse(JSON.stringify(v))); if (e.html) e.html = stripInline(e.html, ['fc']); tidyEl(e); }, 'Style de texte', true);
+}
+function applyShadow(i){ if (!SEL.size) return toast('Sélectionnez un élément'); const v = FM_SHADOWS[i][1]; setProps(e => { delete e.shadow; if (!e.fx) e.fx = {}; if (v) e.fx.sh = {...v}; else delete e.fx.sh; tidyEl(e); }, 'Ombre', false); }
+function setElAnim(k){ if (!SEL.size) return toast('Sélectionnez un élément'); setProps(x => { x.an = {k, click:x.an?.click}; }, 'Animation', false); previewAnim(selEls()); }
+function toggleView(k){ V[k] = !V[k]; if (k === 'snapGrid' && V.snapGrid) V.grid = true; lsSet('ss.view', {grid:V.grid, snapGrid:V.snapGrid, guides:V.guides}); applyView(); if (panel === 'format') renderPanel(); toast(V[k] ? 'Activé' : 'Désactivé'); }
+function setBgPattern(k){ const s = cur(); s.bg = s.bg || {}; if (k) s.bg.pat = k; else { delete s.bg.pat; if (!Object.keys(s.bg).length) delete s.bg; } renderAll(); commit('Motif de fond'); }

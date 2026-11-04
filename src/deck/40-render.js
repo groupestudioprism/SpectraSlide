@@ -128,7 +128,7 @@ function chartSVG(e, sv){
 }
 function elInner(e, sv, o){
   switch (e.t){
-    case 'text': return `<div class="tx" style="${txCss(e.st)}${e.st?.bg ? `background:${cssCol(e.st.bg)};padding:${e.st.pad ?? 16}px ${Math.round((e.st.pad ?? 16) * 1.4)}px;border-radius:${e.st.r ?? 10}px;` : ''}">${e.html || ''}</div>`;
+    case 'text': return `<div class="tx"${o.edit && !e.html ? ` data-ph="${e.ph === 'title' ? 'Cliquez pour ajouter un titre' : e.ph === 'sub' ? 'Cliquez pour ajouter un sous-titre' : 'Cliquez pour écrire'}"` : ''} style="${txCss(e.st)}${e.st?.bg ? `background:${cssCol(e.st.bg)};padding:${e.st.pad ?? 16}px ${Math.round((e.st.pad ?? 16) * 1.4)}px;border-radius:${e.st.r ?? 10}px;` : ''}">${e.html || ''}</div>`;
     case 'shape': return shapeHTML(e, sv);
     case 'line': return lineHTML(e, sv);
     case 'icon': return iconSVG(e.n, realCol(e.fc || 't:ac', sv), e.sw || 1.8);
@@ -168,7 +168,7 @@ function renderSlide(s, o = {}){
     if (o.present && e.t === 'img' && !mediaSrc(e.src) && e.w * e.h > W * H * .15) continue;
     h += `<div class="el el-${e.t}${e.lock ? ' lk' : ''}${e.lk && o.present ? ' lnk' : ''}" ${o.edit || o.present ? `data-id="${e.id}" ` : ''}${e.lk && o.present ? `data-lk="${escH(e.lk)}" ` : ''}${e.alt ? `role="img" aria-label="${escH(e.alt)}" ` : ''}style="${boxCss(e)}">${elInner(e, sv, o)}</div>`;
   }
-  return h + '</div>';
+  return h + footHTML(s, W, H) + '</div>';
 }
 /* aperçu enregistré avec la présentation (accueil, Communauté) : la première diapositive, sans images, assez court pour les métadonnées */
 function previewOfDeck(d, max = 5800){

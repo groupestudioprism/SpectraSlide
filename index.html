@@ -1302,6 +1302,9 @@ body.ro .ray:not([data-panel="outline"]):not([data-panel="templates"]){opacity:.
 @keyframes tr-spin-in{from{opacity:0;transform:rotate(calc(var(--dir,1) * -30deg)) scale(.25)}}@keyframes tr-spin-out{to{opacity:0;transform:rotate(calc(var(--dir,1) * 30deg)) scale(1.6)}}
 @keyframes tr-fall-out{to{opacity:0;transform:translateY(110%) rotate(calc(var(--dir,1) * 14deg))}}
 @keyframes tr-roll-in{from{opacity:0;transform:perspective(1600px) rotateX(calc(var(--dir,1) * -75deg))}}@keyframes tr-roll-out{to{opacity:0;transform:perspective(1600px) rotateX(calc(var(--dir,1) * 75deg))}}
+/* pied de page */
+.sl .sl-foot{position:absolute;display:flex;justify-content:space-between;gap:24px;color:var(--mut);font-weight:600;pointer-events:none;letter-spacing:.01em}
+.sl .sl-foot .ft0{flex:1}.sl .sl-foot .ft1{flex:none}.sl .sl-foot .ft2{flex:none;min-width:1.5em;text-align:right}
 /* @end-slide-css */
 @media (prefers-reduced-motion:reduce){.el.an-run{animation-duration:.01ms!important;animation-delay:0ms!important}}
 /* ---------- panneau Format et réglages communs ---------- */
@@ -1359,6 +1362,18 @@ body.ro .ray:not([data-panel="outline"]):not([data-panel="templates"]){opacity:.
 #pvHelp>div{position:relative;width:min(460px,92vw);max-height:88vh;overflow:auto;padding:22px 24px;border-radius:18px;background:#141221;color:#E9E6F5;box-shadow:0 0 0 1px #2A2540}
 #pvHelp b{font:700 18px var(--f-disp,system-ui)}#pvHelp button{position:absolute;right:14px;top:10px;border:0;background:none;color:#B8B3CE;font-size:26px;cursor:pointer}
 #pvHelp dl{display:grid;grid-template-columns:auto 1fr;gap:8px 18px;margin:16px 0 0;font-size:13.5px}#pvHelp dt{font:600 12px var(--f-mono,monospace);color:#fff;background:#2A2540;padding:3px 8px;border-radius:6px;justify-self:start}#pvHelp dd{margin:0;color:#B8B3CE;align-self:center}
+
+.pn-smarts{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.pn-smarts button{display:grid;justify-items:center;gap:6px;padding:12px 6px 10px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--accent);font-size:12px;font-weight:600}
+.pn-smarts button:hover{border-color:var(--accent);background:var(--accent-soft)}.pn-smarts svg{width:40px;height:40px}.pn-smarts span{color:var(--ink2);text-align:center}
+.fm-count{display:flex;align-items:center;gap:6px;margin:2px 0 10px;font-size:12.5px;font-weight:600;color:var(--ink2)}
+.fm-count button{min-width:34px;height:30px;padding:0 10px;border-radius:99px;border:1px solid var(--line2);background:var(--panel);font-weight:600;color:var(--ink2)}
+.fm-count button[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+
+.fm-foot{display:grid;gap:4px}
+
+.slide-view .el-text .tx[data-ph]:empty::before{content:attr(data-ph);opacity:.4;font-style:italic;font-weight:500;-webkit-text-fill-color:currentColor;pointer-events:none}
+.slide-view .el.editing .tx[data-ph]:empty::before{content:"Tapez votre texte";font-style:normal;opacity:.6}
 </style>
 </head><body>
 
@@ -2240,7 +2255,7 @@ function chartSVG(e, sv){
 }
 function elInner(e, sv, o){
   switch (e.t){
-    case 'text': return `<div class="tx" style="${txCss(e.st)}${e.st?.bg ? `background:${cssCol(e.st.bg)};padding:${e.st.pad ?? 16}px ${Math.round((e.st.pad ?? 16) * 1.4)}px;border-radius:${e.st.r ?? 10}px;` : ''}">${e.html || ''}</div>`;
+    case 'text': return `<div class="tx"${o.edit && !e.html ? ` data-ph="${e.ph === 'title' ? 'Cliquez pour ajouter un titre' : e.ph === 'sub' ? 'Cliquez pour ajouter un sous-titre' : 'Cliquez pour écrire'}"` : ''} style="${txCss(e.st)}${e.st?.bg ? `background:${cssCol(e.st.bg)};padding:${e.st.pad ?? 16}px ${Math.round((e.st.pad ?? 16) * 1.4)}px;border-radius:${e.st.r ?? 10}px;` : ''}">${e.html || ''}</div>`;
     case 'shape': return shapeHTML(e, sv);
     case 'line': return lineHTML(e, sv);
     case 'icon': return iconSVG(e.n, realCol(e.fc || 't:ac', sv), e.sw || 1.8);
@@ -2280,7 +2295,7 @@ function renderSlide(s, o = {}){
     if (o.present && e.t === 'img' && !mediaSrc(e.src) && e.w * e.h > W * H * .15) continue;
     h += `<div class="el el-${e.t}${e.lock ? ' lk' : ''}${e.lk && o.present ? ' lnk' : ''}" ${o.edit || o.present ? `data-id="${e.id}" ` : ''}${e.lk && o.present ? `data-lk="${escH(e.lk)}" ` : ''}${e.alt ? `role="img" aria-label="${escH(e.alt)}" ` : ''}style="${boxCss(e)}">${elInner(e, sv, o)}</div>`;
   }
-  return h + '</div>';
+  return h + footHTML(s, W, H) + '</div>';
 }
 /* aperçu enregistré avec la présentation (accueil, Communauté) : la première diapositive, sans images, assez court pour les métadonnées */
 function previewOfDeck(d, max = 5800){
@@ -3061,6 +3076,89 @@ function applyLayout(L){
   D.slides[CUR] = n; SEL.clear(); renderAll(); commit('Mise en page'); toast(`Mise en page « ${LAYOUTS.find(x => x[0] === L)?.[1] || L} »`);
 }
 
+/* ==== 53-smart.js ==== */
+/* ---------- Schémas prêts à l'emploi (façon SmartArt) : chaque schéma est un groupe d'éléments modifiables ---------- */
+(() => {
+  for (let j = 1; j <= 8; j++){ const a = Math.round(50 / (j + 1) * 10) / 10, b = Math.round((100 - a) * 10) / 10; SHAPES['pyr' + j] = ['Pyramide', `M${a} 0H${b}L100 100H0Z`]; SHAPES['fun' + j] = ['Entonnoir', `M0 0H100L${b} 100H${a}Z`]; }
+  SHAPES.itri = ['Triangle inversé', 'M0 0H100L50 100Z'];
+})();
+const SMARTS = [['process', 'Processus', 4, [3, 6]], ['cycle', 'Cycle', 4, [3, 6]], ['pyramid', 'Pyramide', 4, [3, 6]], ['funnel', 'Entonnoir', 4, [3, 6]], ['org', 'Organigramme', 3, [2, 5]], ['venn', 'Diagramme de Venn', 3, [2, 3]],
+  ['matrix', 'Matrice 2 × 2', 4, [4, 4]], ['list', 'Liste verticale', 4, [3, 6]], ['target', 'Cible', 4, [3, 5]], ['hub', 'Rayonnement', 5, [3, 8]], ['steps', 'Escalier', 4, [3, 6]], ['compare', 'Avant / après', 2, [2, 2]]];
+function smartEls(kind, n){
+  const [W, H] = dims(), k = W / 1280, g = 'g' + uidS(), PAL = ['t:ac', 't:ac2', 't:ac3'], col = i => PAL[i % 3], out = [];
+  const cx = W / 2, cy = H / 2, wA = W * .8, hA = H * .62, x0 = (W - wA) / 2, y0 = (H - hA) / 2, f = v => Math.round(v * k), add = e => { e.g = g; out.push(e); return e; };
+  const node = (shape, x, y, w, h, fill, label, st = {}, ex = {}) => add(SH(shape, x, y, w, h, fill, {html:label, st:{f:'h', fs:f(24), b:1, fc:'t:on', ha:'c', va:'m', lh:1.15, ...st}, ...ex}));
+  const lab = (i, t = 'Étape') => `${t} ${i + 1}`;
+  if (kind === 'process'){
+    const gap = f(10), w = (wA + gap * (n - 1) * 0 - 0) / n, h = f(130), y = cy - h / 2 - f(20);
+    for (let i = 0; i < n; i++){ const x = x0 + i * (wA / n); node('chev', x, y, wA / n + f(26), h, col(i), lab(i), {fs:f(n > 4 ? 20 : 24)}); add(T(x + f(14), y + h + f(18), wA / n - f(24), f(70), 'Décrivez cette étape en une phrase.', {fs:f(17), fc:'t:mut', ha:'c', lh:1.35})); }
+  } else if (kind === 'cycle'){
+    const R = Math.min(wA, hA) / 2 - f(64), d = f(n > 5 ? 104 : 124);
+    add(SH('ellipse', cx - R, cy - R, R * 2, R * 2, '', {stroke:'t:line', sw:f(4), sd:'dash'}));
+    for (let i = 0; i < n; i++){ const a = (i * 360 / n - 90) * Math.PI / 180, m = ((i + .5) * 360 / n - 90) * Math.PI / 180;
+      node('ellipse', cx + R * Math.cos(a) - d / 2, cy + R * Math.sin(a) - d / 2, d, d, col(i), lab(i), {fs:f(20)});
+      add(SH('tri', cx + R * Math.cos(m) - f(13), cy + R * Math.sin(m) - f(13), f(26), f(26), 't:mut', {rot:Math.round((i + .5) * 360 / n - 90 + 180) % 360})); }
+    add(T(cx - f(120), cy - f(24), f(240), f(48), 'Cycle', {f:'h', fs:f(34), b:1, ha:'c'}));
+  } else if (kind === 'pyramid' || kind === 'funnel'){
+    const Wp = Math.min(wA, hA * 1.35), lh = hA / n, gap = f(6);
+    for (let i = 0; i < n; i++){
+      const fn = kind === 'funnel', bw = fn ? Wp * (n - i) / n : Wp * (i + 1) / n, shape = fn ? (i === n - 1 ? 'itri' : 'fun' + Math.min(8, n - i - 1)) : (i === 0 ? 'tri' : 'pyr' + Math.min(8, i));
+      const last = fn && i === n - 1;
+      node(last ? 'round' : shape, cx - (last ? Wp * 1.3 / n : bw) / 2, y0 + i * lh + gap / 2, last ? Wp * 1.3 / n : bw, lh - gap, col(i), lab(i, 'Niveau'), {fs:f(last ? 17 : 22), va:kind === 'pyramid' && i === 0 ? 'b' : 'm'}, last ? {r:f(16)} : {});
+    }
+  } else if (kind === 'org'){
+    const bw = f(250), bh = f(78), cw = Math.min(f(250), (wA - f(24) * (n - 1)) / n), ty = y0 + f(10), cyy = y0 + hA - bh - f(10), bar = f(3);
+    node('round', cx - bw / 2, ty, bw, bh, 't:ac', 'Direction', {fs:f(26)}, {r:f(14)});
+    const xs = Array.from({length:n}, (_, i) => cx - (n * cw + (n - 1) * f(24)) / 2 + i * (cw + f(24)) + cw / 2), my = (ty + bh + cyy) / 2;
+    add(SH('rect', cx - bar / 2, ty + bh, bar, my - ty - bh, 't:line')); add(SH('rect', xs[0] - bar / 2, my - bar / 2, xs[n - 1] - xs[0] + bar, bar, 't:line'));
+    xs.forEach((x, i) => { add(SH('rect', x - bar / 2, my, bar, cyy - my, 't:line')); node('round', x - cw / 2, cyy, cw, bh, 't:soft', 'Équipe ' + (i + 1), {fs:f(22), fc:'t:ink'}, {r:f(14), stroke:col(i + 1), sw:f(3)}); });
+  } else if (kind === 'venn'){
+    const d = Math.min(hA * .72, wA / (n === 2 ? 1.7 : 2)), pos = n === 2 ? [[cx - d * .32, cy], [cx + d * .32, cy]] : [[cx - d * .3, cy - d * .18], [cx + d * .3, cy - d * .18], [cx, cy + d * .32]];
+    pos.slice(0, n).forEach(([x, y], i) => { add(SH('ellipse', x - d / 2, y - d / 2, d, d, col(i), {op:.55})); });
+    pos.slice(0, n).forEach(([x, y], i) => { const dx = x - cx, dy = y - cy, l = Math.hypot(dx, dy) || 1; add(T(x + dx / l * d * .22 - f(80), y + dy / l * d * .22 - f(18), f(160), f(36), 'Idée ' + (i + 1), {f:'h', fs:f(26), b:1, ha:'c', fc:'t:ink'})); });
+  } else if (kind === 'matrix'){
+    const gw = f(16), cw = (Math.min(wA, hA * 1.8) - gw) / 2, ch = (hA - gw) / 2, mx = cx - cw - gw / 2;
+    for (let i = 0; i < 4; i++){ const x = mx + (i % 2) * (cw + gw), y = y0 + Math.floor(i / 2) * (ch + gw);
+      add(SH('round', x, y, cw, ch, 't:soft', {r:f(18), stroke:'t:line', sw:1})); add(SH('rect', x + f(24), y + f(24), f(48), f(6), col(i)));
+      add(T(x + f(24), y + f(42), cw - f(48), f(38), 'Quadrant ' + (i + 1), {f:'h', fs:f(26), b:1})); add(T(x + f(24), y + f(86), cw - f(48), ch - f(100), 'Un court texte explicatif.', {fs:f(18), fc:'t:mut', lh:1.4})); }
+  } else if (kind === 'list'){
+    const rh = Math.min(f(92), hA / n - f(12)), gap = (hA - rh * n) / Math.max(1, n - 1);
+    for (let i = 0; i < n; i++){ const y = y0 + i * (rh + gap);
+      add(SH('round', x0, y, wA, rh, 't:soft', {r:f(16), stroke:'t:line', sw:1})); node('ellipse', x0 + f(18), y + (rh - rh * .66) / 2, rh * .66, rh * .66, col(i), String(i + 1), {fs:f(26)});
+      add(T(x0 + rh + f(20), y, wA - rh - f(40), rh, `Point ${i + 1} : une idée en une ligne`, {f:'h', fs:f(26), b:1, va:'m'})); }
+  } else if (kind === 'target'){
+    const R = Math.min(hA / 2, wA / 4);
+    for (let i = 0; i < n; i++){ const r = R * (n - i) / n; add(SH('ellipse', cx - r, cy - r, r * 2, r * 2, col(i), {op:i === n - 1 ? 1 : .25 + .1 * i})); }
+    add(T(cx - f(70), cy - f(18), f(140), f(36), 'Objectif', {f:'h', fs:f(22), b:1, ha:'c', fc:'t:on'}));
+    for (let i = 0; i < n; i++){ const r = R * (n - i - .5) / n, y = cy - r * .72; add(T(cx + R + f(30), y - f(14), f(300), f(30), `Niveau ${n - i}`, {fs:f(20), b:1})); add(SH('rect', cx + r * .5, y, R + f(26) - r * .5, 2, 't:line')); }
+  } else if (kind === 'hub'){
+    const R = Math.min(hA / 2, wA / 3) - f(40), D = f(150), d = f(n > 6 ? 84 : 104);
+    for (let i = 0; i < n; i++){ const a = (i * 360 / n - 90) * Math.PI / 180, L = R - D / 2 - d / 2 + f(8), mx = cx + (D / 2 + L / 2 - f(4)) * Math.cos(a), my = cy + (D / 2 + L / 2 - f(4)) * Math.sin(a);
+      add(LN(mx - L / 2, my, L, 't:line', f(4), {rot:Math.round(i * 360 / n - 90)})); node('ellipse', cx + R * Math.cos(a) - d / 2, cy + R * Math.sin(a) - d / 2, d, d, col(i + 1), 'Idée ' + (i + 1), {fs:f(18)}); }
+    node('ellipse', cx - D / 2, cy - D / 2, D, D, 't:ac', 'Sujet', {fs:f(30)});
+  } else if (kind === 'steps'){
+    const sw = wA / n;
+    for (let i = 0; i < n; i++){ const h = hA * (.35 + .65 * (i + 1) / n); node('rect', x0 + i * sw + f(4), y0 + hA - h, sw - f(8), h, col(i), lab(i), {fs:f(24), va:'t'}, {r:0}); }
+  } else if (kind === 'compare'){
+    const cw = (wA - f(100)) / 2, ch = hA * .9, y = cy - ch / 2;
+    [['Avant', 't:soft', 't:ink'], ['Après', 't:ac', 't:on']].forEach(([t, fill, ink], i) => { const x = x0 + i * (cw + f(100));
+      add(SH('round', x, y, cw, ch, fill, {r:f(22), stroke:i ? undefined : 't:line', sw:i ? 0 : 1})); add(T(x + f(32), y + f(28), cw - f(64), f(44), t, {f:'h', fs:f(34), b:1, fc:ink})); add(T(x + f(32), y + f(94), cw - f(64), ch - f(120), `• Premier point\n• Deuxième point\n• Troisième point`, {fs:f(24), fc:ink, lh:1.6})); });
+    add(SH('arrow', cx - f(38), cy - f(30), f(76), f(60), 't:ac2'));
+  }
+  return out;
+}
+let SMART_N = null;   // nombre d'éléments choisi dans le panneau (null : celui du schéma)
+function addSmart(k){ const d = SMARTS.find(s => s[0] === k); addEls(smartEls(k, clamp(SMART_N ?? d[2], d[3][0], d[3][1])), d[1]); }
+function smartMini(k){
+  const c = 'currentColor', p = {process:'<path d="M2 10h9l4 6-4 6H2zM13 10h9l4 6-4 6h-9zM24 10h6v12h-6z" fill="currentColor"/>', cycle:'<circle cx="16" cy="16" r="10" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 3"/><circle cx="16" cy="5" r="4" fill="currentColor"/><circle cx="26" cy="21" r="4" fill="currentColor"/><circle cx="6" cy="21" r="4" fill="currentColor"/>',
+    pyramid:'<path d="M16 3l4 8H12zM11 13h10l3 7H8zM7 22h18l3 7H4z" fill="currentColor"/>', funnel:'<path d="M3 4h26l-2 7H5zM6 13h20l-3 7H9zM10 22h12l-2 7h-8z" fill="currentColor"/>', org:'<rect x="11" y="3" width="10" height="7" rx="2" fill="currentColor"/><path d="M16 10v6M6 16h20M6 16v4M16 16v4M26 16v4" stroke="currentColor" stroke-width="2" fill="none"/><rect x="2" y="20" width="9" height="7" rx="2" fill="currentColor"/><rect x="11.5" y="20" width="9" height="7" rx="2" fill="currentColor"/><rect x="21" y="20" width="9" height="7" rx="2" fill="currentColor"/>',
+    venn:'<circle cx="12" cy="14" r="8" fill="currentColor" opacity=".55"/><circle cx="21" cy="14" r="8" fill="currentColor" opacity=".55"/><circle cx="16.5" cy="21" r="8" fill="currentColor" opacity=".55"/>', matrix:'<rect x="3" y="3" width="12" height="12" rx="3" fill="currentColor"/><rect x="17" y="3" width="12" height="12" rx="3" fill="currentColor" opacity=".6"/><rect x="3" y="17" width="12" height="12" rx="3" fill="currentColor" opacity=".6"/><rect x="17" y="17" width="12" height="12" rx="3" fill="currentColor"/>',
+    list:'<circle cx="6" cy="7" r="3" fill="currentColor"/><rect x="12" y="4" width="17" height="6" rx="3" fill="currentColor" opacity=".5"/><circle cx="6" cy="16" r="3" fill="currentColor"/><rect x="12" y="13" width="17" height="6" rx="3" fill="currentColor" opacity=".5"/><circle cx="6" cy="25" r="3" fill="currentColor"/><rect x="12" y="22" width="17" height="6" rx="3" fill="currentColor" opacity=".5"/>',
+    target:'<circle cx="16" cy="16" r="13" fill="currentColor" opacity=".25"/><circle cx="16" cy="16" r="9" fill="currentColor" opacity=".45"/><circle cx="16" cy="16" r="5" fill="currentColor"/>', hub:'<circle cx="16" cy="16" r="5" fill="currentColor"/><path d="M16 11V5M20.5 13.5 25 9M21 16h6M20.5 18.5 25 23M16 21v6M11.5 18.5 7 23M11 16H5M11.5 13.5 7 9" stroke="currentColor" stroke-width="2"/><circle cx="16" cy="4" r="2.5" fill="currentColor"/><circle cx="27" cy="16" r="2.5" fill="currentColor"/><circle cx="16" cy="28" r="2.5" fill="currentColor"/><circle cx="5" cy="16" r="2.5" fill="currentColor"/>',
+    steps:'<rect x="3" y="20" width="7" height="9" fill="currentColor"/><rect x="12" y="13" width="7" height="16" fill="currentColor" opacity=".7"/><rect x="21" y="5" width="7" height="24" fill="currentColor" opacity=".5"/>', compare:'<rect x="2" y="5" width="12" height="22" rx="3" fill="currentColor" opacity=".4"/><rect x="18" y="5" width="12" height="22" rx="3" fill="currentColor"/>'}[k];
+  return `<svg viewBox="0 0 32 32">${p || ''}</svg>`;
+}
+
 /* ==== 55-rail.js ==== */
 /* ---------- Le film des diapositives (vignettes à gauche), notes de l'orateur ---------- */
 const THUMB = new Map();   // id → {key, html}
@@ -3192,7 +3290,9 @@ function effectsPop(anchor){
     <label class="pop-toggle"><input type="checkbox" data-x="sh" ${st.sh ? 'checked' : ''}><div><b>Ombre du texte</b><small>Lisible sur une photo</small></div></label>
     <label class="pop-toggle"><input type="checkbox" data-x="bg" ${st.bg ? 'checked' : ''}><div><b>Étiquette</b><small>Un fond coloré derrière le texte</small></div></label>
     <label class="pop-toggle"><input type="checkbox" data-x="s" ${st.s ? 'checked' : ''}><div><b>Barré</b><small>Ligne au milieu du texte</small></div></label></div>
-    ${st.bg ? `<div class="pop-row"><span>Couleur de l'étiquette</span><button type="button" class="pop-link" id="bgCol">Choisir</button></div>` : ''}`, p => {
+    ${st.bg ? `<div class="pop-row"><span>Couleur de l'étiquette</span><button type="button" class="pop-link" id="bgCol">Choisir</button></div>` : ''}
+    <div class="pop-list"><hr><button type="button" id="moreFx">${ICX.fmt}Néon, contour, dégradé, 3D…<kbd>WordArt</kbd></button></div>`, p => {
+    p.querySelector('#moreFx').onclick = () => { closePop(); openPanel('format'); };
     p.onchange = ev => { const x = ev.target.dataset.x; if (!x) return; const on = ev.target.checked; closePop();
       setSt(x === 'bg' ? (on ? {bg:'t:soft', pad:12, r:10} : {bg:null}) : {[x]:on ? 1 : null}, 'Effet'); };
     p.querySelector('#bgCol')?.addEventListener('click', () => colorPop(anchor, st.bg, v => setSt({bg:v || null}, 'Étiquette')));
@@ -3479,7 +3579,7 @@ function openPanel(k){
 const SIDE_PANELS = ['format', 'anim'];
 const PANEL_SUB = {insert:'Textes, formes, icônes, images, tableaux et graphiques', design:'Thème, couleurs, polices et format de toute la présentation', layout:'Réorganisez la diapositive en un clic : le contenu est conservé',
   anim:'Transitions, apparition, emphase et sortie des éléments', format:'Position, remplissage, ombres, effets de texte et fond', templates:'Partez d\'une présentation conçue par Studio Prism'};
-const BLOCKS = [['stat', 'Chiffre clé'], ['badge', 'Pastille'], ['cta', 'Bouton'], ['iconcard', 'Carte avec icône'], ['numbered', 'Point numéroté'], ['progress', 'Barre de progression'], ['divider', 'Séparateur'], ['quoteb', 'Citation']];
+const BLOCKS = [['stat', 'Chiffre clé'], ['badge', 'Pastille'], ['cta', 'Bouton'], ['iconcard', 'Carte avec icône'], ['numbered', 'Point numéroté'], ['progress', 'Barre de progression'], ['divider', 'Séparateur'], ['quoteb', 'Citation'], ['callout', 'Encadré'], ['tag', 'Étiquette'], ['rating', 'Note en étoiles'], ['browser', 'Fenêtre de navigateur'], ['phone', 'Téléphone']];
 function blockEls(k){
   const [W, H] = dims(), g = 'g' + uidS(), at = (w, h) => centerBox(w, h);
   if (k === 'stat'){ const p = at(360, 170); return [T(p.x, p.y, 360, 110, '87 %', {f:'h', fs:96, b:1, fc:'t:ac', lh:1}, {g}), T(p.x, p.y + 116, 360, 40, 'de clients satisfaits', {fs:24, b:1}, {g})]; }
@@ -3488,6 +3588,11 @@ function blockEls(k){
   if (k === 'iconcard'){ const p = at(340, 300); return [SH('round', p.x, p.y, 340, 300, 't:soft', {r:20, stroke:'t:line', sw:1, g}), SH('ellipse', p.x + 30, p.y + 30, 64, 64, 't:ac', {g}), ICO('idea', p.x + 44, p.y + 44, 36, 't:on', {g}), T(p.x + 30, p.y + 120, 280, 36, 'Une idée forte', {f:'h', fs:26, b:1}, {g}), T(p.x + 30, p.y + 166, 280, 100, 'Expliquez-la en une ou deux phrases courtes.', {fs:18, fc:'t:mut', lh:1.4}, {g})]; }
   if (k === 'numbered'){ const p = at(520, 64); return [SH('ellipse', p.x, p.y, 64, 64, 't:ac', {html:'1', st:{fs:28, b:1, f:'h', fc:'t:on', ha:'c', va:'m'}, g}), T(p.x + 88, p.y + 12, 430, 40, 'Première étape', {f:'h', fs:28, b:1}, {g})]; }
   if (k === 'progress'){ const p = at(560, 70); return [T(p.x, p.y, 400, 30, 'Avancement', {fs:20, b:1}, {g}), T(p.x + 400, p.y, 160, 30, '72 %', {fs:20, b:1, fc:'t:ac', ha:'r'}, {g}), SH('pill', p.x, p.y + 42, 560, 18, 't:soft', {stroke:'t:line', sw:1, g}), SH('pill', p.x, p.y + 42, 403, 18, 't:ac', {g})]; }
+  if (k === 'callout'){ const p = at(560, 130); return [SH('round', p.x, p.y, 560, 130, 't:soft', {r:16, g}), SH('rect', p.x, p.y + 12, 8, 106, 't:ac', {g}), ICO('info', p.x + 32, p.y + 36, 44, 't:ac', {g}), T(p.x + 100, p.y + 22, 430, 90, 'À retenir : une remarque importante, en une ou deux phrases.', {fs:22, lh:1.4, va:'m'}, {g})]; }
+  if (k === 'tag'){ const p = at(230, 96); return [SH('tag', p.x, p.y, 230, 96, 't:ac2', {html:'-20 %', st:{fs:36, b:1, f:'h', fc:'t:on', ha:'c', va:'m'}, rot:-6, shadow:14})]; }
+  if (k === 'rating'){ const p = at(420, 80); return [...[0, 1, 2, 3, 4].map(i => SH('star', p.x + i * 68, p.y, 56, 56, '#FFC53D', {g})), T(p.x + 350, p.y + 6, 80, 44, '4,8', {f:'h', fs:34, b:1}, {g})]; }
+  if (k === 'browser'){ const p = at(640, 400); return [SH('round', p.x, p.y, 640, 400, 't:soft', {r:16, stroke:'t:line', sw:2, g, shadow:20}), SH('round', p.x, p.y, 640, 56, 't:line', {r:16, g}), SH('rect', p.x, p.y + 28, 640, 28, 't:line', {g}), ...['#FF5F57', '#FEBC2E', '#28C840'].map((c, i) => SH('ellipse', p.x + 22 + i * 24, p.y + 21, 14, 14, c, {g})), SH('pill', p.x + 120, p.y + 12, 400, 32, 't:bg', {g, html:'www.votre-site.fr', st:{fs:15, fc:'t:mut', ha:'c', va:'m'}}), IMG(p.x + 16, p.y + 72, 608, 312, {g, r:8})]; }
+  if (k === 'phone'){ const p = at(260, 520); return [SH('round', p.x, p.y, 260, 520, '#16122B', {r:44, g, shadow:28}), IMG(p.x + 12, p.y + 12, 236, 496, {g, r:34}), SH('pill', p.x + 90, p.y + 22, 80, 22, '#16122B', {g})]; }
   if (k === 'divider'){ const p = at(W * .6, 20); return [LN(p.x, p.y + 10, W * .6, 't:line', 2)]; }
   if (k === 'quoteb'){ const p = at(760, 220); return [T(p.x - 6, p.y - 40, 120, 140, '“', {f:'h', fs:150, b:1, fc:'t:ac', lh:1}, {g, op:.3}), T(p.x + 60, p.y, 700, 120, 'Le design, ce n\'est pas seulement ce à quoi ça ressemble, c\'est comment ça marche.', {f:'h', fs:32, i:1, lh:1.3}, {g}), T(p.x + 60, p.y + 150, 600, 32, 'Nom de l\'auteur', {fs:20, b:1, fc:'t:ac'}, {g})]; }
   return [];
@@ -3506,6 +3611,7 @@ function renderPanel(){
   if (panel === 'insert'){
     h += `<h4 class="pn-h">Textes</h4><div class="pn-texts">${Object.entries(TEXT_STYLES).map(([k, [t, st, x]]) => `<button type="button" data-ins="text:${k}" style="${txCss({...st, fs:Math.min(st.fs, k === 'big' ? 44 : 30)}).replace(/justify-content:[^;]+;/, '')}${st.bg ? `background:${realCol(st.bg, sv)};` : ''}--fh:${fontStack(th.fh).replace(/"/g, "'")};--fb:${fontStack(th.fb).replace(/"/g, "'")};--ac:${th.ac};--ink:${th.ink};--mut:${th.mut};--on:${onColor(th.ac)};--hw:${th.hw}">${k === 'list' ? '• Liste à puces' : escH(x)}</button>`).join('')}</div>
       <h4 class="pn-h">Éléments prêts à l'emploi <small>groupés, à personnaliser</small></h4><div class="pn-chips big">${BLOCKS.map(([k, t]) => `<button type="button" data-ins="block:${k}">${t}</button>`).join('')}</div>
+      <h4 class="pn-h">Schémas <small>façon SmartArt : groupes modifiables</small></h4><div class="fm-count">Éléments <button type="button" data-smartn="" aria-pressed="${SMART_N == null}">Auto</button>${[3, 4, 5, 6, 8].map(n => `<button type="button" data-smartn="${n}" aria-pressed="${SMART_N === n}">${n}</button>`).join('')}</div><div class="pn-smarts">${SMARTS.map(([k, t]) => `<button type="button" data-ins="smart:${k}" title="${t}">${smartMini(k)}<span>${t}</span></button>`).join('')}</div>
       <h4 class="pn-h">Formes <small>${SHAPE_ORDER.length} formes, remplissage et effets au choix</small></h4>${SHAPE_GROUPS.map(([t, ks]) => `<p class="pn-sub">${t}</p><div class="pn-shapes2">${ks.map(k => `<button type="button" data-ins="shape:${k}" title="${escH(SHAPES[k][0])}" style="color:${th.ac}">${shapeIcon(k)}</button>`).join('')}</div>`).join('')}
       <h4 class="pn-h">Images</h4><div class="pn-imgs2"><button type="button" class="pn-drop" data-ins="img">${IC.img}<b>Importer une image</b><span>ou glissez-la sur la diapositive · Ctrl + V</span></button>${Object.entries(D.media || {}).filter(([k]) => usedMedia().has(k)).slice(0, 12).map(([k, v]) => `<button type="button" class="pn-imgthumb" data-ins="media:${k}"><img src="${escH(v)}" alt=""></button>`).join('')}</div>
       <h4 class="pn-h">Tableaux et graphiques</h4><div class="pn-chips big"><button type="button" data-ins="table:3x3">Tableau 3 × 3</button><button type="button" data-ins="table:5x4">Tableau 4 × 5</button>${CHART_TYPES.map(([k, t]) => `<button type="button" data-ins="chart:${k}">${iconSVG(k === 'pie' || k === 'donut' ? 'pie' : k === 'line' || k === 'area' ? 'trend' : 'chart')} ${t}</button>`).join('')}</div>
@@ -3516,7 +3622,7 @@ function renderPanel(){
       <div class="th-custom"><label class="pn-color">Accent <input type="color" data-tc="ac" value="${th.ac}"></label><label class="pn-color">Accent 2 <input type="color" data-tc="ac2" value="${th.ac2}"></label><label class="pn-color">Accent 3 <input type="color" data-tc="ac3" value="${th.ac3}"></label>
         <label class="pn-color">Fond <input type="color" data-tc="bg" value="${th.bg}"></label><button type="button" class="pn-wide" data-reset="1">Couleurs d'origine du thème</button></div>
       <h4 class="pn-h">Polices <small>titres · texte</small></h4><div class="pair-row">${PAIRS.map(([a, c], i) => { ensureFont(a); ensureFont(c); return `<button type="button" data-pair="${i}" class="${th.fh === a && th.fb === c ? 'on' : ''}"><b style="font-family:${fontStack(a)}">${escH(a)}</b><span style="font-family:${fontStack(c)}">${escH(c)}</span></button>`; }).join('')}</div>
-      <h4 class="pn-h">Format</h4><div class="seg fmt">${Object.entries(SIZE_NAMES).map(([k, t]) => `<button type="button" data-size="${k}" aria-checked="${D.size === k}">${t}</button>`).join('')}</div>`;
+      <h4 class="pn-h">Format</h4><div class="seg fmt">${Object.entries(SIZE_NAMES).map(([k, t]) => `<button type="button" data-size="${k}" aria-checked="${D.size === k}">${t}</button>`).join('')}</div>` + footPanelHTML();
   } else if (panel === 'layout'){
     const L = cur().lay;
     h += `<h4 class="pn-h">Cette diapositive <small>le texte, les listes et les images sont repris</small></h4><div class="lay-grid big">${LAYOUTS.map(([k, t, d]) => `<button type="button" data-lay="${k}" class="${L === k ? 'on' : ''}" title="${escH(d)}"><span class="lay-m" style="color:${th.ac}">${layoutMini(k)}</span><b>${escH(t)}</b></button>`).join('')}</div>
@@ -3533,6 +3639,7 @@ function renderPanel(){
   }
   b.innerHTML = h;
   if (panel === 'format') wireFormat(b);
+  if (panel === 'design') wireFoot(b);
   if (panel === 'anim') b.querySelectorAll('[data-ak]').forEach(i => { i.oninput = i.type === 'range' ? ev => animPanelInput(ev, false) : null; i.onchange = ev => animPanelInput(ev, true); });
   if (panel === 'design') b.querySelectorAll('.th-mini').forEach(m => m.querySelector('.th-s').style.transform = `scale(${m.style.getPropertyValue('--k')})`);
   if (panel === 'templates') window.SWScaleMinis?.(b);
@@ -3543,8 +3650,9 @@ function onPanelClick(ev){
   if (d.ins){ const [k, v] = d.ins.split(':');
     if (k === 'text') addText(v); else if (k === 'shape') addShape(v); else if (k === 'icon') addIcon(v); else if (k === 'img') pickImage();
     else if (k === 'media'){ const src = D.media[v]; const im = new Image(); im.onload = () => { const [W, H] = dims(), kk = Math.min(1, W * .5 / im.width, H * .6 / im.height), w = Math.round(im.width * kk), h = Math.round(im.height * kk), p = centerBox(w, h); addEls([IMG(p.x, p.y, w, h, {src:'m:' + v})], 'Image'); }; im.src = src; }
-    else if (k === 'table'){ const [c, r] = v.split('x'); addTable(+r, +c); } else if (k === 'chart') addChart(v); else if (k === 'block') addEls(blockEls(v), BLOCKS.find(x => x[0] === v)?.[1]);
+    else if (k === 'table'){ const [c, r] = v.split('x'); addTable(+r, +c); } else if (k === 'chart') addChart(v); else if (k === 'block') addEls(blockEls(v), BLOCKS.find(x => x[0] === v)?.[1]); else if (k === 'smart') addSmart(v);
     if (innerWidth < 760) openPanel(null); return; }
+  if (d.smartn != null){ SMART_N = d.smartn ? +d.smartn : null; renderPanel(); return; }
   if (V.ro && !d.tpl) return;
   if (d.th){ D.theme = {id:d.th}; ensureThemeFonts(); THUMB.clear(); renderAll(); commit('Thème'); toast(`Thème « ${DTHEMES.find(x => x.id === d.th).name} »`); return; }
   if (d.pal){ const p = PALETTES[+d.pal]; D.theme = {...D.theme, ac:p[0], ac2:p[1], ac3:p[2]}; THUMB.clear(); renderAll(); commit('Couleurs'); return; }
@@ -3629,7 +3737,7 @@ function formatPanelHTML(){
     return h;
   }
   const st = e.st || {}, hasTxt = e.t === 'text' || (e.t === 'shape' && e.html != null), f = e.fx || {}, one = l.length === 1;
-  if (one) h += sec('pos', 'Position et taille', `<div class="fm-geo">${[['x', 'X'], ['y', 'Y'], ['w', 'L'], ['h', 'H'], ['rot', '°']].map(([k, t]) => `<label><span>${t}</span><input type="number" data-geo="${k}" value="${fNum(k === 'rot' ? e.rot || 0 : e[k])}" step="${k === 'rot' ? 5 : 1}"></label>`).join('')}</div>
+  if (one) h += sec('pos', 'Position et taille', `<div class="fm-geo">${[['x', 'X'], ['y', 'Y'], ['w', 'L'], ['h', 'H'], ['rot', '°']].map(([k, t]) => `<label><span>${t}</span><input type="number" data-geo="${k}" value="${k === 'rot' ? fNum(e.rot || 0) : Math.round(e[k])}" step="${k === 'rot' ? 5 : 1}"></label>`).join('')}</div>
       <div class="pn-chips"><button type="button" data-fv="fx.fh" data-v="${f.fh ? '' : 1}" aria-pressed="${!!f.fh}">${ICX.pos} Miroir horizontal</button><button type="button" data-fv="fx.fv" data-v="${f.fv ? '' : 1}" aria-pressed="${!!f.fv}">Miroir vertical</button></div>
       <label class="fm-txt"><span>Texte alternatif <small>description pour l'accessibilité</small></span><input type="text" data-ft="alt" maxlength="300" value="${escH(e.alt || '')}" placeholder="Décrivez cet élément"></label>
       <label class="fm-txt"><span>Lien <small>ouvert en cliquant en présentation</small></span><input type="text" data-ft="lk" maxlength="500" value="${escH(e.lk || '')}" placeholder="https://… ou #3 (diapositive 3)"></label>`, true);
@@ -3651,7 +3759,7 @@ function formatPanelHTML(){
   h += sec('adj', 'Ajustements', `${rg('fx.br', 'Luminosité', 30, 200, 1, f.br ?? 100, ' %')}${rg('fx.ct', 'Contraste', 30, 200, 1, f.ct ?? 100, ' %')}${rg('fx.sa', 'Saturation', 0, 250, 1, f.sa ?? 100, ' %')}${rg('fx.hu', 'Teinte', -180, 180, 1, f.hu || 0, '°')}`);
   if (hasTxt){
     const to = st.to, tl = st.tl, tsd = st.tsd, t3 = st.t3, tg = st.tg;
-    h += sec('txt', 'Effets de texte', `<p class="pn-sub">Styles prêts à l'emploi</p><div class="wa-grid">${WORDART.map(([t, x], i) => `<button type="button" data-wa="${i}" title="${t}"><span style="${txCss({f:'h', fs:26, b:1, fc:'#FFFFFF', ...x})}">Abc</span><em>${t}</em></button>`).join('')}</div>
+    h += sec('txt', 'Effets de texte', `<p class="pn-sub">Styles prêts à l'emploi</p><div class="wa-grid" style="${varsCss(sv)}">${WORDART.map(([t, x], i) => `<button type="button" data-wa="${i}" title="${t}"><span style="${txCss({f:'h', fs:26, b:1, fc:'#FFFFFF', ...x})}">Abc</span><em>${t}</em></button>`).join('')}</div>
       ${tog('st.to', 'Contour du texte', '', !!to)}${to ? `<div class="fm-box">${rg('st.to.w', 'Épaisseur', 0, 12, .5, to.w, ' px')}${sw('st.to.c', 'Couleur', to.c)}${tog('st.to.f0', 'Texte creux', 'Seul le contour reste visible', to.f === 0)}</div>` : ''}
       ${tog('st.tg', 'Dégradé dans le texte', '', !!tg)}${tg ? `<div class="fm-box">${sw('st.tg.0', 'Couleur 1', tg[0])}${sw('st.tg.1', 'Couleur 2', tg[1])}${rg('st.tg.2', 'Angle', 0, 360, 5, tg[2] ?? 90, '°')}</div>` : ''}
       ${tog('st.tl', 'Lueur du texte', '', !!tl)}${tl ? `<div class="fm-box">${rg('st.tl.b', 'Rayon', 2, 60, 1, tl.b, ' px')}${sw('st.tl.c', 'Couleur', tl.c)}</div>` : ''}
@@ -3700,7 +3808,7 @@ function wireFormat(b){
       if (path === 'fill' && !v){ fmApply('fill', ''); } else fmApply(path, v || null); fmCommit('Couleur');
     }, {none:none !== false, noneLabel:'Aucune'}); }; });
   b.querySelectorAll('[data-fshadow]').forEach(x => { x.onclick = () => { const v = FM_SHADOWS[+x.dataset.fshadow][1]; setProps(e => { delete e.shadow; if (!e.fx) e.fx = {}; if (v) e.fx.sh = {...v}; else delete e.fx.sh; tidyEl(e); }, 'Ombre', false); renderPanel(); }; });
-  b.querySelectorAll('[data-wa]').forEach(x => { x.onclick = () => { const w = WORDART[+x.dataset.wa][1]; setProps(e => { if (!e.st) e.st = {}; WORDART_KEYS.forEach(k => delete e.st[k]); Object.entries(w).forEach(([k, v]) => e.st[k] = JSON.parse(JSON.stringify(v))); if (e.html) e.html = stripInline(e.html, ['fc']); tidyEl(e); }, 'Style de texte', true); renderPanel(); }; });
+  b.querySelectorAll('[data-wa]').forEach(x => { x.onclick = () => { applyWordArt(+x.dataset.wa); renderPanel(); }; });
   b.querySelectorAll('[data-fv="fillkind"]').forEach(x => { x.onclick = () => { const k = x.dataset.v; setProps(e => { const c = e.fill || 't:ac';
     if (k === 'none'){ e.fill = ''; delete e.g2; delete e.g3; delete e.gt; } else if (k === 'solid'){ e.fill = c; delete e.g2; delete e.g3; delete e.gt; }
     else { e.fill = c; if (!e.g2) e.g2 = e.fill === 't:ac' ? 't:ac2' : 't:ac'; if (k === 'lin') delete e.gt; else e.gt = k; } }, 'Remplissage', true); renderPanel(); }; });
@@ -3714,6 +3822,44 @@ function wireFormat(b){
     else if (a === 'bgreset'){ delete s.bg; renderAll(); fmCommit('Fond du thème'); }
     else if (a === 'bgall'){ D.slides.forEach(q => { if (q !== s){ if (s.bg) q.bg = JSON.parse(JSON.stringify(s.bg)); else delete q.bg; q.nodeco = s.nodeco; } }); renderAll(); commit('Fond pour toutes'); toast('Fond appliqué à toutes les diapositives'); }
     else if (a === 'fxreset'){ setProps(e => { delete e.fx; delete e.shadow; delete e.pat; delete e.sd; if (e.st) WORDART_KEYS.forEach(k => delete e.st[k]); }, 'Effets réinitialisés', true); renderPanel(); } }; });
+}
+
+/* actions réutilisées par le Spectre (Ctrl + K) */
+function applyWordArt(i){
+  const w = WORDART[i][1]; if (!selEls().some(e => e.t === 'text' || (e.t === 'shape' && e.html != null))) return toast('Sélectionnez un texte');
+  setProps(e => { if (!(e.t === 'text' || e.t === 'shape')) return; if (!e.st) e.st = {}; WORDART_KEYS.forEach(k => delete e.st[k]); Object.entries(w).forEach(([k, v]) => e.st[k] = JSON.parse(JSON.stringify(v))); if (e.html) e.html = stripInline(e.html, ['fc']); tidyEl(e); }, 'Style de texte', true);
+}
+function applyShadow(i){ if (!SEL.size) return toast('Sélectionnez un élément'); const v = FM_SHADOWS[i][1]; setProps(e => { delete e.shadow; if (!e.fx) e.fx = {}; if (v) e.fx.sh = {...v}; else delete e.fx.sh; tidyEl(e); }, 'Ombre', false); }
+function setElAnim(k){ if (!SEL.size) return toast('Sélectionnez un élément'); setProps(x => { x.an = {k, click:x.an?.click}; }, 'Animation', false); previewAnim(selEls()); }
+function toggleView(k){ V[k] = !V[k]; if (k === 'snapGrid' && V.snapGrid) V.grid = true; lsSet('ss.view', {grid:V.grid, snapGrid:V.snapGrid, guides:V.guides}); applyView(); if (panel === 'format') renderPanel(); toast(V[k] ? 'Activé' : 'Désactivé'); }
+function setBgPattern(k){ const s = cur(); s.bg = s.bg || {}; if (k) s.bg.pat = k; else { delete s.bg.pat; if (!Object.keys(s.bg).length) delete s.bg; } renderAll(); commit('Motif de fond'); }
+
+/* ==== 64-foot.js ==== */
+/* ---------- Pied de page : numéro, date et texte sur toutes les diapositives (D.foot {num, date, text, skip}) ---------- */
+const footParts = (s, i) => {
+  const f = D?.foot; if (!f || (f.skip !== false && s.v === 'title')) return null;
+  const l = [f.text || '', f.date ? new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'long', year:'numeric'}) : '', f.num ? String(i + 1) : ''];
+  return l.some(Boolean) ? l : null;
+};
+function footHTML(s, W, H){
+  const i = D.slides.indexOf(s), p = footParts(s, i); if (!p) return '';
+  const k = W / H < 1.5 ? W / 1280 * 1.22 : Math.min(W / 1280, H / 720), M = Math.round(80 * W / 1280), fs = Math.max(11, Math.round(14 * k));
+  return `<div class="sl-foot" style="left:${M}px;right:${M}px;bottom:${Math.round(22 * k)}px;font-size:${fs}px">${p.map((t, j) => `<span class="ft${j}">${escH(t)}</span>`).join('')}</div>`;
+}
+function footPanelHTML(){
+  const f = D.foot || {};
+  return `<h4 class="pn-h">Pied de page <small>sur toutes les diapositives</small></h4><div class="fm-foot">
+    <label class="pop-toggle"><input type="checkbox" data-foot="num" ${f.num ? 'checked' : ''}><div><b>Numéro de diapositive</b></div></label>
+    <label class="pop-toggle"><input type="checkbox" data-foot="date" ${f.date ? 'checked' : ''}><div><b>Date du jour</b></div></label>
+    <label class="fm-txt"><span>Texte</span><input type="text" data-foot="text" maxlength="120" value="${escH(f.text || '')}" placeholder="Nom de la société, titre court…"></label>
+    <label class="pop-toggle"><input type="checkbox" data-foot="skip" ${f.skip !== false ? 'checked' : ''}><div><b>Pas sur la couverture</b></div></label></div>`;
+}
+function wireFoot(b){
+  b.querySelectorAll('[data-foot]').forEach(i => { i.onchange = () => {
+    if (V.ro) return; const f = {...(D.foot || {})}, k = i.dataset.foot, v = i.type === 'checkbox' ? i.checked : i.value.trim();
+    if (k === 'skip') f.skip = v ? undefined : false; else f[k] = v || undefined;
+    ['num', 'date', 'text'].forEach(q => { if (!f[q]) delete f[q]; });
+    if (f.skip === undefined) delete f.skip; D.foot = f.num || f.date || f.text ? f : undefined; if (!D.foot) delete D.foot; THUMB.clear(); renderAll(); commit('Pied de page'); }; });
 }
 
 /* ==== 65-present.js ==== */
@@ -4024,6 +4170,7 @@ async function exportPptx(){
         }
       } catch(x){ console.warn('[SPECTRA Slide] export pptx', e, x); }
     }
+    const fp = footParts(s, D.slides.indexOf(s)); if (fp){ const fy = H - Math.round(22 * W / 1280) - 24, mx = Math.round(80 * W / 1280); [['left', 0], ['center', 1], ['right', 2]].forEach(([al, j]) => { if (fp[j]) sl.addText(fp[j], {x:pxIn(mx), y:pxIn(fy), w:pxIn(W - 2 * mx), h:pxIn(26), fontFace:sv.fb, fontSize:pxPt(14), color:hx(sv.mut), align:al, valign:'middle', margin:0}); }); }
     if (s.notes) sl.addNotes(s.notes);
   }
   const blob = await p.write({outputType:'blob'});
@@ -4218,6 +4365,7 @@ async function importPptx(file){
 function cleanDeck(j){
   const d = {v:1, app:'spectraslide', title:String(j.title || 'Présentation sans titre').slice(0, 120), theme:j.theme && typeof j.theme === 'object' ? j.theme : {id:'spectra'}, size:SIZES[j.size] ? j.size : '16:9', slides:[], media:{}};
   if (j.loop) d.loop = true;
+  if (j.foot && typeof j.foot === 'object'){ const f = {}; if (j.foot.num) f.num = true; if (j.foot.date) f.date = true; if (j.foot.text) f.text = String(j.foot.text).slice(0, 120); if (j.foot.skip === false) f.skip = false; if (f.num || f.date || f.text) d.foot = f; }
   for (const [k, v] of Object.entries(j.media || {})) if (/^data:image\/(png|jpe?g|gif|webp|svg\+xml);base64,/.test(String(v))) d.media[k] = v;
   const okCol = c => c == null || c === '' || /^t:[a-z0-9]+$/.test(c) || /^#[0-9a-f]{3,8}$/i.test(c) ? c : undefined;
   for (const s0 of (j.slides || []).slice(0, 400)){
@@ -4254,10 +4402,17 @@ function spectreActions(){
   Object.entries(TEXT_STYLES).forEach(([k, [t]]) => add('Insérer', 'Ajouter : ' + t.toLowerCase(), () => addText(k), 'texte'));
   SHAPE_ORDER.forEach(k => add('Insérer', 'Forme : ' + SHAPES[k][0].toLowerCase(), () => addShape(k), 'forme'));
   add('Insérer', 'Image…', () => pickImage(), 'photo'); add('Insérer', 'Icône…', () => iconPop(g$('edBar')), 'pictogramme'); add('Insérer', 'Tableau', () => addTable(4, 3)); CHART_TYPES.forEach(([k, t]) => add('Insérer', 'Graphique : ' + t.toLowerCase(), () => addChart(k), 'diagramme'));
-  BLOCKS.forEach(([k, t]) => add('Insérer', 'Élément : ' + t.toLowerCase(), () => addEls(blockEls(k), t)));
+  SMARTS.forEach(([k, t]) => add('Schémas', 'Schéma : ' + t.toLowerCase(), () => addSmart(k), 'smartart diagramme organigramme cycle pyramide')); BLOCKS.forEach(([k, t]) => add('Insérer', 'Élément : ' + t.toLowerCase(), () => addEls(blockEls(k), t)));
   DTHEMES.forEach(t => add('Design', 'Thème ' + t.name, () => { D.theme = {id:t.id}; ensureThemeFonts(); THUMB.clear(); renderAll(); commit('Thème'); }, 'couleurs style'));
   Object.entries(SIZE_NAMES).forEach(([k, t]) => add('Design', 'Format ' + t, () => resizeDeck(k), 'taille'));
   add('Design', 'Fond de la diapositive…', () => openPanel('format'), 'couleur arrière-plan');
+  add('Design', 'Format et effets…', () => openPanel('format'), 'ombre lueur reflet flou dégradé motif effet position taille');
+  add('Affichage', 'Afficher / masquer la grille', () => toggleView('grid'), 'quadrillage alignement'); add('Affichage', 'Magnétisme de la grille', () => toggleView('snapGrid'), 'aimanter aligner');
+  add('Affichage', 'Afficher / masquer les repères (marges et centre)', () => toggleView('guides'), 'guides règle');
+  WORDART.slice(1).forEach(([t], i) => add('Effets de texte', 'Style de texte : ' + t.toLowerCase(), () => applyWordArt(i + 1), 'wordart néon contour dégradé ombre 3d'));
+  FM_SHADOWS.forEach(([t], i) => add('Effets', i ? 'Ombre : ' + t.toLowerCase() : 'Retirer l\'ombre', () => applyShadow(i), 'ombre portée'));
+  PAT_ORDER.forEach(k => add('Design', 'Motif de fond : ' + PATS[k][0].toLowerCase(), () => setBgPattern(k), 'arrière-plan texture'));
+  ANIM_LIST.forEach(a => add('Animer', 'Animation : ' + a[1].toLowerCase(), () => setElAnim(a[0]), 'élément ' + ({in:'entrée', em:'emphase', out:'sortie'})[a[2]]));
   add('Animer', 'Animer toute la présentation', () => { openPanel('anim'); g$('edPanelBody').querySelector('[data-a="magic"]')?.click(); }, 'animation transition'); TRANS.slice(1).forEach(([k, t]) => add('Animer', 'Transition : ' + t.toLowerCase(), () => { cur().tr = k; commit('Transition'); previewTransition(); }));
   add('Fichier', 'Exporter en PDF', () => doExport('pdf'), 'imprimer'); add('Fichier', 'Exporter en PowerPoint (.pptx)', () => doExport('pptx'), 'ppt'); add('Fichier', 'Exporter en page web', () => doExport('html'));
   add('Fichier', 'Ouvrir un fichier PowerPoint…', () => g$('homeFile').click(), 'importer pptx'); add('Fichier', 'Enregistrer comme modèle', saveTplDlg); add('Fichier', 'Publier dans la Communauté', () => window.SWHome?.publishCurrent?.()); add('Fichier', 'Partager…', () => window.SWShareCurrent?.());
@@ -4308,7 +4463,7 @@ function parseIntent(raw){
     if (/^(en )?gras$/.test(q)){ one('Gras', () => setSt({b:1}, 'Gras')); return out; } if (/^(en )?italique$/.test(q)){ one('Italique', () => setSt({i:1}, 'Italique')); return out; }
     if (/^(supprime|efface)/.test(q)){ one('Supprimer', delSel); return out; } if (/^dupli/.test(q)){ one('Dupliquer', dupSel); return out; }
     if (/premier plan|devant/.test(q)){ one('Premier plan', () => layer('front')); return out; } if (/arriere.plan|derriere/.test(q)){ one('Arrière-plan', () => layer('back')); return out; }
-    const an = ANIMS.find(([k, t]) => k && q.includes(nrmS(t))); if (an && /anim/.test(q)){ one(`Animation : ${an[1].toLowerCase()}`, () => setProps(x => { x.an = {k:an[0]}; }, 'Animation', false)); return out; }
+    const an = ANIM_LIST.find(([k, t]) => k && q.includes(nrmS(t))); if (an && /anim/.test(q)){ one(`Animation : ${an[1].toLowerCase()}`, () => setElAnim(an[0])); return out; }
   }
   if (/^anime/.test(q) && /tout|presentation/.test(q)){ one('Animer toute la présentation', () => { openPanel('anim'); g$('edPanelBody').querySelector('[data-a="magic"]')?.click(); }); return out; }
   if (/^anime/.test(q)){ one('Animer cette diapositive', () => { cur().an = 'rise'; cur().tr = cur().tr || 'fade'; commit('Animation'); previewSlideAnim(); }); return out; }
@@ -4337,7 +4492,8 @@ function drawSpectre(){
     const it = parseIntent(raw); l = [];
     if (it) l.push({g:'Compris', t:it.map(a => a.t).join(' · '), run:() => runIntents(it), intent:true});
     const ai = raw.length >= 3 ? spAiItem(raw) : null;
-    if (ai && !it && (!fz.length || words.length >= 3)) l.push(ai, ...fz.slice(0, 40)); else { l.push(...fz.slice(0, 40)); if (ai) l.push(ai); }
+    const exact = fz.some(a => words.every(w => nrmS(a.t).includes(w)));
+    if (ai && !it && (!fz.length || (words.length >= 3 && !exact))) l.push(ai, ...fz.slice(0, 40)); else { l.push(...fz.slice(0, 40)); if (ai) l.push(ai); }
   } else {
     l = [...AI_QUICK.map(x => ({g:'IA', t:x.t, ai:true, prefill:x.prefill, run:() => aiAsk(x.p)})), ...SP_START.map(t => SPX.all.find(a => a.t === t)).filter(Boolean)];
     head = `<p class="sp-h">Suggestions <small>Écrivez aussi une phrase : « nouvelle diapo en deux colonnes », « thème océan », « ajoute un tableau 3 x 4 », « mets le titre en bleu », « présente »…</small></p>`;
