@@ -13,7 +13,7 @@ function spectreActions(){
   BLOCKS.forEach(([k, t]) => add('Insérer', 'Élément : ' + t.toLowerCase(), () => addEls(blockEls(k), t)));
   DTHEMES.forEach(t => add('Design', 'Thème ' + t.name, () => { D.theme = {id:t.id}; ensureThemeFonts(); THUMB.clear(); renderAll(); commit('Thème'); }, 'couleurs style'));
   Object.entries(SIZE_NAMES).forEach(([k, t]) => add('Design', 'Format ' + t, () => resizeDeck(k), 'taille'));
-  add('Design', 'Fond de la diapositive…', () => bgPop(g$('edBar')), 'couleur arrière-plan');
+  add('Design', 'Fond de la diapositive…', () => openPanel('format'), 'couleur arrière-plan');
   add('Animer', 'Animer toute la présentation', () => { openPanel('anim'); g$('edPanelBody').querySelector('[data-a="magic"]')?.click(); }, 'animation transition'); TRANS.slice(1).forEach(([k, t]) => add('Animer', 'Transition : ' + t.toLowerCase(), () => { cur().tr = k; commit('Transition'); previewTransition(); }));
   add('Fichier', 'Exporter en PDF', () => doExport('pdf'), 'imprimer'); add('Fichier', 'Exporter en PowerPoint (.pptx)', () => doExport('pptx'), 'ppt'); add('Fichier', 'Exporter en page web', () => doExport('html'));
   add('Fichier', 'Ouvrir un fichier PowerPoint…', () => g$('homeFile').click(), 'importer pptx'); add('Fichier', 'Enregistrer comme modèle', saveTplDlg); add('Fichier', 'Publier dans la Communauté', () => window.SWHome?.publishCurrent?.()); add('Fichier', 'Partager…', () => window.SWShareCurrent?.());

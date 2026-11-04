@@ -3,6 +3,7 @@ let popClose = null;
 function openPop(anchor, html, wire, cls = ''){
   closePop(); const p = g$('edPop'); p.className = 'pop ' + cls; p.innerHTML = html; p.hidden = false;
   const r = anchor.getBoundingClientRect ? anchor.getBoundingClientRect() : {left:anchor.x, right:anchor.x, top:anchor.y, bottom:anchor.y};
+  p.style.maxHeight = Math.max(240, innerHeight - 100) + 'px'; p.style.overflowY = 'auto';
   const w = p.offsetWidth, h = p.offsetHeight;
   p.style.left = clamp(r.left, 8, innerWidth - w - 8) + 'px'; p.style.top = (r.bottom + h + 8 > innerHeight ? Math.max(8, r.top - h - 8) : r.bottom + 6) + 'px';
   wire && wire(p);
@@ -90,35 +91,6 @@ function posPop(anchor){
     <button type="button" data-x="lock">${iconSVG('lock')}${l.every(e => e.lock) ? 'Déverrouiller' : 'Verrouiller la position'}</button></div>`, p => {
     p.onclick = e => { const a = e.target.closest('[data-al]'), y = e.target.closest('[data-ly]'), x = e.target.closest('[data-x]'); if (!a && !y && !x) return; closePop();
       if (a) alignSel(a.dataset.al); if (y) layer(y.dataset.ly); if (x?.dataset.x === 'group') groupSel(); if (x?.dataset.x === 'ungroup') ungroupSel(); if (x?.dataset.x === 'lock') lockSel(); };
-  }, 'wide');
-}
-const ANIMS = [['', 'Aucune'], ['fade', 'Fondu'], ['rise', 'Monter'], ['drop', 'Descendre'], ['left', 'Glisser'], ['zoom', 'Zoom'], ['pop', 'Rebond'], ['wipe', 'Balayage'], ['blur', 'Mise au point'], ['type', 'Machine à écrire']];
-function animPop(anchor){
-  const l = selEls(); if (!l.length) return; const an = l[0].an || {};
-  openPop(anchor, `<p class="pop-h">Animation d'entrée <small>pendant la présentation</small></p><div class="pop-chips">${ANIMS.map(([k, t]) => `<button type="button" data-an="${k}" aria-pressed="${(an.k || '') === k}">${t}</button>`).join('')}</div>
-    <div class="pop-list"><hr><label class="pop-toggle"><input type="checkbox" id="anClick" ${an.click ? 'checked' : ''}><div><b>Au clic</b><small>Apparaît quand vous avancez, au lieu d'apparaître tout seul</small></div></label></div>`, p => {
-    p.onclick = e => { const b = e.target.closest('[data-an]'); if (!b) return; const k = b.dataset.an; setProps(x => { if (!k) delete x.an; else x.an = {k, click:p.querySelector('#anClick').checked}; }, 'Animation', false); p.querySelectorAll('[data-an]').forEach(x => x.setAttribute('aria-pressed', x === b)); if (k) previewAnim(selEls()); };
-    p.querySelector('#anClick').onchange = e => setProps(x => { if (x.an) x.an.click = e.target.checked; }, 'Animation au clic', false);
-  });
-}
-function previewAnim(list){ list.forEach((e, i) => { const n = elNode(e.id); if (!n || !e.an) return; n.classList.remove('an-run'); n.style.removeProperty('--d'); void n.offsetWidth; n.dataset.an = e.an.k; n.style.setProperty('--d', i * 90 + 'ms'); n.classList.add('an-run'); setTimeout(() => { n.classList.remove('an-run'); delete n.dataset.an; }, 1400 + i * 90); }); }
-/* fond de la diapositive */
-function bgPop(anchor){
-  const s = cur(), sv = curVars();
-  openPop(anchor, `<p class="pop-h">Fond de la diapositive</p><div class="pop-sw">${['', 't:soft', 't:ac', 't:ac2', 't:ink', ...STD_COLORS.slice(0, 7)].map(c => `<button type="button" data-c="${c}" title="${c ? T_NAMES[c] || c : 'Fond du thème'}" style="background:${c ? realCol(c, sv) : `linear-gradient(135deg,${sv.bg} 50%,${sv.soft} 50%)`}"${(s.bg?.c || '') === c && !s.bg?.g && !s.bg?.img ? ' class="on"' : ''}></button>`).join('')}</div>
-    <p class="pop-h">Dégradés</p><div class="pop-sw grad">${GRADS.map((g, i) => `<button type="button" data-g="${i}" style="background:linear-gradient(135deg,${realCol(g[0], sv)},${realCol(g[1], sv)})"></button>`).join('')}</div>
-    <div class="pop-list"><hr><button type="button" data-b="img">${IC.img}Image de fond…</button>${s.bg?.img ? `<label class="pop-toggle"><input type="range" id="bgDim" min="0" max=".8" step=".05" value="${s.bg.dim || 0}"><div><b>Assombrir l'image</b></div></label>` : ''}
-    <label class="pop-toggle"><input type="checkbox" id="bgDeco" ${s.nodeco ? '' : 'checked'}><div><b>Décor du thème</b><small>Les formes dessinées par le thème</small></div></label>
-    <button type="button" data-b="custom">${IC.color}Couleur personnalisée…</button><button type="button" data-b="all">${IC.copy}Appliquer ce fond à toutes les diapositives</button></div>`, p => {
-    p.onclick = e => { const c = e.target.closest('[data-c]'), g = e.target.closest('[data-g]'), b = e.target.closest('[data-b]');
-      if (c){ closePop(); s.bg = c.dataset.c ? {c:c.dataset.c} : undefined; if (!s.bg) delete s.bg; renderAll(); commit('Fond'); }
-      if (g){ closePop(); s.bg = {g:GRADS[+g.dataset.g], a:135}; renderAll(); commit('Fond dégradé'); }
-      if (b?.dataset.b === 'img'){ closePop(); imgTarget = '@bg'; g$('edImgFile').click(); }
-      if (b?.dataset.b === 'custom'){ colorPop(anchor, s.bg?.c, v => { if (v){ s.bg = {c:v}; renderAll(); commit('Fond'); } }, {none:false}); }
-      if (b?.dataset.b === 'all'){ closePop(); D.slides.forEach(x => { if (x !== s){ if (s.bg) x.bg = JSON.parse(JSON.stringify(s.bg)); else delete x.bg; x.nodeco = s.nodeco; } }); renderAll(); commit('Fond pour toutes'); toast('Fond appliqué à toutes les diapositives'); } };
-    p.querySelector('#bgDeco').onchange = e => { s.nodeco = !e.target.checked || undefined; renderAll(); commit('Décor'); };
-    p.querySelector('#bgDim')?.addEventListener('input', e => { s.bg.dim = +e.target.value; renderStage(); });
-    p.querySelector('#bgDim')?.addEventListener('change', () => { commit('Fond'); renderRail(true); });
   }, 'wide');
 }
 function layoutMini(k){
@@ -244,13 +216,14 @@ function chartTypePop(anchor){
   });
 }
 /* ---------- La barre Prisme ---------- */
-const RAYS = [['insert', 'Insérer', 'plus', '#7B3FF2'], ['design', 'Design', 'palette', '#12B5E5'], ['layout', 'Mises en page', 'grid', '#2FBF71'], ['anim', 'Animer', 'sparkle', '#F5B82E'], ['templates', 'Modèles', 'layers', '#F2387A']];
+const RAYS = [['insert', 'Insérer', 'plus', '#7B3FF2'], ['design', 'Design', 'palette', '#12B5E5'], ['layout', 'Mises en page', 'grid', '#2FBF71'], ['anim', 'Animer', 'sparkle', '#F5B82E'], ['format', 'Format', 'tool', '#E5484D'], ['templates', 'Modèles', 'layers', '#F2387A']];
 const ICX = {
   shape:'<svg viewBox="0 0 24 24"><circle cx="8.5" cy="8.5" r="5"/><rect x="11" y="11" width="9" height="9" rx="1.5"/></svg>', text:'<svg viewBox="0 0 24 24"><path d="M5 6V4h14v2M12 4v16M9 20h6"/></svg>',
   slide:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M12 9v4M10 11h4"/></svg>', layout:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M10 9v11"/></svg>',
   bg:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m3 16 5-5 4 4 3-3 6 6"/></svg>', present:'<svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg>',
   op:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>', pos:'<svg viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 13h7v7h-7z"/><path d="M15 4h5v5M9 20H4v-5"/></svg>',
   anim:'<svg viewBox="0 0 24 24"><path d="M5 19c2-6 5-9 14-14M14 5h5v5"/><circle cx="6" cy="18" r="1.5"/></svg>', fx:'<svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>',
+  fmt:'<svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>',
   stroke:'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3" stroke-dasharray="3 2.5"/></svg>', crop:'<svg viewBox="0 0 24 24"><path d="M6 2v16h16M2 6h16v16"/></svg>',
   filter:'<svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="5"/><circle cx="15" cy="10" r="5"/><circle cx="12" cy="15" r="5"/></svg>', mask:'<svg viewBox="0 0 24 24"><path d="M12 3l8.7 5v8L12 21l-8.7-5V8z"/></svg>',
   replace:'<svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 14-5.3L20 8M20 4v4h-4M20 12a8 8 0 0 1-14 5.3L4 16M4 20v-4h4"/></svg>', data:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/></svg>',
@@ -269,7 +242,7 @@ function refreshToolbar(){
     <div class="tg">${tb('b', IC.b, 'Gras (Ctrl + B)', st.b ? ' aria-pressed="true"' : '')}${tb('i', IC.i, 'Italique (Ctrl + I)', st.i ? ' aria-pressed="true"' : '')}${tb('u', IC.u, 'Souligné (Ctrl + U)', st.u ? ' aria-pressed="true"' : '')}
       <button type="button" class="tb" data-k="fc" title="Couleur du texte">${colI('fc', st.fc || 't:ink')}</button></div>
     <div class="tg">${tb('align', IC[{l:'al', c:'ac', r:'ar', j:'aj'}[st.ha || 'l']], 'Alignement')}${tb('list', IC.ul, 'Liste à puces')}${tb('spacing', IC.spacing, 'Espacement')}${tb('fx', ICX.fx, 'Effets du texte')}</div>`;
-  const common = `<div class="tg">${tb('op', ICX.op, 'Transparence et ombre')}${tb('anim', ICX.anim, 'Animation', e?.an ? ' aria-pressed="true"' : '')}${tb('pos', ICX.pos, 'Position, alignement et plans')}${tb('dup', IC.copy, 'Dupliquer (Ctrl + D)')}${tb('del', IC.trash, 'Supprimer (Suppr)')}</div>`;
+  const common = `<div class="tg">${tb('fmt', ICX.fmt, 'Format et effets')}${tb('op', ICX.op, 'Transparence et ombre')}${tb('anim', ICX.anim, 'Animation', e?.an ? ' aria-pressed="true"' : '')}${tb('pos', ICX.pos, 'Position, alignement et plans')}${tb('dup', IC.copy, 'Dupliquer (Ctrl + D)')}${tb('del', IC.trash, 'Supprimer (Suppr)')}</div>`;
   if (k === 'slide'){
     h += `<div class="tg"><button type="button" class="tb tb-txt" data-k="newslide" title="Nouvelle diapositive (Ctrl + M)">${ICX.slide}<span>Diapo</span></button>${tb('layout', ICX.layout, 'Mise en page')}${tb('bg', ICX.bg, 'Fond de la diapositive')}</div>
       <div class="tg">${tb('text', ICX.text, 'Ajouter du texte (T)')}${tb('shape', ICX.shape, 'Ajouter une forme')}${tb('img', IC.img, 'Ajouter une image')}${tb('icon', iconSVG('star'), 'Ajouter une icône')}${tb('table', IC.table, 'Ajouter un tableau')}${tb('chart', iconSVG('chart'), 'Ajouter un graphique')}</div>`;
@@ -288,14 +261,15 @@ function refreshToolbar(){
   const fi = g$('fsIn'); if (fi){ fi.onkeydown = ev => { ev.stopPropagation(); if (ev.key === 'Enter'){ ev.preventDefault(); const v = +fi.value.replace(',', '.'); if (v > 0) setSt({fs:clamp(v, 4, 600)}, 'Taille du texte'); fi.blur(); } }; fi.onmousedown = ev => ev.stopPropagation(); }
   bar.querySelector('[data-k="undo"]').disabled = UNDO.i <= 0; bar.querySelector('[data-k="redo"]').disabled = UNDO.i >= UNDO.list.length - 1;
   updateStat();
+  if (panel === 'format' && !g$('edPanel').hidden) renderPanel();
 }
 function onToolbar(ev){
   const b = ev.target.closest('[data-k]'); if (!b || b.disabled) return; const k = b.dataset.k, l = selEls(), e = l[0];
   const A = {
-    undo, redo, newslide:() => layoutPop(b, true), layout:() => layoutPop(b, false), bg:() => bgPop(b), text:() => addText('body'), shape:() => shapePop(b), img:() => pickImage(), icon:() => iconPop(b), table:() => tablePop(b), chart:() => chartAddPop(b), present:() => present(CUR),
+    undo, redo, newslide:() => layoutPop(b, true), layout:() => layoutPop(b, false), bg:() => openPanel('format'), text:() => addText('body'), shape:() => shapePop(b), img:() => pickImage(), icon:() => iconPop(b), table:() => tablePop(b), chart:() => chartAddPop(b), present:() => present(CUR),
     font:() => fontPop(b), 'fs-':() => sizeStep(-1), 'fs+':() => sizeStep(1), b:() => setSt({b:e?.st?.b ? null : 1}, 'Gras'), i:() => setSt({i:e?.st?.i ? null : 1}, 'Italique'), u:() => setSt({u:e?.st?.u ? null : 1}, 'Souligné'),
     fc:() => colorPop(b, e?.st?.fc, v => setSt({fc:v || 't:ink'}, 'Couleur du texte'), {noneLabel:'Automatique'}), align:() => alignPop(b), list:toggleList, spacing:() => spacingPop(b), fx:() => effectsPop(b),
-    op:() => opacityPop(b), anim:() => animPop(b), pos:() => posPop(b), dup:dupSel, del:delSel, group:groupSel,
+    fmt:() => openPanel('format'), op:() => opacityPop(b), anim:() => openPanel('anim'), pos:() => posPop(b), dup:dupSel, del:delSel, group:groupSel,
     fill:() => colorPop(b, e.fill, (v, g) => setProps(x => { if (g){ x.fill = g[0]; x.g2 = g[1]; } else { x.fill = v || ''; delete x.g2; } }, 'Remplissage'), {grad:true}),
     stroke:() => strokePop(b), shapek:() => shapePop(b, true), addtxt:() => startEdit(e.id),
     lcol:() => colorPop(b, e.stroke, v => setProps(x => { x.stroke = v || 't:ink'; }, 'Couleur'), {none:false}), lstyle:() => linePop(b),
@@ -314,10 +288,13 @@ function toggleList(){
   else { const lines = (e.html || '').split(/<br\s*\/?>/).map(x => x.trim()).filter(Boolean); e.html = `<ul>${(lines.length ? lines : ['']).map(x => `<li>${x}</li>`).join('')}</ul>`; }
   updateEl(e, true); fitTexts([e.id]); renderSel(); commit(isList ? 'Retirer la liste' : 'Liste à puces'); refreshToolbar();
 }
+function shapeGroupsHTML(change, attr, cls = 'pop-shapes', color = ''){
+  return SHAPE_GROUPS.map(([t, ks]) => { const l = ks.filter(k => !change || (k !== 'line' && k !== 'arrowline')); return l.length ? `<p class="pop-h">${t}</p><div class="${cls}">${l.map(k => `<button type="button" ${attr}="${k}" title="${escH(SHAPES[k][0])}"${color}>${shapeIcon(k)}</button>`).join('')}</div>` : ''; }).join('');
+}
 function shapePop(anchor, change){
-  openPop(anchor, `<p class="pop-h">${change ? 'Changer de forme' : 'Formes'}</p><div class="pop-shapes">${SHAPE_ORDER.filter(k => !change || (k !== 'line' && k !== 'arrowline')).map(k => `<button type="button" data-sh="${k}" title="${escH(SHAPES[k][0])}">${shapeIcon(k)}</button>`).join('')}</div>`, p => {
+  openPop(anchor, shapeGroupsHTML(change, 'data-sh'), p => {
     p.onclick = e => { const b = e.target.closest('[data-sh]'); if (!b) return; closePop(); if (change) setProps(x => { x.k = b.dataset.sh; }, 'Forme'); else addShape(b.dataset.sh); };
-  }, 'wide');
+  }, 'wide shapes');
 }
 function shapeIcon(k){
   if (k === 'line') return '<svg viewBox="0 0 40 40"><path d="M4 20h32" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>';
@@ -354,7 +331,7 @@ function ctxMenu(ev){
   openPop(anchor, html, p => { p.onclick = e => { const b = e.target.closest('[data-cm]'); if (!b || b.disabled) return; closePop(); const k = b.dataset.cm;
     if (k === 'cut') copySel(null, true); else if (k === 'copy') copySel(); else if (k === 'paste') pasteEls(); else if (k === 'dup') dupSel(); else if (k === 'front' || k === 'back') layer(k);
     else if (k === 'group') groupSel(); else if (k === 'ungroup') ungroupSel(); else if (k === 'lock') lockSel(); else if (k === 'del') delSel(); else if (k === 'anim') animPop(anchor);
-    else if (k === 'layout') layoutPop(anchor); else if (k === 'bg') bgPop(anchor); else if (k === 'newslide') layoutPop(anchor, true); else if (k === 'dupslide') dupSlide();
+    else if (k === 'layout') layoutPop(anchor); else if (k === 'bg') openPanel('format'); else if (k === 'newslide') layoutPop(anchor, true); else if (k === 'dupslide') dupSlide();
     else if (k === 'rimg') pickImage(selEls()[0]?.id); else if (k === 'align') alignObjPop(anchor); else if (k === 'present') present(CUR); else if (k === 'hideslide') toggleHide(); }; }, 'menu');
 }
 /* aligner sur la diapositive (un élément) ou entre eux (plusieurs) ; répartir à partir de 3 éléments */

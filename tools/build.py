@@ -15,7 +15,7 @@ Usage : python3 tools/build.py
 import pathlib, sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 S = ROOT / 'src'
-CSS_ORDER = ['base.css', 'splash.css', 'auth.css', 'home.css', 'shell.css', 'slide.css']
+CSS_ORDER = ['base.css', 'splash.css', 'auth.css', 'home.css', 'shell.css', 'slide.css', 'fx.css']
 FB = '10.12.2'
 CONFIG = '''const FIREBASE_CONFIG = {
   // Projet Firebase de Studio Prism : le même que le site et qu'ARCHIPLAN. Configuration publique par conception

@@ -1,6 +1,6 @@
 /* ---------- La scène : la diapositive au centre, sélection, déplacement, redimensionnement, rotation, repères, édition du texte ---------- */
 const g$ = id => document.getElementById(id);
-const V = {z:1, zoom:0, ro:false};          // zoom 0 = ajusté à la fenêtre
+const V = {z:1, zoom:0, ro:false, grid:false, snapGrid:false, guides:false, ...(lsGet('ss.view') || {})};          // zoom 0 = ajusté à la fenêtre
 const DRAG = {mode:null};
 let EDT = null;                              // élément dont le texte est en cours d'édition : {id, node}
 const PAD = () => innerWidth < 760 ? 14 : 44;
@@ -12,7 +12,7 @@ function stageFit(){
 function layoutStage(){
   const [W, H] = dims(), fit = stageFit(); V.z = V.zoom ? V.zoom : fit;
   const host = g$('slideHost'), st = g$('stage');
-  host.style.width = Math.round(W * V.z) + 'px'; host.style.height = Math.round(H * V.z) + 'px';
+  host.style.setProperty('--z', V.z); host.style.width = Math.round(W * V.z) + 'px'; host.style.height = Math.round(H * V.z) + 'px';
   g$('slideView').style.transform = `scale(${V.z})`;
   const inn = g$('stageIn'); const padB = innerWidth < 760 ? 140 : 110;
   inn.style.width = Math.max(st.clientWidth, Math.round(W * V.z) + PAD() * 2) + 'px';
@@ -25,7 +25,7 @@ function renderStage(){
   if (EDT) stopEdit(true);
   layoutStage();
   g$('slideView').innerHTML = renderSlide(cur(), {edit:true});
-  fitTexts(); renderSel(); updateStat();
+  fitTexts(); renderSel(); updateStat(); applyView();
 }
 /* la hauteur d'un texte suit son contenu (jamais tronqué) */
 function fitTexts(ids){
@@ -80,6 +80,7 @@ function snapMove(b, dx, dy, skip){
   const xs = [0, W / 2, W, M, W - M], ys = [0, H / 2, H, Math.round(64 * H / 720), H - M];
   for (const e of cur().els){ if (skip.has(e.id)) continue; const r = bbox([e]); xs.push(r.x, r.x + r.w / 2, r.x + r.w); ys.push(r.y, r.y + r.h / 2, r.y + r.h); }
   const nx = b.x + dx, ny = b.y + dy, gd = []; let best = null;
+  if (V.snapGrid){ const g = 20; [nx, nx + b.w / 2, nx + b.w].forEach(c => xs.push(Math.round(c / g) * g)); [ny, ny + b.h / 2, ny + b.h].forEach(c => ys.push(Math.round(c / g) * g)); }
   for (const [off, cand] of [[0, nx], [b.w / 2, nx + b.w / 2], [b.w, nx + b.w]]) for (const t of xs){ const d = t - cand; if (Math.abs(d) <= th && (!best || Math.abs(d) < Math.abs(best.d))) best = {d, p:t}; }
   let bestY = null;
   for (const cand of [ny, ny + b.h / 2, ny + b.h]) for (const t of ys){ const d = t - cand; if (Math.abs(d) <= th && (!bestY || Math.abs(d) < Math.abs(bestY.d))) bestY = {d, p:t}; }

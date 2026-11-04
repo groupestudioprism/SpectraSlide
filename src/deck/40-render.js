@@ -18,29 +18,26 @@ function txCss(st = {}){
   c += `font-weight:${st.b ? (st.f === 'h' ? 'var(--hw)' : '700') : (st.f === 'h' ? '500' : '400')};`;
   if (st.i) c += 'font-style:italic;'; if (st.u) c += 'text-decoration:underline;'; if (st.s) c += 'text-decoration:line-through;';
   if (st.ls) c += `letter-spacing:${st.ls}em;`; if (st.up) c += 'text-transform:uppercase;';
-  if (st.sh) c += `text-shadow:0 2px 14px rgb(0 0 0 / .35);`;
+  c += fxTextCss(st);
   if (st.hl) c += `--hl:${cssCol(st.hl)};`;
   return c;
 }
-function boxCss(e){
-  let c = `left:${Math.round(e.x)}px;top:${Math.round(e.y)}px;width:${Math.round(e.w)}px;height:${Math.round(e.h)}px;`;
-  if (e.rot) c += `transform:rotate(${+e.rot}deg);`;
-  if (e.op != null && e.op < 1) c += `opacity:${+e.op};`;
-  if (e.shadow) c += `filter:drop-shadow(0 ${Math.round(e.shadow * .5)}px ${e.shadow}px rgb(10 8 30 / .28));`;
-  return c;
-}
-const fillCss = e => !e.fill ? 'transparent' : e.g2 ? `linear-gradient(${e.ga ?? 135}deg,${cssCol(e.fill)},${cssCol(e.g2)})` : cssCol(e.fill);
+const fillCss = e => !e.fill ? 'transparent' : e.g2 ? gradCss(e) : cssCol(e.fill);
 let GRAD_N = 0;
 function shapeHTML(e, sv){
-  const k = e.k || 'rect', sw = +e.sw || 0, stroke = e.stroke && sw ? cssCol(e.stroke) : '';
+  const k = e.k || 'rect', sw = +e.sw || 0, stroke = e.stroke && sw ? cssCol(e.stroke) : '', pl = patLayer(e, sv), dash = e.sd === 'dot' ? 'dotted' : 'dashed';
   let g = '';
   if (['rect', 'round', 'ellipse', 'pill'].includes(k)){
     const r = k === 'ellipse' ? '50%' : k === 'pill' ? Math.min(e.w, e.h) / 2 + 'px' : k === 'round' ? (e.r ?? 18) + 'px' : (e.r || 0) + 'px';
-    g = `<div class="shp" style="background:${fillCss(e)};border-radius:${r};${stroke ? `box-shadow:inset 0 0 0 ${sw}px ${stroke};` : ''}"></div>`;
+    const bd = !stroke ? '' : e.sd ? `border:${sw}px ${dash} ${stroke};box-sizing:border-box;` : `box-shadow:inset 0 0 0 ${sw}px ${stroke};`;
+    g = `<div class="shp" style="background:${pl ? `${pl.url} 0 0/${pl.w}px ${pl.h}px,` : ''}${fillCss(e)};border-radius:${r};${bd}"></div>`;
   } else {
     const d = SHAPES[k]?.[1] || SHAPES.tri[1]; let fill = e.fill ? realCol(e.fill, sv) : 'none', defs = '';
-    if (e.fill && e.g2){ const id = 'sg' + (++GRAD_N).toString(36); const a = (e.ga ?? 135) * Math.PI / 180; defs = `<defs><linearGradient id="${id}" x1="${.5 - Math.cos(a - Math.PI / 2) / 2}" y1="${.5 - Math.sin(a - Math.PI / 2) / 2}" x2="${.5 + Math.cos(a - Math.PI / 2) / 2}" y2="${.5 + Math.sin(a - Math.PI / 2) / 2}"><stop offset="0" stop-color="${realCol(e.fill, sv)}"/><stop offset="1" stop-color="${realCol(e.g2, sv)}"/></linearGradient></defs>`; fill = `url(#${id})`; }
-    g = `<svg class="shp" viewBox="0 0 100 100" preserveAspectRatio="none">${defs}<path d="${d}" fill="${fill}"${stroke ? ` stroke="${realCol(e.stroke, sv)}" stroke-width="${sw}" vector-effect="non-scaling-stroke" stroke-linejoin="round"` : ''}/></svg>`;
+    if (e.fill && e.g2 && e.gt !== 'con'){ const id = 'sg' + (++GRAD_N).toString(36); defs = gradDefs(id, e, sv); fill = `url(#${id})`; }
+    else if (e.fill && e.g2) fill = realCol(e.fill, sv);
+    const sdA = e.sd ? ` stroke-dasharray="${e.sd === 'dot' ? `${sw} ${sw * 1.6}` : `${sw * 3} ${sw * 2}`}"` : '';
+    g = `<svg class="shp" viewBox="0 0 100 100" preserveAspectRatio="none">${defs}<path d="${d}" fill="${fill}"${stroke ? ` stroke="${realCol(e.stroke, sv)}" stroke-width="${sw}" vector-effect="non-scaling-stroke" stroke-linejoin="round"${sdA}` : ''}/></svg>`;
+    if (pl){ const m = `url('data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="${d}"/></svg>`).replace(/'/g, '%27')}') 0 0/100% 100% no-repeat`; g += `<div class="shp" style="background:${pl.url} 0 0/${pl.w}px ${pl.h}px;-webkit-mask:${m};mask:${m}"></div>`; }
   }
   if (e.html != null) g += `<div class="txw"><div class="tx in" style="${txCss({ha:'c', va:'m', fc:'t:on', fs:22, ...(e.st || {})})}">${e.html}</div></div>`;
   return g;
@@ -145,23 +142,31 @@ function elInner(e, sv, o){
   }
   return '';
 }
-function slideBg(s, sv, o = {}){
-  const b = s.bg || {};
-  if (b.g) return `linear-gradient(${b.a ?? 135}deg,${cssCol(b.g[0])},${cssCol(b.g[1])})`;
+const MESHES = [['Aurore', ['#7C3AED', '#06B6D4', '#EC4899', '#0F0B1E']], ['Coucher de soleil', ['#FF7A59', '#FFC83D', '#EC4899', '#2B1055']], ['Océan', ['#0EA5E9', '#22D3EE', '#6366F1', '#06213A']], ['Forêt', ['#34D399', '#A3E635', '#0EA5E9', '#0B2A20']],
+  ['Pastel', ['#FBCFE8', '#BAE6FD', '#DDD6FE', '#FFF7FB']], ['Pêche', ['#FED7AA', '#FBCFE8', '#FDE68A', '#FFF8F1']], ['Menthe', ['#A7F3D0', '#BFDBFE', '#FDE68A', '#F3FFFA']], ['Minuit', ['#4F46E5', '#7C3AED', '#0EA5E9', '#070A1A']]];
+const meshCss = m => `radial-gradient(at 15% 20%,${m[0]} 0,transparent 55%),radial-gradient(at 85% 15%,${m[1]} 0,transparent 55%),radial-gradient(at 75% 90%,${m[2]} 0,transparent 60%),radial-gradient(at 10% 90%,${m[0]} 0,transparent 45%),${m[3]}`;
+function bgBase(b, sv){
+  if (b.mesh) return meshCss(b.mesh.map(cssCol));
+  if (b.g){ const cs = b.g.map(cssCol); if (b.gt === 'rad') return `radial-gradient(circle at 50% 40%,${cs.join(',')})`; if (b.gt === 'con') return `conic-gradient(from ${b.a ?? 135}deg at 50% 50%,${[...cs, cs[0]].join(',')})`; return `linear-gradient(${b.a ?? 135}deg,${cs.join(',')})`; }
   if (b.c) return cssCol(b.c);
   return sv.bg;
+}
+function slideBg(s, sv, o = {}){
+  const b = s.bg || {}, base = bgBase(b, sv), t = b.pat && patTile(b.pat, realCol(b.pc || 't:ink', sv) || '#000', numIn(b.po, .03, 1, .12), numIn(b.ps, .5, 4, 1));
+  return t ? `${t.url} 0 0/${t.w}px ${t.h}px,${base}` : base;
 }
 /* opts : {edit, preview (sans images, pour les vignettes enregistrées), present, print, theme, size} */
 function renderSlide(s, o = {}){
   const th = dtheme(o.theme || D.theme), [W, H] = SIZES[o.size || D.size] || SIZES['16:9'], sv = slideVars(th, s.v || 'content');
-  if (s.bg?.c && !s.bg.c.startsWith?.('t:')){ const dk = luma(s.bg.c) < .45; if (dk !== sv.dark && (s.bg.ink !== false)){ sv.ink = dk ? '#FFFFFF' : th.ink === '#FFFFFF' ? '#16122B' : th.ink; sv.mut = mix(sv.ink, s.bg.c, .35); sv.line = mix(s.bg.c, sv.ink, .16); sv.soft = mix(s.bg.c, sv.ink, .06); sv.dark = dk; } sv.bg = s.bg.c; }
+  const bgc = s.bg && (s.bg.mesh ? realCol(s.bg.mesh[3], sv) : s.bg.g ? (() => { const a = realCol(s.bg.g[0], sv), b = realCol(s.bg.g[1], sv); return /^#[0-9a-f]{6}$/i.test(a) && /^#[0-9a-f]{6}$/i.test(b) ? mix(a, b, .5) : null; })() : s.bg.c && !s.bg.c.startsWith?.('t:') ? s.bg.c : null);
+  if (bgc && /^#[0-9a-f]{6}$/i.test(bgc)){ const dk = luma(bgc) < .45; if (dk !== sv.dark && (s.bg.ink !== false)){ sv.ink = dk ? '#FFFFFF' : th.ink === '#FFFFFF' ? '#16122B' : th.ink; sv.mut = mix(sv.ink, bgc, .35); sv.line = mix(bgc, sv.ink, .16); sv.soft = mix(bgc, sv.ink, .06); sv.dark = dk; } if (!s.bg.g && !s.bg.mesh) sv.bg = bgc; }
   let h = `<div class="sl${sv.dark ? ' dk' : ''}" style="width:${W}px;height:${H}px;${varsCss(sv)};background:${slideBg(s, sv, o)}">`;
   const bi = s.bg?.img && !o.preview ? mediaSrc(s.bg.img) : '';
   if (bi) h += `<div class="sl-bgi" style="background-image:url('${bi.replace(/'/g, '%27')}');${s.bg.dim ? '' : ''}"></div>${s.bg.dim ? `<div class="sl-bgi" style="background:#000;opacity:${s.bg.dim}"></div>` : ''}`;
   if (!s.nodeco && !s.bg?.img) h += decorSVG(th, s.v || 'content', W, H, sv);
   for (const e of s.els){
     if (o.present && e.t === 'img' && !mediaSrc(e.src) && e.w * e.h > W * H * .15) continue;
-    h += `<div class="el el-${e.t}${e.lock ? ' lk' : ''}" ${o.edit || o.present ? `data-id="${e.id}" ` : ''}style="${boxCss(e)}">${elInner(e, sv, o)}</div>`;
+    h += `<div class="el el-${e.t}${e.lock ? ' lk' : ''}${e.lk && o.present ? ' lnk' : ''}" ${o.edit || o.present ? `data-id="${e.id}" ` : ''}${e.lk && o.present ? `data-lk="${escH(e.lk)}" ` : ''}${e.alt ? `role="img" aria-label="${escH(e.alt)}" ` : ''}style="${boxCss(e)}">${elInner(e, sv, o)}</div>`;
   }
   return h + '</div>';
 }
