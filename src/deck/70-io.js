@@ -28,9 +28,10 @@ function svgToPng(svg, w, h, scale = 2){
 function imgCrop(e, scale = 1.5){
   return new Promise(res => { const src = mediaSrc(e.src); if (!src) return res(null); const im = new Image();
     im.onload = () => { const W = Math.round(e.w * scale), H = Math.round(e.h * scale), c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
-      const f = IMG_FILTERS[e.filter]?.[1]; if (f) x.filter = f;
+      const fx = e.fx || {}, f = [IMG_FILTERS[e.filter]?.[1], fx.br != null && fx.br !== 100 ? `brightness(${fx.br / 100})` : '', fx.ct != null && fx.ct !== 100 ? `contrast(${fx.ct / 100})` : '', fx.sa != null && fx.sa !== 100 ? `saturate(${fx.sa / 100})` : '', fx.hu ? `hue-rotate(${fx.hu}deg)` : ''].filter(Boolean).join(' '); if (f) x.filter = f;
       const m = e.mask || (e.r ? 'round' : 'none'), mask = m !== 'none';
-      if (mask){ x.beginPath(); if (m === 'circle') x.ellipse(W / 2, H / 2, W / 2, H / 2, 0, 0, Math.PI * 2); else if (m === 'hex') { x.moveTo(W * .25, 0); x.lineTo(W * .75, 0); x.lineTo(W, H / 2); x.lineTo(W * .75, H); x.lineTo(W * .25, H); x.lineTo(0, H / 2); } else if (m === 'diamond'){ x.moveTo(W / 2, 0); x.lineTo(W, H / 2); x.lineTo(W / 2, H); x.lineTo(0, H / 2); }
+      if (mask && SHAPES[m]?.[1] && !['circle', 'hex', 'diamond', 'arch', 'blob', 'round'].includes(m)){ x.save(); x.scale(W / 100, H / 100); x.clip(new Path2D(SHAPES[m][1])); x.restore(); }
+      else if (mask){ x.beginPath(); if (m === 'circle') x.ellipse(W / 2, H / 2, W / 2, H / 2, 0, 0, Math.PI * 2); else if (m === 'hex') { x.moveTo(W * .25, 0); x.lineTo(W * .75, 0); x.lineTo(W, H / 2); x.lineTo(W * .75, H); x.lineTo(W * .25, H); x.lineTo(0, H / 2); } else if (m === 'diamond'){ x.moveTo(W / 2, 0); x.lineTo(W, H / 2); x.lineTo(W / 2, H); x.lineTo(0, H / 2); }
         else { const r = m === 'arch' ? Math.min(W / 2, H) : m === 'blob' ? Math.min(W, H) * .4 : (e.r || Math.min(e.w, e.h) * .08) * scale; x.roundRect ? x.roundRect(0, 0, W, H, m === 'arch' ? [r, r, 0, 0] : r) : x.rect(0, 0, W, H); } x.clip(); }
       const iw = im.naturalWidth, ih = im.naturalHeight, cover = e.fit !== 'contain', k = cover ? Math.max(W / iw, H / ih) : Math.min(W / iw, H / ih), dw = iw * k, dh = ih * k;
       const dx = (W - dw) * (e.px ?? 50) / 100, dy = (H - dh) * (e.py ?? 50) / 100;
@@ -113,6 +114,7 @@ async function exportPptx(){
         }
         else if (e.t === 'line'){ const a2 = e.a2 || (e.k === 'arrowline' ? 'arrow' : ''); sl.addShape(p.ShapeType.line, {x:pos.x, y:pxIn(e.y + e.h / 2), w:pos.w, h:0, rotate:pos.rotate, line:{color:hx(realCol(e.stroke || 't:ink', sv)), width:pxPt(e.lw || 3), dashType:e.dash === 'dot' ? 'sysDot' : e.dash ? 'dash' : 'solid', beginArrowType:e.a1 === 'arrow' ? 'triangle' : e.a1 === 'dot' ? 'oval' : undefined, endArrowType:a2 === 'arrow' ? 'triangle' : a2 === 'dot' ? 'oval' : undefined}}); }
         else if (e.t === 'img'){ const data = await imgCrop(e); if (data) sl.addImage({data, ...pos, transparency:tr || undefined}); }
+        else if (e.t === 'video'){ const v = vidInfo(e.url); if (v?.yt) sl.addMedia({type:'online', link:`https://www.youtube.com/embed/${v.yt}`, x:pos.x, y:pos.y, w:pos.w, h:pos.h}); else sl.addText(e.url ? [{text:'▶ ' + e.url, options:{hyperlink:{url:e.url}}}] : '▶ Vidéo', {...pos, fill:{color:'16122B'}, color:'FFFFFF', align:'center', valign:'middle', fontFace:sv.fb, fontSize:16}); }
         else if (e.t === 'icon'){ const png = await svgToPng(iconSVG(e.n, realCol(e.fc || 't:ac', sv), e.sw || 1.8).replace('<svg ', `<svg width="${e.w}" height="${e.h}" `), e.w, e.h, 3); if (png) sl.addImage({data:png, ...pos}); }
         else if (e.t === 'table'){
           const hc = realCol(e.hc || 't:ac', sv), rows = e.rows.map((r, i) => r.map(c => { const head = i === 0 && e.head !== false; const t = c.replace(/<br\s*\/?>/g, '\n').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
@@ -332,13 +334,13 @@ function cleanDeck(j){
     const s = {id:String(s0.id || sid()), v:['title', 'section', 'content', 'end'].includes(s0.v) ? s0.v : 'content', lay:String(s0.lay || ''), els:[], notes:String(s0.notes || '').slice(0, 20000), tr:s0.tr ? String(s0.tr) : undefined, an:s0.an ? String(s0.an) : undefined, hide:!!s0.hide || undefined, nodeco:!!s0.nodeco || undefined};
     if (s0.bg && typeof s0.bg === 'object'){ const b = {}; if (okCol(s0.bg.c)) b.c = s0.bg.c; if (Array.isArray(s0.bg.g)) b.g = s0.bg.g.map(okCol).filter(Boolean).slice(0, 2); if (/^m:\w+$/.test(s0.bg.img || '')) b.img = s0.bg.img; if (+s0.bg.dim) b.dim = clamp(+s0.bg.dim, 0, .9); if (b.g && b.g.length < 2) delete b.g; if (b.g && ['rad', 'con'].includes(s0.bg.gt)) b.gt = s0.bg.gt; if (b.g && isFinite(+s0.bg.a)) b.a = numIn(s0.bg.a, -720, 720); if (Array.isArray(s0.bg.mesh) && s0.bg.mesh.length === 4 && s0.bg.mesh.every(isCol)) b.mesh = s0.bg.mesh; if (PATS[s0.bg.pat]){ b.pat = s0.bg.pat; if (isCol(s0.bg.pc)) b.pc = s0.bg.pc; b.po = numIn(s0.bg.po, .03, 1, .12); b.ps = numIn(s0.bg.ps, .5, 4, 1); } if (s0.adv) s.adv = numIn(s0.adv, 1, 600); if (s0.trd) s.trd = numIn(s0.trd, .2, 3); if (Object.keys(b).length) s.bg = b; }
     for (const e0 of s0.els.slice(0, 300)){
-      if (!e0 || !['text', 'shape', 'line', 'img', 'icon', 'table', 'chart'].includes(e0.t)) continue;
+      if (!e0 || !['text', 'shape', 'line', 'img', 'icon', 'table', 'chart', 'video'].includes(e0.t)) continue;
       const e = {...e0}; e.id = String(e.id || nid()); for (const k of ['x', 'y', 'w', 'h']) e[k] = +e[k] || 0; e.w = Math.max(1, e.w); e.h = Math.max(1, e.h);
       if (e.html != null) e.html = SAN(String(e.html)); if (e.rows) e.rows = (Array.isArray(e.rows) ? e.rows : []).slice(0, 60).map(r => (Array.isArray(r) ? r : []).slice(0, 20).map(c => SAN(String(c ?? ''))));
       for (const k of ['fill', 'g2', 'stroke', 'fc', 'hc']) if (k in e && okCol(e[k]) === undefined) delete e[k];
       if (e.st){ e.st = {...e.st}; for (const k of ['fc', 'bg', 'hl']) if (k in e.st && okCol(e.st[k]) === undefined) delete e.st[k]; if (e.st.f && !['h', 'b'].includes(e.st.f) && !FONTS.some(f => f[0] === e.st.f)) e.st.f = 'b'; }
       if (e.t === 'img' && e.src && !/^m:\w+$/.test(e.src)){ if (/^data:image\/(png|jpe?g|gif|webp);base64,/.test(e.src)){ const id = uidS(); d.media[id] = e.src; e.src = 'm:' + id; } else e.src = ''; }
-      if (e.t === 'icon' && !ICONS[e.n]) e.n = 'star'; if (e.t === 'shape' && !SHAPES[e.k]) e.k = 'rect'; cleanFx(e);
+      if (e.t === 'icon' && !ICONS[e.n]) e.n = 'star'; if (e.t === 'shape' && !SHAPES[e.k]) e.k = 'rect'; cleanFx(e); if (e.t === 'video'){ e.url = vidInfo(e.url) ? String(e.url).slice(0, 400) : ''; }
       if (e.t === 'chart'){ e.labels = (e.labels || []).map(String).slice(0, 60); e.series = (e.series || []).slice(0, 12).map(x => ({n:String(x.n || ''), v:(x.v || []).slice(0, 60).map(v => v == null || isNaN(+v) ? null : +v)})); }
       s.els.push(e);
     }

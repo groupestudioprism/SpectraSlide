@@ -258,6 +258,7 @@ function refreshToolbar(){
   else if (k === 'table'){ h += `<div class="tg">${tb('row+', ICX.rowp, 'Ajouter une ligne')}${tb('row-', ICX.rowm, 'Retirer la dernière ligne')}${tb('col+', ICX.colp, 'Ajouter une colonne')}${tb('col-', ICX.colm, 'Retirer la dernière colonne')}<button type="button" class="tb" data-k="thc" title="Couleur de l'en-tête">${colI('fill', e.hc || 't:ac')}</button>${tb('thead', IC.table, 'En-tête et lignes alternées')}</div>
       <div class="tg"><div class="tsz">${tb('fs-', IC.minus, 'Plus petit')}<input class="tsz-in" id="fsIn" value="${e.fs || 18}" aria-label="Taille du texte">${tb('fs+', IC.plus, 'Plus grand')}</div>${tb('font', '<span class="tb-aa">Aa</span>', 'Police')}</div>` + common; }
   else if (k === 'chart'){ h += `<div class="tg"><button type="button" class="tb tb-txt" data-k="cdata" title="Modifier les données">${ICX.data}<span>Données</span></button>${tb('ctype', iconSVG('chart'), 'Type de graphique')}${tb('cvals', '<span class="tb-aa">12</span>', 'Afficher les valeurs', e.vals !== false ? ' aria-pressed="true"' : '')}</div>` + common; }
+  else if (k === 'video'){ h += `<div class="tg"><button type="button" class="tb tb-txt" data-k="vurl" title="Changer la vidéo">${ICX.replace}<span>Changer</span></button></div>` + common; }
   else if (k === 'multi'){ const tx = l.filter(x => x.st); h += (tx.length ? `<div class="tg">${tb('font', '<span class="tb-aa">Aa</span>', 'Police')}<button type="button" class="tb" data-k="fc" title="Couleur du texte">${colI('fc', tx[0].st.fc || 't:ink')}</button>${tb('fs-', IC.minus, 'Plus petit')}${tb('fs+', IC.plus, 'Plus grand')}</div>` : '') + `<div class="tg">${tb('group', iconSVG('layers'), 'Grouper (Ctrl + G)')}</div>` + common; }
   bar.innerHTML = h; bar.dataset.ctx = k;
   const fi = g$('fsIn'); if (fi){ fi.onkeydown = ev => { ev.stopPropagation(); if (ev.key === 'Enter'){ ev.preventDefault(); const v = +fi.value.replace(',', '.'); if (v > 0) setSt({fs:clamp(v, 4, 600)}, 'Taille du texte'); fi.blur(); } }; fi.onmousedown = ev => ev.stopPropagation(); }
@@ -278,7 +279,7 @@ function onToolbar(ev){
     replace:() => pickImage(e.id), crop:() => imgPop(b, 'crop'), filter:() => imgPop(b, 'filter'), mask:() => imgPop(b, 'mask'),
     icol:() => colorPop(b, e.fc, v => setProps(x => { x.fc = v || 't:ac'; }, 'Couleur'), {none:false}), ichange:() => iconPop(b, e.id), 'isw-':() => setProps(x => { x.sw = Math.max(.6, (x.sw || 1.8) - .4); }, 'Trait'), 'isw+':() => setProps(x => { x.sw = Math.min(4, (x.sw || 1.8) + .4); }, 'Trait'),
     'row+':() => tableOp('row+'), 'row-':() => tableOp('row-'), 'col+':() => tableOp('col+'), 'col-':() => tableOp('col-'), thead:() => theadPop(b), thc:() => colorPop(b, e.hc, v => setProps(x => { x.hc = v || undefined; }, 'En-tête'), {noneLabel:'Couleur du thème'}),
-    cdata:() => chartDialog(e.id), ctype:() => chartTypePop(b), cvals:() => setProps(x => { x.vals = x.vals === false; }, 'Valeurs'),
+    vurl:() => askVideo(e.id), cdata:() => chartDialog(e.id), ctype:() => chartTypePop(b), cvals:() => setProps(x => { x.vals = x.vals === false; }, 'Valeurs'),
   };
   A[k]?.();
 }

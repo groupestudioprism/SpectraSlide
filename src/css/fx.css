@@ -49,6 +49,9 @@
 @keyframes tr-spin-in{from{opacity:0;transform:rotate(calc(var(--dir,1) * -30deg)) scale(.25)}}@keyframes tr-spin-out{to{opacity:0;transform:rotate(calc(var(--dir,1) * 30deg)) scale(1.6)}}
 @keyframes tr-fall-out{to{opacity:0;transform:translateY(110%) rotate(calc(var(--dir,1) * 14deg))}}
 @keyframes tr-roll-in{from{opacity:0;transform:perspective(1600px) rotateX(calc(var(--dir,1) * -75deg))}}@keyframes tr-roll-out{to{opacity:0;transform:perspective(1600px) rotateX(calc(var(--dir,1) * 75deg))}}
+/* vidéo */
+.sl .vidw{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000;display:block;border-radius:6px}
+.sl .vidw.ph{display:grid;place-items:center;align-content:center;gap:10px;background:linear-gradient(135deg,#1B1633,#0C0A16);color:#E9E6F5;font:600 15px system-ui}.sl .vidw.ph svg{width:22%;max-width:96px;height:auto}
 /* pied de page */
 .sl .sl-foot{position:absolute;display:flex;justify-content:space-between;gap:24px;color:var(--mut);font-weight:600;pointer-events:none;letter-spacing:.01em}
 .sl .sl-foot .ft0{flex:1}.sl .sl-foot .ft1{flex:none}.sl .sl-foot .ft2{flex:none;min-width:1.5em;text-align:right}

@@ -178,6 +178,7 @@ function onStageDbl(ev){
   if (e.t === 'table') return startEdit(e.id, ev);
   if (e.t === 'img') return pickImage(e.id);
   if (e.t === 'chart') return chartDialog(e.id);
+  if (e.t === 'video') return askVideo(e.id);
   if (e.t === 'icon') return iconPop(g$('edBar'), e.id);
 }
 /* ---------- Édition du texte (dans la diapositive) ---------- */

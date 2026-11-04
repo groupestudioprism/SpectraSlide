@@ -81,7 +81,7 @@ function wirePresent(){
   const p = g$('present');
   p.addEventListener('keydown', pvKey);
   p.addEventListener('mousemove', e => { wake(); if (INK.loupe) loupeMove(e); if (PV.laser){ const l = g$('pvLaser'); l.style.left = e.clientX + 'px'; l.style.top = e.clientY + 'px'; } });
-  g$('pvStage').addEventListener('click', e => { if (e.target.closest('a')) return; const lk = e.target.closest('[data-lk]'); if (lk){ pvLink(lk); return; } pvNext(); });
+  g$('pvStage').addEventListener('click', e => { if (e.target.closest('a,video,iframe')) return; const lk = e.target.closest('[data-lk]'); if (lk){ pvLink(lk); return; } pvNext(); });
   g$('pvBlack').addEventListener('click', () => { if (g$('pvBlack').classList.contains('end')) exitPresent(); else g$('pvBlack').hidden = true; });
   p.addEventListener('contextmenu', e => { e.preventDefault(); pvPrev(); });
   g$('pvGrid').addEventListener('click', e => { const b = e.target.closest('[data-k]'); if (!b) return; g$('pvGrid').hidden = true; const k = +b.dataset.k; showSlide(k, k > PV.i ? 1 : -1); });

@@ -11,6 +11,7 @@ function maskCss(e){
   if (m === 'hex') return 'clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);';
   if (m === 'diamond') return 'clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);';
   if (m === 'blob') return 'border-radius:63% 37% 54% 46% / 55% 48% 52% 45%;';
+  if (SHAPES[m]?.[1]){ const u = `url('data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="${SHAPES[m][1]}"/></svg>`).replace(/'/g, '%27')}') 0 0/100% 100% no-repeat`; return `-webkit-mask:${u};mask:${u};`; }
   return e.r ? `border-radius:${e.r}px;` : '';
 }
 function txCss(st = {}){
@@ -134,6 +135,7 @@ function elInner(e, sv, o){
     case 'icon': return iconSVG(e.n, realCol(e.fc || 't:ac', sv), e.sw || 1.8);
     case 'table': return tableHTML(e, sv);
     case 'chart': return chartSVG(e, sv);
+    case 'video': return videoHTML(e, o);
     case 'img': {
       const src = o.preview ? '' : mediaSrc(e.src), f = IMG_FILTERS[e.filter]?.[1] || '';
       if (!src) return o.present || o.print ? `<div class="imgw" style="${maskCss(e)}background:${cssCol('t:soft')}"></div>` : `<div class="imgw ph-img" style="${maskCss(e)}">${o.preview ? '' : iconSVG('camera')}${o.preview || e.w < 160 ? '' : `<span>${escH(e.hint ? 'Image : ' + e.hint : 'Double-cliquez pour ajouter une image')}</span>`}</div>`;
