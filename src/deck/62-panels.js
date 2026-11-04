@@ -10,7 +10,7 @@ function openPanel(k){
 const SIDE_PANELS = ['format', 'anim'];
 const PANEL_SUB = {insert:'Textes, formes, icônes, images, tableaux et graphiques', design:'Thème, couleurs, polices et format de toute la présentation', layout:'Réorganisez la diapositive en un clic : le contenu est conservé',
   anim:'Transitions, apparition, emphase et sortie des éléments', format:'Position, remplissage, ombres, effets de texte et fond', templates:'Partez d\'une présentation conçue par Studio Prism'};
-const BLOCKS = [['stat', 'Chiffre clé'], ['badge', 'Pastille'], ['cta', 'Bouton'], ['iconcard', 'Carte avec icône'], ['numbered', 'Point numéroté'], ['progress', 'Barre de progression'], ['divider', 'Séparateur'], ['quoteb', 'Citation']];
+const BLOCKS = [['stat', 'Chiffre clé'], ['badge', 'Pastille'], ['cta', 'Bouton'], ['iconcard', 'Carte avec icône'], ['numbered', 'Point numéroté'], ['progress', 'Barre de progression'], ['divider', 'Séparateur'], ['quoteb', 'Citation'], ['callout', 'Encadré'], ['tag', 'Étiquette'], ['rating', 'Note en étoiles'], ['browser', 'Fenêtre de navigateur'], ['phone', 'Téléphone']];
 function blockEls(k){
   const [W, H] = dims(), g = 'g' + uidS(), at = (w, h) => centerBox(w, h);
   if (k === 'stat'){ const p = at(360, 170); return [T(p.x, p.y, 360, 110, '87 %', {f:'h', fs:96, b:1, fc:'t:ac', lh:1}, {g}), T(p.x, p.y + 116, 360, 40, 'de clients satisfaits', {fs:24, b:1}, {g})]; }
@@ -19,6 +19,11 @@ function blockEls(k){
   if (k === 'iconcard'){ const p = at(340, 300); return [SH('round', p.x, p.y, 340, 300, 't:soft', {r:20, stroke:'t:line', sw:1, g}), SH('ellipse', p.x + 30, p.y + 30, 64, 64, 't:ac', {g}), ICO('idea', p.x + 44, p.y + 44, 36, 't:on', {g}), T(p.x + 30, p.y + 120, 280, 36, 'Une idée forte', {f:'h', fs:26, b:1}, {g}), T(p.x + 30, p.y + 166, 280, 100, 'Expliquez-la en une ou deux phrases courtes.', {fs:18, fc:'t:mut', lh:1.4}, {g})]; }
   if (k === 'numbered'){ const p = at(520, 64); return [SH('ellipse', p.x, p.y, 64, 64, 't:ac', {html:'1', st:{fs:28, b:1, f:'h', fc:'t:on', ha:'c', va:'m'}, g}), T(p.x + 88, p.y + 12, 430, 40, 'Première étape', {f:'h', fs:28, b:1}, {g})]; }
   if (k === 'progress'){ const p = at(560, 70); return [T(p.x, p.y, 400, 30, 'Avancement', {fs:20, b:1}, {g}), T(p.x + 400, p.y, 160, 30, '72 %', {fs:20, b:1, fc:'t:ac', ha:'r'}, {g}), SH('pill', p.x, p.y + 42, 560, 18, 't:soft', {stroke:'t:line', sw:1, g}), SH('pill', p.x, p.y + 42, 403, 18, 't:ac', {g})]; }
+  if (k === 'callout'){ const p = at(560, 130); return [SH('round', p.x, p.y, 560, 130, 't:soft', {r:16, g}), SH('rect', p.x, p.y + 12, 8, 106, 't:ac', {g}), ICO('info', p.x + 32, p.y + 36, 44, 't:ac', {g}), T(p.x + 100, p.y + 22, 430, 90, 'À retenir : une remarque importante, en une ou deux phrases.', {fs:22, lh:1.4, va:'m'}, {g})]; }
+  if (k === 'tag'){ const p = at(230, 96); return [SH('tag', p.x, p.y, 230, 96, 't:ac2', {html:'-20 %', st:{fs:36, b:1, f:'h', fc:'t:on', ha:'c', va:'m'}, rot:-6, shadow:14})]; }
+  if (k === 'rating'){ const p = at(420, 80); return [...[0, 1, 2, 3, 4].map(i => SH('star', p.x + i * 68, p.y, 56, 56, '#FFC53D', {g})), T(p.x + 350, p.y + 6, 80, 44, '4,8', {f:'h', fs:34, b:1}, {g})]; }
+  if (k === 'browser'){ const p = at(640, 400); return [SH('round', p.x, p.y, 640, 400, 't:soft', {r:16, stroke:'t:line', sw:2, g, shadow:20}), SH('round', p.x, p.y, 640, 56, 't:line', {r:16, g}), SH('rect', p.x, p.y + 28, 640, 28, 't:line', {g}), ...['#FF5F57', '#FEBC2E', '#28C840'].map((c, i) => SH('ellipse', p.x + 22 + i * 24, p.y + 21, 14, 14, c, {g})), SH('pill', p.x + 120, p.y + 12, 400, 32, 't:bg', {g, html:'www.votre-site.fr', st:{fs:15, fc:'t:mut', ha:'c', va:'m'}}), IMG(p.x + 16, p.y + 72, 608, 312, {g, r:8})]; }
+  if (k === 'phone'){ const p = at(260, 520); return [SH('round', p.x, p.y, 260, 520, '#16122B', {r:44, g, shadow:28}), IMG(p.x + 12, p.y + 12, 236, 496, {g, r:34}), SH('pill', p.x + 90, p.y + 22, 80, 22, '#16122B', {g})]; }
   if (k === 'divider'){ const p = at(W * .6, 20); return [LN(p.x, p.y + 10, W * .6, 't:line', 2)]; }
   if (k === 'quoteb'){ const p = at(760, 220); return [T(p.x - 6, p.y - 40, 120, 140, '“', {f:'h', fs:150, b:1, fc:'t:ac', lh:1}, {g, op:.3}), T(p.x + 60, p.y, 700, 120, 'Le design, ce n\'est pas seulement ce à quoi ça ressemble, c\'est comment ça marche.', {f:'h', fs:32, i:1, lh:1.3}, {g}), T(p.x + 60, p.y + 150, 600, 32, 'Nom de l\'auteur', {fs:20, b:1, fc:'t:ac'}, {g})]; }
   return [];
@@ -37,6 +42,7 @@ function renderPanel(){
   if (panel === 'insert'){
     h += `<h4 class="pn-h">Textes</h4><div class="pn-texts">${Object.entries(TEXT_STYLES).map(([k, [t, st, x]]) => `<button type="button" data-ins="text:${k}" style="${txCss({...st, fs:Math.min(st.fs, k === 'big' ? 44 : 30)}).replace(/justify-content:[^;]+;/, '')}${st.bg ? `background:${realCol(st.bg, sv)};` : ''}--fh:${fontStack(th.fh).replace(/"/g, "'")};--fb:${fontStack(th.fb).replace(/"/g, "'")};--ac:${th.ac};--ink:${th.ink};--mut:${th.mut};--on:${onColor(th.ac)};--hw:${th.hw}">${k === 'list' ? '• Liste à puces' : escH(x)}</button>`).join('')}</div>
       <h4 class="pn-h">Éléments prêts à l'emploi <small>groupés, à personnaliser</small></h4><div class="pn-chips big">${BLOCKS.map(([k, t]) => `<button type="button" data-ins="block:${k}">${t}</button>`).join('')}</div>
+      <h4 class="pn-h">Schémas <small>façon SmartArt : groupes modifiables</small></h4><div class="fm-count">Éléments <button type="button" data-smartn="" aria-pressed="${SMART_N == null}">Auto</button>${[3, 4, 5, 6, 8].map(n => `<button type="button" data-smartn="${n}" aria-pressed="${SMART_N === n}">${n}</button>`).join('')}</div><div class="pn-smarts">${SMARTS.map(([k, t]) => `<button type="button" data-ins="smart:${k}" title="${t}">${smartMini(k)}<span>${t}</span></button>`).join('')}</div>
       <h4 class="pn-h">Formes <small>${SHAPE_ORDER.length} formes, remplissage et effets au choix</small></h4>${SHAPE_GROUPS.map(([t, ks]) => `<p class="pn-sub">${t}</p><div class="pn-shapes2">${ks.map(k => `<button type="button" data-ins="shape:${k}" title="${escH(SHAPES[k][0])}" style="color:${th.ac}">${shapeIcon(k)}</button>`).join('')}</div>`).join('')}
       <h4 class="pn-h">Images</h4><div class="pn-imgs2"><button type="button" class="pn-drop" data-ins="img">${IC.img}<b>Importer une image</b><span>ou glissez-la sur la diapositive · Ctrl + V</span></button>${Object.entries(D.media || {}).filter(([k]) => usedMedia().has(k)).slice(0, 12).map(([k, v]) => `<button type="button" class="pn-imgthumb" data-ins="media:${k}"><img src="${escH(v)}" alt=""></button>`).join('')}</div>
       <h4 class="pn-h">Tableaux et graphiques</h4><div class="pn-chips big"><button type="button" data-ins="table:3x3">Tableau 3 × 3</button><button type="button" data-ins="table:5x4">Tableau 4 × 5</button>${CHART_TYPES.map(([k, t]) => `<button type="button" data-ins="chart:${k}">${iconSVG(k === 'pie' || k === 'donut' ? 'pie' : k === 'line' || k === 'area' ? 'trend' : 'chart')} ${t}</button>`).join('')}</div>
@@ -47,7 +53,7 @@ function renderPanel(){
       <div class="th-custom"><label class="pn-color">Accent <input type="color" data-tc="ac" value="${th.ac}"></label><label class="pn-color">Accent 2 <input type="color" data-tc="ac2" value="${th.ac2}"></label><label class="pn-color">Accent 3 <input type="color" data-tc="ac3" value="${th.ac3}"></label>
         <label class="pn-color">Fond <input type="color" data-tc="bg" value="${th.bg}"></label><button type="button" class="pn-wide" data-reset="1">Couleurs d'origine du thème</button></div>
       <h4 class="pn-h">Polices <small>titres · texte</small></h4><div class="pair-row">${PAIRS.map(([a, c], i) => { ensureFont(a); ensureFont(c); return `<button type="button" data-pair="${i}" class="${th.fh === a && th.fb === c ? 'on' : ''}"><b style="font-family:${fontStack(a)}">${escH(a)}</b><span style="font-family:${fontStack(c)}">${escH(c)}</span></button>`; }).join('')}</div>
-      <h4 class="pn-h">Format</h4><div class="seg fmt">${Object.entries(SIZE_NAMES).map(([k, t]) => `<button type="button" data-size="${k}" aria-checked="${D.size === k}">${t}</button>`).join('')}</div>`;
+      <h4 class="pn-h">Format</h4><div class="seg fmt">${Object.entries(SIZE_NAMES).map(([k, t]) => `<button type="button" data-size="${k}" aria-checked="${D.size === k}">${t}</button>`).join('')}</div>` + footPanelHTML();
   } else if (panel === 'layout'){
     const L = cur().lay;
     h += `<h4 class="pn-h">Cette diapositive <small>le texte, les listes et les images sont repris</small></h4><div class="lay-grid big">${LAYOUTS.map(([k, t, d]) => `<button type="button" data-lay="${k}" class="${L === k ? 'on' : ''}" title="${escH(d)}"><span class="lay-m" style="color:${th.ac}">${layoutMini(k)}</span><b>${escH(t)}</b></button>`).join('')}</div>
@@ -64,6 +70,7 @@ function renderPanel(){
   }
   b.innerHTML = h;
   if (panel === 'format') wireFormat(b);
+  if (panel === 'design') wireFoot(b);
   if (panel === 'anim') b.querySelectorAll('[data-ak]').forEach(i => { i.oninput = i.type === 'range' ? ev => animPanelInput(ev, false) : null; i.onchange = ev => animPanelInput(ev, true); });
   if (panel === 'design') b.querySelectorAll('.th-mini').forEach(m => m.querySelector('.th-s').style.transform = `scale(${m.style.getPropertyValue('--k')})`);
   if (panel === 'templates') window.SWScaleMinis?.(b);
@@ -74,8 +81,9 @@ function onPanelClick(ev){
   if (d.ins){ const [k, v] = d.ins.split(':');
     if (k === 'text') addText(v); else if (k === 'shape') addShape(v); else if (k === 'icon') addIcon(v); else if (k === 'img') pickImage();
     else if (k === 'media'){ const src = D.media[v]; const im = new Image(); im.onload = () => { const [W, H] = dims(), kk = Math.min(1, W * .5 / im.width, H * .6 / im.height), w = Math.round(im.width * kk), h = Math.round(im.height * kk), p = centerBox(w, h); addEls([IMG(p.x, p.y, w, h, {src:'m:' + v})], 'Image'); }; im.src = src; }
-    else if (k === 'table'){ const [c, r] = v.split('x'); addTable(+r, +c); } else if (k === 'chart') addChart(v); else if (k === 'block') addEls(blockEls(v), BLOCKS.find(x => x[0] === v)?.[1]);
+    else if (k === 'table'){ const [c, r] = v.split('x'); addTable(+r, +c); } else if (k === 'chart') addChart(v); else if (k === 'block') addEls(blockEls(v), BLOCKS.find(x => x[0] === v)?.[1]); else if (k === 'smart') addSmart(v);
     if (innerWidth < 760) openPanel(null); return; }
+  if (d.smartn != null){ SMART_N = d.smartn ? +d.smartn : null; renderPanel(); return; }
   if (V.ro && !d.tpl) return;
   if (d.th){ D.theme = {id:d.th}; ensureThemeFonts(); THUMB.clear(); renderAll(); commit('Thème'); toast(`Thème « ${DTHEMES.find(x => x.id === d.th).name} »`); return; }
   if (d.pal){ const p = PALETTES[+d.pal]; D.theme = {...D.theme, ac:p[0], ac2:p[1], ac3:p[2]}; THUMB.clear(); renderAll(); commit('Couleurs'); return; }

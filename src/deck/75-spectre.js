@@ -10,10 +10,17 @@ function spectreActions(){
   Object.entries(TEXT_STYLES).forEach(([k, [t]]) => add('Insérer', 'Ajouter : ' + t.toLowerCase(), () => addText(k), 'texte'));
   SHAPE_ORDER.forEach(k => add('Insérer', 'Forme : ' + SHAPES[k][0].toLowerCase(), () => addShape(k), 'forme'));
   add('Insérer', 'Image…', () => pickImage(), 'photo'); add('Insérer', 'Icône…', () => iconPop(g$('edBar')), 'pictogramme'); add('Insérer', 'Tableau', () => addTable(4, 3)); CHART_TYPES.forEach(([k, t]) => add('Insérer', 'Graphique : ' + t.toLowerCase(), () => addChart(k), 'diagramme'));
-  BLOCKS.forEach(([k, t]) => add('Insérer', 'Élément : ' + t.toLowerCase(), () => addEls(blockEls(k), t)));
+  SMARTS.forEach(([k, t]) => add('Schémas', 'Schéma : ' + t.toLowerCase(), () => addSmart(k), 'smartart diagramme organigramme cycle pyramide')); BLOCKS.forEach(([k, t]) => add('Insérer', 'Élément : ' + t.toLowerCase(), () => addEls(blockEls(k), t)));
   DTHEMES.forEach(t => add('Design', 'Thème ' + t.name, () => { D.theme = {id:t.id}; ensureThemeFonts(); THUMB.clear(); renderAll(); commit('Thème'); }, 'couleurs style'));
   Object.entries(SIZE_NAMES).forEach(([k, t]) => add('Design', 'Format ' + t, () => resizeDeck(k), 'taille'));
   add('Design', 'Fond de la diapositive…', () => openPanel('format'), 'couleur arrière-plan');
+  add('Design', 'Format et effets…', () => openPanel('format'), 'ombre lueur reflet flou dégradé motif effet position taille');
+  add('Affichage', 'Afficher / masquer la grille', () => toggleView('grid'), 'quadrillage alignement'); add('Affichage', 'Magnétisme de la grille', () => toggleView('snapGrid'), 'aimanter aligner');
+  add('Affichage', 'Afficher / masquer les repères (marges et centre)', () => toggleView('guides'), 'guides règle');
+  WORDART.slice(1).forEach(([t], i) => add('Effets de texte', 'Style de texte : ' + t.toLowerCase(), () => applyWordArt(i + 1), 'wordart néon contour dégradé ombre 3d'));
+  FM_SHADOWS.forEach(([t], i) => add('Effets', i ? 'Ombre : ' + t.toLowerCase() : 'Retirer l\'ombre', () => applyShadow(i), 'ombre portée'));
+  PAT_ORDER.forEach(k => add('Design', 'Motif de fond : ' + PATS[k][0].toLowerCase(), () => setBgPattern(k), 'arrière-plan texture'));
+  ANIM_LIST.forEach(a => add('Animer', 'Animation : ' + a[1].toLowerCase(), () => setElAnim(a[0]), 'élément ' + ({in:'entrée', em:'emphase', out:'sortie'})[a[2]]));
   add('Animer', 'Animer toute la présentation', () => { openPanel('anim'); g$('edPanelBody').querySelector('[data-a="magic"]')?.click(); }, 'animation transition'); TRANS.slice(1).forEach(([k, t]) => add('Animer', 'Transition : ' + t.toLowerCase(), () => { cur().tr = k; commit('Transition'); previewTransition(); }));
   add('Fichier', 'Exporter en PDF', () => doExport('pdf'), 'imprimer'); add('Fichier', 'Exporter en PowerPoint (.pptx)', () => doExport('pptx'), 'ppt'); add('Fichier', 'Exporter en page web', () => doExport('html'));
   add('Fichier', 'Ouvrir un fichier PowerPoint…', () => g$('homeFile').click(), 'importer pptx'); add('Fichier', 'Enregistrer comme modèle', saveTplDlg); add('Fichier', 'Publier dans la Communauté', () => window.SWHome?.publishCurrent?.()); add('Fichier', 'Partager…', () => window.SWShareCurrent?.());
@@ -64,7 +71,7 @@ function parseIntent(raw){
     if (/^(en )?gras$/.test(q)){ one('Gras', () => setSt({b:1}, 'Gras')); return out; } if (/^(en )?italique$/.test(q)){ one('Italique', () => setSt({i:1}, 'Italique')); return out; }
     if (/^(supprime|efface)/.test(q)){ one('Supprimer', delSel); return out; } if (/^dupli/.test(q)){ one('Dupliquer', dupSel); return out; }
     if (/premier plan|devant/.test(q)){ one('Premier plan', () => layer('front')); return out; } if (/arriere.plan|derriere/.test(q)){ one('Arrière-plan', () => layer('back')); return out; }
-    const an = ANIMS.find(([k, t]) => k && q.includes(nrmS(t))); if (an && /anim/.test(q)){ one(`Animation : ${an[1].toLowerCase()}`, () => setProps(x => { x.an = {k:an[0]}; }, 'Animation', false)); return out; }
+    const an = ANIM_LIST.find(([k, t]) => k && q.includes(nrmS(t))); if (an && /anim/.test(q)){ one(`Animation : ${an[1].toLowerCase()}`, () => setElAnim(an[0])); return out; }
   }
   if (/^anime/.test(q) && /tout|presentation/.test(q)){ one('Animer toute la présentation', () => { openPanel('anim'); g$('edPanelBody').querySelector('[data-a="magic"]')?.click(); }); return out; }
   if (/^anime/.test(q)){ one('Animer cette diapositive', () => { cur().an = 'rise'; cur().tr = cur().tr || 'fade'; commit('Animation'); previewSlideAnim(); }); return out; }
@@ -93,7 +100,8 @@ function drawSpectre(){
     const it = parseIntent(raw); l = [];
     if (it) l.push({g:'Compris', t:it.map(a => a.t).join(' · '), run:() => runIntents(it), intent:true});
     const ai = raw.length >= 3 ? spAiItem(raw) : null;
-    if (ai && !it && (!fz.length || words.length >= 3)) l.push(ai, ...fz.slice(0, 40)); else { l.push(...fz.slice(0, 40)); if (ai) l.push(ai); }
+    const exact = fz.some(a => words.every(w => nrmS(a.t).includes(w)));
+    if (ai && !it && (!fz.length || (words.length >= 3 && !exact))) l.push(ai, ...fz.slice(0, 40)); else { l.push(...fz.slice(0, 40)); if (ai) l.push(ai); }
   } else {
     l = [...AI_QUICK.map(x => ({g:'IA', t:x.t, ai:true, prefill:x.prefill, run:() => aiAsk(x.p)})), ...SP_START.map(t => SPX.all.find(a => a.t === t)).filter(Boolean)];
     head = `<p class="sp-h">Suggestions <small>Écrivez aussi une phrase : « nouvelle diapo en deux colonnes », « thème océan », « ajoute un tableau 3 x 4 », « mets le titre en bleu », « présente »…</small></p>`;
