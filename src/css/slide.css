@@ -43,10 +43,6 @@
 .sl .stbl tr:last-child td{border-bottom:2px solid var(--line)}
 /* animations d'entrée (présentation, aperçu) */
 .el[data-an].an-wait{opacity:0}
-.el[data-an].an-run{animation:an-fade .7s cubic-bezier(.2,.75,.25,1) var(--d,0ms) both}
-.el[data-an="rise"].an-run{animation-name:an-rise}.el[data-an="drop"].an-run{animation-name:an-drop}.el[data-an="left"].an-run{animation-name:an-left}
-.el[data-an="zoom"].an-run{animation-name:an-zoom}.el[data-an="pop"].an-run{animation-name:an-pop;animation-duration:.75s}.el[data-an="wipe"].an-run{animation-name:an-wipe;animation-duration:.9s}
-.el[data-an="blur"].an-run{animation-name:an-blur;animation-duration:.9s}.el[data-an="type"].an-run{animation:an-wipe 1.4s steps(28) var(--d,0ms) both}
 @keyframes an-fade{from{opacity:0}}
 @keyframes an-rise{from{opacity:0;translate:0 46px}}
 @keyframes an-drop{from{opacity:0;translate:0 -46px}}
@@ -56,13 +52,13 @@
 @keyframes an-wipe{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
 @keyframes an-blur{from{opacity:0;filter:blur(14px);scale:1.06}}
 /* transitions entre diapositives */
-.tr-in{animation:.65s cubic-bezier(.22,.7,.2,1) both}.tr-out{animation:.65s cubic-bezier(.4,0,.6,1) both;pointer-events:none}
+.tr-in{animation:var(--trd,.65s) cubic-bezier(.22,.7,.2,1) both}.tr-out{animation:var(--trd,.65s) cubic-bezier(.4,0,.6,1) both;pointer-events:none}
 .tr-in.tr-fade{animation-name:tr-fade-in}.tr-out.tr-fade{animation-name:tr-fade-out}
 .tr-in.tr-slide{animation-name:tr-slide-in}.tr-out.tr-slide{animation-name:tr-fade-out}
 .tr-in.tr-push{animation-name:tr-push-in}.tr-out.tr-push{animation-name:tr-push-out}
 .tr-in.tr-zoom{animation-name:tr-zoom-in}.tr-out.tr-zoom{animation-name:tr-zoom-out}
-.tr-in.tr-flip{animation-name:tr-flip-in;animation-duration:.8s}.tr-out.tr-flip{animation-name:tr-flip-out;animation-duration:.4s}
-.tr-in.tr-wipe{animation-name:tr-wipe-in;animation-duration:.8s}.tr-out.tr-wipe{animation-name:tr-keep;animation-duration:.8s}
+.tr-in.tr-flip{animation-name:tr-flip-in;animation-duration:var(--trd,.8s)}.tr-out.tr-flip{animation-name:tr-flip-out;animation-duration:calc(var(--trd,.8s) / 2)}
+.tr-in.tr-wipe{animation-name:tr-wipe-in;animation-duration:var(--trd,.8s)}.tr-out.tr-wipe{animation-name:tr-keep;animation-duration:var(--trd,.8s)}
 .tr-in.tr-rise{animation-name:tr-rise-in}.tr-out.tr-rise{animation-name:tr-fade-out}
 .tr-in.tr-blur{animation-name:tr-blur-in}.tr-out.tr-blur{animation-name:tr-blur-out}
 @keyframes tr-fade-in{from{opacity:0}}@keyframes tr-fade-out{to{opacity:0}}@keyframes tr-keep{to{opacity:1}}

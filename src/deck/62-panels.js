@@ -1,13 +1,15 @@
 /* ---------- Tiroirs : Insérer, Design, Mises en page, Animer, Modèles ---------- */
 let panel = null;
 function openPanel(k){
-  if (panel === k || !k){ panel = null; g$('edPanel').hidden = true; g$('edRail').querySelectorAll('.ray').forEach(r => r.setAttribute('aria-pressed', 'false')); return; }
-  panel = k; const p = g$('edPanel'); p.hidden = false; const ray = RAYS.find(r => r[0] === k); p.style.setProperty('--ray', ray[3]);
+  const sideChange = () => { const on = !!panel && SIDE_PANELS.includes(panel) && !g$('edPanel').hidden; if (g$('app').classList.contains('has-side') !== on){ g$('app').classList.toggle('has-side', on); layoutStage(); renderSel(); } };
+  if (panel === k || !k){ panel = null; g$('edPanel').hidden = true; g$('edRail').querySelectorAll('.ray').forEach(r => r.setAttribute('aria-pressed', 'false')); sideChange(); return; }
+  panel = k; const p = g$('edPanel'); p.hidden = false; p.classList.toggle('side', SIDE_PANELS.includes(k)); const ray = RAYS.find(r => r[0] === k); p.style.setProperty('--ray', ray[3]);
   g$('edRail').querySelectorAll('.ray').forEach(r => r.setAttribute('aria-pressed', r.dataset.panel === k));
-  renderPanel();
+  renderPanel(); sideChange();
 }
+const SIDE_PANELS = ['format', 'anim'];
 const PANEL_SUB = {insert:'Textes, formes, icônes, images, tableaux et graphiques', design:'Thème, couleurs, polices et format de toute la présentation', layout:'Réorganisez la diapositive en un clic : le contenu est conservé',
-  anim:'Transitions entre diapositives et apparition des éléments', templates:'Partez d\'une présentation conçue par Studio Prism'};
+  anim:'Transitions, apparition, emphase et sortie des éléments', format:'Position, remplissage, ombres, effets de texte et fond', templates:'Partez d\'une présentation conçue par Studio Prism'};
 const BLOCKS = [['stat', 'Chiffre clé'], ['badge', 'Pastille'], ['cta', 'Bouton'], ['iconcard', 'Carte avec icône'], ['numbered', 'Point numéroté'], ['progress', 'Barre de progression'], ['divider', 'Séparateur'], ['quoteb', 'Citation']];
 function blockEls(k){
   const [W, H] = dims(), g = 'g' + uidS(), at = (w, h) => centerBox(w, h);
@@ -28,8 +30,6 @@ function themeCard(t){
 }
 const PALETTES = [['#6D3BFF', '#00A6E8', '#FF4D8D'], ['#0A5E8E', '#03A2AC', '#F2A541'], ['#E8505B', '#F9A26C', '#14B8A6'], ['#2F7D4E', '#8BBF6A', '#E0A526'], ['#1D4ED8', '#F59E0B', '#10B981'], ['#7C3AED', '#EC4899', '#F59E0B'], ['#0F766E', '#F97316', '#64748B'], ['#B42318', '#1D2939', '#E8A33D'], ['#111827', '#6B7280', '#EF4444'], ['#9A7B4F', '#2E2A26', '#C9A96E'], ['#00E5FF', '#FF2BD6', '#C6FF3D'], ['#E63946', '#1D4ED8', '#F4B400']];
 const PAIRS = [['Bricolage Grotesque', 'Inter'], ['Outfit', 'Inter'], ['Sora', 'Inter'], ['Montserrat', 'Inter'], ['Syne', 'Space Grotesk'], ['Unbounded', 'DM Sans'], ['Fraunces', 'DM Sans'], ['Playfair Display', 'Lora'], ['Instrument Serif', 'DM Sans'], ['DM Serif Display', 'Source Serif 4'], ['Manrope', 'Manrope'], ['Poppins', 'Poppins'], ['Caveat', 'Nunito'], ['Space Grotesk', 'Space Grotesk']];
-const TRANS = [['', 'Aucune'], ['fade', 'Fondu'], ['slide', 'Glisser'], ['push', 'Pousser'], ['zoom', 'Zoom'], ['flip', 'Retourner'], ['wipe', 'Balayer'], ['rise', 'Monter'], ['blur', 'Flou']];
-const SLIDE_ANIMS = [['', 'Aucune'], ['rise', 'Cascade'], ['fade', 'Fondu'], ['pop', 'Rebond'], ['zoom', 'Zoom'], ['left', 'Glisser'], ['blur', 'Mise au point']];
 function renderPanel(){
   const b = g$('edPanelBody'), ray = RAYS.find(r => r[0] === panel); if (!ray) return;
   g$('edPanelTitle').textContent = ray[1]; g$('edPanelSub').textContent = PANEL_SUB[panel] || '';
@@ -37,7 +37,7 @@ function renderPanel(){
   if (panel === 'insert'){
     h += `<h4 class="pn-h">Textes</h4><div class="pn-texts">${Object.entries(TEXT_STYLES).map(([k, [t, st, x]]) => `<button type="button" data-ins="text:${k}" style="${txCss({...st, fs:Math.min(st.fs, k === 'big' ? 44 : 30)}).replace(/justify-content:[^;]+;/, '')}${st.bg ? `background:${realCol(st.bg, sv)};` : ''}--fh:${fontStack(th.fh).replace(/"/g, "'")};--fb:${fontStack(th.fb).replace(/"/g, "'")};--ac:${th.ac};--ink:${th.ink};--mut:${th.mut};--on:${onColor(th.ac)};--hw:${th.hw}">${k === 'list' ? '• Liste à puces' : escH(x)}</button>`).join('')}</div>
       <h4 class="pn-h">Éléments prêts à l'emploi <small>groupés, à personnaliser</small></h4><div class="pn-chips big">${BLOCKS.map(([k, t]) => `<button type="button" data-ins="block:${k}">${t}</button>`).join('')}</div>
-      <h4 class="pn-h">Formes</h4><div class="pn-shapes2">${SHAPE_ORDER.map(k => `<button type="button" data-ins="shape:${k}" title="${escH(SHAPES[k][0])}" style="color:${th.ac}">${shapeIcon(k)}</button>`).join('')}</div>
+      <h4 class="pn-h">Formes <small>${SHAPE_ORDER.length} formes, remplissage et effets au choix</small></h4>${SHAPE_GROUPS.map(([t, ks]) => `<p class="pn-sub">${t}</p><div class="pn-shapes2">${ks.map(k => `<button type="button" data-ins="shape:${k}" title="${escH(SHAPES[k][0])}" style="color:${th.ac}">${shapeIcon(k)}</button>`).join('')}</div>`).join('')}
       <h4 class="pn-h">Images</h4><div class="pn-imgs2"><button type="button" class="pn-drop" data-ins="img">${IC.img}<b>Importer une image</b><span>ou glissez-la sur la diapositive · Ctrl + V</span></button>${Object.entries(D.media || {}).filter(([k]) => usedMedia().has(k)).slice(0, 12).map(([k, v]) => `<button type="button" class="pn-imgthumb" data-ins="media:${k}"><img src="${escH(v)}" alt=""></button>`).join('')}</div>
       <h4 class="pn-h">Tableaux et graphiques</h4><div class="pn-chips big"><button type="button" data-ins="table:3x3">Tableau 3 × 3</button><button type="button" data-ins="table:5x4">Tableau 4 × 5</button>${CHART_TYPES.map(([k, t]) => `<button type="button" data-ins="chart:${k}">${iconSVG(k === 'pie' || k === 'donut' ? 'pie' : k === 'line' || k === 'area' ? 'trend' : 'chart')} ${t}</button>`).join('')}</div>
       <h4 class="pn-h">Icônes <small>${Object.keys(ICONS).length} icônes, aux couleurs du thème</small></h4><label class="pn-search">${IC.search}<input id="pnIcQ" placeholder="Chercher : équipe, argent, idée, maison…"></label><div class="pn-icons" id="pnIc" style="color:${th.ac}">${Object.keys(ICONS).map(k => `<button type="button" data-ins="icon:${k}" title="${escH(ICONS[k][0].split(' ')[0])}">${iconSVG(k)}</button>`).join('')}</div>`;
@@ -54,17 +54,17 @@ function renderPanel(){
       <h4 class="pn-h">Ajouter une diapositive</h4><div class="lay-grid big">${LAYOUTS.map(([k, t]) => `<button type="button" data-newlay="${k}"><span class="lay-m" style="color:${th.ac2}">${layoutMini(k)}</span><b>${escH(t)}</b></button>`).join('')}</div>
       <h4 class="pn-h">Couleurs de la diapositive</h4><div class="seg">${[['content', 'Contenu'], ['title', 'Titre'], ['section', 'Section']].map(([k, t]) => `<button type="button" data-var="${k}" aria-checked="${(cur().v || 'content') === k || (k === 'title' && cur().v === 'end')}">${t}</button>`).join('')}</div>`;
   } else if (panel === 'anim'){
-    const s = cur(), l = selEls();
-    h += `<h4 class="pn-h">Transition vers cette diapositive</h4><div class="pn-chips big">${TRANS.map(([k, t]) => `<button type="button" data-tr="${k}" aria-pressed="${(s.tr || '') === k}">${t}</button>`).join('')}</div>
-      <h4 class="pn-h">Apparition des éléments <small>automatique, l'un après l'autre</small></h4><div class="pn-chips big">${SLIDE_ANIMS.map(([k, t]) => `<button type="button" data-san="${k}" aria-pressed="${(s.an || '') === k}">${t}</button>`).join('')}</div>
-      ${l.length ? `<h4 class="pn-h">Élément sélectionné <small>prioritaire sur l'apparition automatique</small></h4><div class="pn-chips big">${ANIMS.map(([k, t]) => `<button type="button" data-ean="${k}" aria-pressed="${(l[0].an?.k || '') === k}">${t}</button>`).join('')}</div><label class="pop-toggle"><input type="checkbox" id="eanClick" ${l[0].an?.click ? 'checked' : ''}><div><b>Au clic</b><small>Apparaît quand vous avancez</small></div></label>` : '<p class="pn-hint">Sélectionnez un élément pour lui donner sa propre animation, ou « Au clic » pour le faire apparaître quand vous avancez.</p>'}
-      <div class="pn-acts"><button type="button" class="pn-wide" data-a="preview">${ICX.present} Aperçu</button><button type="button" class="pn-wide" data-a="all">${IC.copy} Appliquer à toutes les diapositives</button><button type="button" class="pn-wide" data-a="magic">${IC.sparkle} Animer toute la présentation</button><button type="button" class="pn-wide" data-a="none">Tout retirer</button></div>`;
+    h += animPanelHTML();
+  } else if (panel === 'format'){
+    h += formatPanelHTML();
   } else if (panel === 'templates'){
     const mine = E2.userLib.templates || [];
     h += (mine.length ? `<h4 class="pn-h">Mes modèles</h4><div class="pn-tpls">${mine.map(t => `<button type="button" class="pn-tpl" data-tpl="${escH(t.id)}"><span class="tthumb">${tplMini(t)}</span><b>${escH(t.name)}</b></button>`).join('')}</div>` : '')
       + `<h4 class="pn-h">Modèles Studio Prism <small>une nouvelle présentation, ou leurs diapositives ajoutées ici</small></h4><div class="pn-tpls">${SS_TEMPLATES.filter(t => t.id !== 'blank').map(t => `<button type="button" class="pn-tpl" data-tpl="${t.id}"><span class="tthumb">${tplMini(t)}</span><b>${escH(t.name)}</b></button>`).join('')}</div>`;
   }
   b.innerHTML = h;
+  if (panel === 'format') wireFormat(b);
+  if (panel === 'anim') b.querySelectorAll('[data-ak]').forEach(i => { i.oninput = i.type === 'range' ? ev => animPanelInput(ev, false) : null; i.onchange = ev => animPanelInput(ev, true); });
   if (panel === 'design') b.querySelectorAll('.th-mini').forEach(m => m.querySelector('.th-s').style.transform = `scale(${m.style.getPropertyValue('--k')})`);
   if (panel === 'templates') window.SWScaleMinis?.(b);
 }
@@ -87,7 +87,7 @@ function onPanelClick(ev){
   if (d.var){ cur().v = d.var; renderAll(); commit('Couleurs de la diapositive'); return; }
   if (d.tr != null){ cur().tr = d.tr || undefined; renderPanel(); commit('Transition'); if (d.tr) previewTransition(); return; }
   if (d.san != null){ cur().an = d.san || undefined; renderPanel(); commit('Animation'); if (d.san) previewSlideAnim(); return; }
-  if (d.ean != null){ const k = d.ean, click = g$('eanClick')?.checked; setProps(x => { if (!k) delete x.an; else x.an = {k, click}; }, 'Animation', false); renderPanel(); if (k) previewAnim(selEls()); return; }
+  if (d.ean != null){ const k = d.ean, keep = selEls()[0]?.an; setProps(x => { if (!k) delete x.an; else x.an = {...(keep && ANIM_BY[keep.k]?.[2] === ANIM_BY[k][2] ? keep : {click:keep?.click}), k}; }, 'Animation', false); renderPanel(); if (k) previewAnim(selEls()); return; }
   if (d.a === 'preview'){ previewSlideAnim(); return; }
   if (d.a === 'all'){ const s = cur(); D.slides.forEach(x => { x.tr = s.tr; x.an = s.an; }); commit('Animations pour toutes'); toast('Transition et animation appliquées à toutes les diapositives'); renderPanel(); return; }
   if (d.a === 'magic'){ D.slides.forEach((x, i) => { x.tr = VARIANT_DARK[x.v] ? 'zoom' : 'fade'; x.an = VARIANT_DARK[x.v] ? 'blur' : 'rise'; }); commit('Animer la présentation'); renderPanel(); previewSlideAnim(); toast('Toute la présentation est animée · F5 pour voir'); return; }
