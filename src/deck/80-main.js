@@ -71,6 +71,8 @@ function filePop(anchor){
 function shortcutsDlg(){
   const k = (a, b) => `<tr><td>${a}</td><td>${b}</td></tr>`;
   SWDlg.open(`<h3>Raccourcis et astuces</h3><div class="sc-wrap"><table class="sc">
+    ${k('<kbd>Ctrl</kbd> + <kbd>H</kbd>', 'Rechercher et remplacer dans toute la présentation')}
+    ${k('<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>C</kbd> / <kbd>V</kbd>', 'Copier le style d\'un élément · l\'appliquer à un autre')}
     ${k('Double-clic', 'Modifier un texte · choisir une image · saisir les données d\'un graphique')}
     ${k('<kbd>Entrée</kbd> · <kbd>Échap</kbd>', 'Modifier le texte sélectionné · terminer')}
     ${k('<kbd>T</kbd> · <kbd>R</kbd> · <kbd>C</kbd> · <kbd>L</kbd>', 'Ajouter un texte, un rectangle, un cercle, une ligne')}
@@ -100,6 +102,9 @@ function globalKeys(e){
     if (!g$('edPop').hidden) return closePop(); if (!g$('apDlg').hidden) return; if (EDT){ e.preventDefault(); const id = EDT.id; stopEdit(); select(id); return; } if (panel) return openPanel(panel); if (SEL.size) return clearSel();
   }
   if (mod && lk === 'p'){ e.preventDefault(); return doExport('pdf'); }
+  if (g$('spectre').hidden && g$('apDlg').hidden && !EDT && !(document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))){
+    if (mod && e.altKey && lk === 'c'){ e.preventDefault(); return copyStyle(); } if (mod && e.altKey && lk === 'v'){ e.preventDefault(); return pasteStyle(); }
+    if (mod && lk === 'h'){ e.preventDefault(); return findDlg(); } }
   if (mod && lk === 's'){ e.preventDefault(); window.SWHome?.flush?.(); return toast('Enregistré automatiquement'); }
   if (!g$('spectre').hidden || !g$('apDlg').hidden) return;
   const ae = document.activeElement;

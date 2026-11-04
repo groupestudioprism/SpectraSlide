@@ -45,7 +45,8 @@ function formatPanelHTML(){
   }
   const st = e.st || {}, hasTxt = e.t === 'text' || (e.t === 'shape' && e.html != null), f = e.fx || {}, one = l.length === 1;
   if (one) h += sec('pos', 'Position et taille', `<div class="fm-geo">${[['x', 'X'], ['y', 'Y'], ['w', 'L'], ['h', 'H'], ['rot', '°']].map(([k, t]) => `<label><span>${t}</span><input type="number" data-geo="${k}" value="${k === 'rot' ? fNum(e.rot || 0) : Math.round(e[k])}" step="${k === 'rot' ? 5 : 1}"></label>`).join('')}</div>
-      <div class="pn-chips"><button type="button" data-fv="fx.fh" data-v="${f.fh ? '' : 1}" aria-pressed="${!!f.fh}">${ICX.pos} Miroir horizontal</button><button type="button" data-fv="fx.fv" data-v="${f.fv ? '' : 1}" aria-pressed="${!!f.fv}">Miroir vertical</button></div>
+      <div class="pn-chips"><button type="button" data-fv="fx.fh" data-v="${f.fh ? '' : 1}" aria-pressed="${!!f.fh}">${ICX.pos} Miroir horizontal</button><button type="button" data-fv="fx.fv" data-v="${f.fv ? '' : 1}" aria-pressed="${!!f.fv}">Miroir vertical</button><button type="button" data-fa="cpstyle">Copier le style</button><button type="button" data-fa="pastestyle">Coller le style</button></div>
+      ${e.t === 'video' ? `<label class="fm-txt"><span>Adresse de la vidéo</span><input type="text" data-ft="url" maxlength="400" value="${escH(e.url || '')}"></label>` : ''}
       <label class="fm-txt"><span>Texte alternatif <small>description pour l'accessibilité</small></span><input type="text" data-ft="alt" maxlength="300" value="${escH(e.alt || '')}" placeholder="Décrivez cet élément"></label>
       <label class="fm-txt"><span>Lien <small>ouvert en cliquant en présentation</small></span><input type="text" data-ft="lk" maxlength="500" value="${escH(e.lk || '')}" placeholder="https://… ou #3 (diapositive 3)"></label>`, true);
   if (e.t === 'shape'){
@@ -106,7 +107,7 @@ function wireFormat(b){
   b.querySelectorAll('input[data-f]').forEach(i => { i.oninput = () => { const v = +i.value, bt = i.previousElementSibling?.querySelector('b'); if (bt) bt.textContent = fNum(v) + (i.dataset.u || ''); fmApply(i.dataset.f, v, true); }; i.onchange = () => fmCommit('Réglage'); });
   b.querySelectorAll('input[data-fg]').forEach(i => { i.onchange = () => fmGroupToggle(i.dataset.fg, i.checked); });
   b.querySelectorAll('input[data-geo]').forEach(i => { i.onchange = () => { const k = i.dataset.geo, v = +i.value; if (!isFinite(v)) return; setProps(e => { if (k === 'rot'){ if (v) e.rot = v; else delete e.rot; } else e[k] = k === 'w' || k === 'h' ? Math.max(8, v) : v; }, 'Position', true); renderPanel(); }; });
-  b.querySelectorAll('input[data-ft]').forEach(i => { i.onchange = () => { const k = i.dataset.ft; let v = i.value.trim(); if (k === 'lk' && v && !/^(https?:\/\/|#\d+$)/i.test(v)){ if (/^[\w.-]+\.[a-z]{2,}/i.test(v)) v = 'https://' + v; else { toast('Lien : une adresse https://… ou #3 pour une diapositive'); i.value = ''; v = ''; } } setProps(e => { if (v) e[k] = v; else delete e[k]; }, k === 'lk' ? 'Lien' : 'Texte alternatif', false); }; });
+  b.querySelectorAll('input[data-ft]').forEach(i => { i.onchange = () => { const k = i.dataset.ft; let v = i.value.trim(); if (k === 'lk' && v && !/^(https?:\/\/|#\d+$)/i.test(v)){ if (/^[\w.-]+\.[a-z]{2,}/i.test(v)) v = 'https://' + v; else { toast('Lien : une adresse https://… ou #3 pour une diapositive'); i.value = ''; v = ''; } } if (k === 'url' && !vidInfo(v)){ toast('Adresse non reconnue'); i.value = selEls()[0]?.url || ''; return; } setProps(e => { if (v) e[k] = v; else delete e[k]; }, k === 'lk' ? 'Lien' : k === 'url' ? 'Vidéo' : 'Texte alternatif', k === 'url'); }; });
   b.querySelectorAll('[data-fv]').forEach(x => { x.onclick = () => { fmApply(x.dataset.fv, fmVal(x.dataset.v)); fmCommit('Réglage'); }; });
   b.querySelectorAll('[data-fcol]').forEach(x => { x.onclick = () => {
     const p = x.dataset.fcol, isBgp = p.startsWith('bgp.'), path = isBgp ? p.slice(4) : p, root = isBgp ? (cur().bg || {}) : selEls()[0], none = path === 'fill' || path === 'g3' || path === 'stroke' || path === 'bg.c' || path === 'c' || path === 'pc' ? undefined : false;
@@ -124,6 +125,7 @@ function wireFormat(b){
   b.querySelectorAll('[data-bgg]').forEach(x => { x.onclick = () => bgSet({g:[...FM_GRADS[+x.dataset.bgg]], a:135}, 'Fond dégradé'); });
   b.querySelectorAll('[data-bgm]').forEach(x => { x.onclick = () => bgSet({mesh:[...MESHES[+x.dataset.bgm][1]]}, 'Fond ambiance'); });
   b.querySelectorAll('[data-fa]').forEach(x => { x.onclick = () => { const a = x.dataset.fa, s = cur();
+    if (a === 'cpstyle'){ copyStyle(); return; } if (a === 'pastestyle'){ pasteStyle(); renderPanel(); return; }
     if (a === 'bgimg'){ imgTarget = '@bg'; g$('edImgFile').click(); }
     else if (a === 'bgnoimg'){ delete s.bg.img; delete s.bg.dim; if (!Object.keys(s.bg).length) delete s.bg; renderAll(); fmCommit('Fond'); }
     else if (a === 'bgreset'){ delete s.bg; renderAll(); fmCommit('Fond du thème'); }

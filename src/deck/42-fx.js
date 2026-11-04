@@ -109,3 +109,8 @@ function cleanFx(e){
   }
   return e;
 }
+
+/* formes de masque et filtres d'image supplémentaires */
+Object.assign(MASKS, {star5:'Étoile', heart:'Cœur', tri:'Triangle', pent:'Pentagone', cloud:'Nuage', drop:'Goutte', shield:'Bouclier', seal:'Sceau', burst:'Explosion', bolt:'Éclair', moon:'Lune', bubble2:'Bulle', gear:'Engrenage', leaf:'Feuille', petal:'Pétale', tag:'Étiquette', ring:'Anneau', frame:'Cadre'});
+Object.assign(IMG_FILTERS, {fade:['Délavé', 'contrast(.85) brightness(1.1) saturate(.8)'], noir:['Noir profond', 'grayscale(1) contrast(1.4) brightness(.85)'], vintage:['Vintage', 'sepia(.45) contrast(.9) saturate(1.3) hue-rotate(-8deg)'], drama:['Dramatique', 'contrast(1.35) saturate(1.25) brightness(.9)'],
+  pastel:['Pastel', 'saturate(.7) brightness(1.15) contrast(.9)'], dream:['Rêve', 'blur(1.2px) brightness(1.1) saturate(1.2)'], cinema:['Cinéma', 'contrast(1.15) saturate(.85) sepia(.15) hue-rotate(-6deg)'], neg:['Négatif', 'invert(1)']});
