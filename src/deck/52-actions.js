@@ -18,7 +18,7 @@ function addText(kind = 'body'){
   addEls([e], name); setTimeout(() => startEdit(e.id, 'all'), 30);
 }
 function addShape(k){
-  const s = k === 'line' || k === 'arrowline' ? null : (k === 'pill' ? [320, 110] : k === 'arrow' || k === 'chev' ? [300, 160] : k === 'bubble' ? [300, 220] : [240, 240]);
+  const s = k === 'line' || k === 'arrowline' ? null : (SHAPE_SIZES[k] || [240, 240]);
   if (!s){ const p = centerBox(400, 20); return addEls([LN(p.x, p.y + 10, 400, 't:ink', 4, {k, a2:k === 'arrowline' ? 'arrow' : ''})], 'Ligne'); }
   const p = centerBox(s[0], s[1]); addEls([SH(k, p.x, p.y, s[0], s[1], 't:ac', k === 'round' ? {r:24} : {})], SHAPES[k]?.[0] || 'Forme');
 }
