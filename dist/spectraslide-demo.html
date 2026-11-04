@@ -963,10 +963,6 @@ body.ro .ray:not([data-panel="outline"]):not([data-panel="templates"]){opacity:.
 .sl .stbl tr:last-child td{border-bottom:2px solid var(--line)}
 /* animations d'entrée (présentation, aperçu) */
 .el[data-an].an-wait{opacity:0}
-.el[data-an].an-run{animation:an-fade .7s cubic-bezier(.2,.75,.25,1) var(--d,0ms) both}
-.el[data-an="rise"].an-run{animation-name:an-rise}.el[data-an="drop"].an-run{animation-name:an-drop}.el[data-an="left"].an-run{animation-name:an-left}
-.el[data-an="zoom"].an-run{animation-name:an-zoom}.el[data-an="pop"].an-run{animation-name:an-pop;animation-duration:.75s}.el[data-an="wipe"].an-run{animation-name:an-wipe;animation-duration:.9s}
-.el[data-an="blur"].an-run{animation-name:an-blur;animation-duration:.9s}.el[data-an="type"].an-run{animation:an-wipe 1.4s steps(28) var(--d,0ms) both}
 @keyframes an-fade{from{opacity:0}}
 @keyframes an-rise{from{opacity:0;translate:0 46px}}
 @keyframes an-drop{from{opacity:0;translate:0 -46px}}
@@ -976,13 +972,13 @@ body.ro .ray:not([data-panel="outline"]):not([data-panel="templates"]){opacity:.
 @keyframes an-wipe{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
 @keyframes an-blur{from{opacity:0;filter:blur(14px);scale:1.06}}
 /* transitions entre diapositives */
-.tr-in{animation:.65s cubic-bezier(.22,.7,.2,1) both}.tr-out{animation:.65s cubic-bezier(.4,0,.6,1) both;pointer-events:none}
+.tr-in{animation:var(--trd,.65s) cubic-bezier(.22,.7,.2,1) both}.tr-out{animation:var(--trd,.65s) cubic-bezier(.4,0,.6,1) both;pointer-events:none}
 .tr-in.tr-fade{animation-name:tr-fade-in}.tr-out.tr-fade{animation-name:tr-fade-out}
 .tr-in.tr-slide{animation-name:tr-slide-in}.tr-out.tr-slide{animation-name:tr-fade-out}
 .tr-in.tr-push{animation-name:tr-push-in}.tr-out.tr-push{animation-name:tr-push-out}
 .tr-in.tr-zoom{animation-name:tr-zoom-in}.tr-out.tr-zoom{animation-name:tr-zoom-out}
-.tr-in.tr-flip{animation-name:tr-flip-in;animation-duration:.8s}.tr-out.tr-flip{animation-name:tr-flip-out;animation-duration:.4s}
-.tr-in.tr-wipe{animation-name:tr-wipe-in;animation-duration:.8s}.tr-out.tr-wipe{animation-name:tr-keep;animation-duration:.8s}
+.tr-in.tr-flip{animation-name:tr-flip-in;animation-duration:var(--trd,.8s)}.tr-out.tr-flip{animation-name:tr-flip-out;animation-duration:calc(var(--trd,.8s) / 2)}
+.tr-in.tr-wipe{animation-name:tr-wipe-in;animation-duration:var(--trd,.8s)}.tr-out.tr-wipe{animation-name:tr-keep;animation-duration:var(--trd,.8s)}
 .tr-in.tr-rise{animation-name:tr-rise-in}.tr-out.tr-rise{animation-name:tr-fade-out}
 .tr-in.tr-blur{animation-name:tr-blur-in}.tr-out.tr-blur{animation-name:tr-blur-out}
 @keyframes tr-fade-in{from{opacity:0}}@keyframes tr-fade-out{to{opacity:0}}@keyframes tr-keep{to{opacity:1}}
@@ -1255,6 +1251,114 @@ body.ro .ray:not([data-panel="outline"]):not([data-panel="templates"]){opacity:.
   #present.with-notes .pv-stage{right:0;bottom:40vh}#present.with-notes .pv-notes{left:0;top:auto;width:auto;height:40vh;border-left:0;border-top:1px solid #2A2540}
   #present.with-notes .pv-bar{left:50%}
 }
+/* @slide-css */
+/* ---------- Effets : animations d'éléments, transitions supplémentaires, panneau Format, annotations ---------- */
+.el.an-run{animation:var(--an,an-fade) var(--dur,.7s) var(--ease,cubic-bezier(.2,.75,.25,1)) var(--d,0ms) var(--rep,1) both}
+.el[data-an="swing"].an-run{transform-origin:50% 0}
+@keyframes an-right{from{opacity:0;translate:70px 0}}
+@keyframes an-grow{from{opacity:0;scale:0}}
+@keyframes an-stretch{from{opacity:0;scale:1.7 .15}}
+@keyframes an-wipev{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes an-flip{from{opacity:0;rotate:1 0 0 90deg}}
+@keyframes an-spin{from{opacity:0;rotate:-180deg;scale:.3}}
+@keyframes an-swing{0%{opacity:0;rotate:-70deg}55%{opacity:1;rotate:14deg}75%{rotate:-7deg}100%{rotate:0deg}}
+@keyframes an-bounce{0%{opacity:0;translate:0 -140px}40%{opacity:1;translate:0 0}58%{translate:0 -34px}76%{translate:0 0}88%{translate:0 -10px}100%{translate:0 0}}
+@keyframes an-pulse{50%{scale:1.12}}
+@keyframes an-beat{0%,100%{scale:1}14%{scale:1.22}28%{scale:1}42%{scale:1.22}70%{scale:1}}
+@keyframes an-shake{0%,100%{translate:0 0}20%,60%{translate:-12px 0}40%,80%{translate:12px 0}}
+@keyframes an-wobble{15%{translate:-26px 0;rotate:-5deg}30%{translate:20px 0;rotate:3deg}45%{translate:-14px 0;rotate:-3deg}60%{translate:9px 0;rotate:2deg}75%{translate:-4px 0;rotate:-1deg}100%{translate:0 0;rotate:0deg}}
+@keyframes an-tada{0%,100%{scale:1;rotate:0deg}10%,20%{scale:.9;rotate:-3deg}30%,50%,70%,90%{scale:1.1;rotate:3deg}40%,60%,80%{scale:1.1;rotate:-3deg}}
+@keyframes an-jello{0%,100%{scale:1}22%{scale:1.25 .75}33%{scale:.75 1.25}44%{scale:1.15 .85}55%{scale:.95 1.05}66%{scale:1.05 .95}}
+@keyframes an-flash{0%,50%,100%{opacity:1}25%,75%{opacity:0}}
+@keyframes an-turn{to{rotate:360deg}}
+@keyframes an-float{0%,100%{translate:0 0}50%{translate:0 -20px}}
+@keyframes an-fadeout{to{opacity:0}}
+@keyframes an-zoomout{to{opacity:0;scale:.3}}
+@keyframes an-shrink{to{opacity:0;scale:0}}
+@keyframes an-fall{to{opacity:0;translate:0 160px;rotate:14deg}}
+@keyframes an-slideout{to{opacity:0;translate:-120px 0}}
+@keyframes an-spinout{to{opacity:0;rotate:180deg;scale:.3}}
+@keyframes an-blurout{to{opacity:0;filter:blur(16px)}}
+/* transitions supplémentaires */
+@property --p{syntax:'<percentage>';inherits:false;initial-value:0%}
+.tr-in.tr-cube{animation-name:tr-cube-in;animation-duration:var(--trd,.9s)}.tr-out.tr-cube{animation-name:tr-cube-out;animation-duration:var(--trd,.9s)}
+.tr-in.tr-circle{animation-name:tr-circle-in;animation-duration:var(--trd,.9s)}.tr-out.tr-circle{animation-name:tr-keep;animation-duration:var(--trd,.9s)}
+.tr-in.tr-diamond{animation-name:tr-diamond-in;animation-duration:var(--trd,.9s)}.tr-out.tr-diamond{animation-name:tr-keep;animation-duration:var(--trd,.9s)}
+.tr-in.tr-curtain{animation-name:tr-curtain-in;animation-duration:var(--trd,.9s)}.tr-out.tr-curtain{animation-name:tr-keep;animation-duration:var(--trd,.9s)}
+.tr-in.tr-split{animation-name:tr-split-in;animation-duration:var(--trd,.9s)}.tr-out.tr-split{animation-name:tr-keep;animation-duration:var(--trd,.9s)}
+.tr-in.tr-blinds{animation-name:tr-blinds-in;animation-duration:var(--trd,.9s);-webkit-mask:linear-gradient(90deg,#000 var(--p),transparent 0) 0 0/10% 100%;mask:linear-gradient(90deg,#000 var(--p),transparent 0) 0 0/10% 100%}.tr-out.tr-blinds{animation-name:tr-keep;animation-duration:var(--trd,.9s)}
+.tr-in.tr-uncover{animation-name:tr-keep}.tr-out.tr-uncover{z-index:3;animation-name:tr-slide-out}
+.tr-in.tr-spin{animation-name:tr-spin-in}.tr-out.tr-spin{animation-name:tr-spin-out}
+.tr-in.tr-fall{animation-name:tr-keep}.tr-out.tr-fall{z-index:3;animation-name:tr-fall-out;animation-duration:var(--trd,.9s);transform-origin:50% 100%}
+.tr-in.tr-roll{animation-name:tr-roll-in;animation-duration:var(--trd,.8s)}.tr-out.tr-roll{animation-name:tr-roll-out;animation-duration:calc(var(--trd,.8s) / 2)}
+@keyframes tr-cube-in{from{opacity:.3;transform:perspective(1800px) translateX(calc(var(--dir,1) * 50%)) rotateY(calc(var(--dir,1) * 90deg))}}
+@keyframes tr-cube-out{to{opacity:.3;transform:perspective(1800px) translateX(calc(var(--dir,1) * -50%)) rotateY(calc(var(--dir,1) * -90deg))}}
+@keyframes tr-circle-in{from{clip-path:circle(0% at 50% 50%)}to{clip-path:circle(75% at 50% 50%)}}
+@keyframes tr-diamond-in{from{clip-path:polygon(50% 50%,50% 50%,50% 50%,50% 50%)}to{clip-path:polygon(50% -50%,150% 50%,50% 150%,-50% 50%)}}
+@keyframes tr-curtain-in{from{clip-path:inset(0 50% 0 50%)}to{clip-path:inset(0 0 0 0)}}
+@keyframes tr-split-in{from{clip-path:inset(50% 0 50% 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes tr-blinds-in{from{--p:0%}to{--p:101%}}
+@keyframes tr-slide-out{to{transform:translateX(calc(var(--dir,1) * -100%))}}
+@keyframes tr-spin-in{from{opacity:0;transform:rotate(calc(var(--dir,1) * -30deg)) scale(.25)}}@keyframes tr-spin-out{to{opacity:0;transform:rotate(calc(var(--dir,1) * 30deg)) scale(1.6)}}
+@keyframes tr-fall-out{to{opacity:0;transform:translateY(110%) rotate(calc(var(--dir,1) * 14deg))}}
+@keyframes tr-roll-in{from{opacity:0;transform:perspective(1600px) rotateX(calc(var(--dir,1) * -75deg))}}@keyframes tr-roll-out{to{opacity:0;transform:perspective(1600px) rotateX(calc(var(--dir,1) * 75deg))}}
+/* @end-slide-css */
+@media (prefers-reduced-motion:reduce){.el.an-run{animation-duration:.01ms!important;animation-delay:0ms!important}}
+/* ---------- panneau Format et réglages communs ---------- */
+.pn-sub{margin:12px 0 6px;font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--mut)}
+.pn-hint{margin:14px 0 0;font-size:12.5px;line-height:1.5;color:var(--mut)}
+.pn-grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:4px 14px;align-items:end;margin-top:8px}
+.pn-box,.fm-box{margin:8px 0;padding:6px 12px 8px;border:1px solid var(--line);border-radius:12px;background:var(--panel2)}
+.pn-rg,.fm-rg{display:grid;gap:4px;margin:8px 0 2px;font-size:12.5px;font-weight:600;color:var(--ink2)}
+.pn-rg span,.fm-rg span{display:flex;justify-content:space-between;gap:8px}.pn-rg b,.fm-rg b{font-weight:700;color:var(--mut);font-variant-numeric:tabular-nums}
+.pn-rg input,.fm-rg input{width:100%;accent-color:var(--accent)}
+.pn-num{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--ink2);margin-top:8px}.pn-num span{flex:none}.pn-num em{font-style:normal;color:var(--mut)}
+.pn-num input,.pn-num select{flex:1;min-width:0;height:34px;padding:0 8px;border:1px solid var(--line2);border-radius:9px;background:var(--panel);color:var(--ink);font:inherit}
+.fm-sec{border-bottom:1px solid var(--line);padding:2px 0}
+.fm-sec summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:12px 2px;font-size:13.5px;font-weight:700;color:var(--ink)}
+.fm-sec summary::-webkit-details-marker{display:none}
+.fm-sec summary::after{content:"";width:8px;height:8px;border:solid var(--mut);border-width:0 2px 2px 0;transform:rotate(45deg);transition:transform .2s}
+.fm-sec[open] summary::after{transform:rotate(-135deg)}
+.fm-body{padding:0 2px 12px}
+.fm-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0;font-size:12.5px;font-weight:600;color:var(--ink2)}
+.fm-sw{width:44px;height:28px;border-radius:8px;border:1px solid var(--line2);background:var(--c,transparent);cursor:pointer;box-shadow:inset 0 0 0 2px var(--panel)}
+.fm-sw[data-none]{background:repeating-linear-gradient(45deg,var(--panel2) 0 5px,var(--line) 5px 10px)}
+.fm-geo{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:8px}
+.fm-geo label{display:grid;gap:3px;font-size:11px;font-weight:700;color:var(--mut);text-align:center}
+.fm-geo input{width:100%;min-width:0;height:34px;padding:0 4px;text-align:center;border:1px solid var(--line2);border-radius:9px;background:var(--panel);color:var(--ink);font:600 13px var(--f-mono,monospace)}
+.fm-txt{display:grid;gap:4px;margin-top:10px;font-size:12.5px;font-weight:600;color:var(--ink2)}.fm-txt small{font-weight:500;color:var(--mut)}
+.fm-txt input{height:36px;padding:0 10px;border:1px solid var(--line2);border-radius:9px;background:var(--panel);color:var(--ink);font:inherit}
+.fm-grid{display:grid;gap:8px;margin:6px 0}.fm-grid.g6{grid-template-columns:repeat(6,1fr)}.fm-grid.g4{grid-template-columns:repeat(4,1fr)}
+.fm-c{aspect-ratio:1;border-radius:10px;border:1px solid var(--line2);cursor:pointer;padding:0}.fm-c.wide{aspect-ratio:1.6}
+.fm-c:hover{transform:translateY(-1px);border-color:var(--ink2)}.fm-c.on{box-shadow:0 0 0 2px var(--panel),0 0 0 4px var(--accent)}
+.wa-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.wa-grid button{display:grid;gap:4px;justify-items:center;padding:10px 4px 6px;border-radius:12px;border:1px solid var(--line);background:#16122B;cursor:pointer;overflow:hidden}
+.wa-grid button:hover{border-color:var(--accent)}.wa-grid span{line-height:1.2;white-space:nowrap}.wa-grid em{font-style:normal;font-size:10.5px;font-weight:600;color:#B8B3CE}
+.pn-chips button svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;vertical-align:-2px;margin-right:4px}
+.pn-shapes2+.pn-sub{margin-top:14px}
+.pop.shapes{width:min(400px,calc(100vw - 16px))}.pop.shapes .pop-h{margin-top:8px}
+.slide-host.show-grid::before{content:"";position:absolute;inset:0;z-index:5;pointer-events:none;background-image:linear-gradient(rgb(128 128 160 / .22) 1px,transparent 1px),linear-gradient(90deg,rgb(128 128 160 / .22) 1px,transparent 1px);background-size:calc(20px * var(--z,1)) calc(20px * var(--z,1))}
+.slide-host.show-guides::after{content:"";position:absolute;inset:8.9% 6.25%;z-index:5;pointer-events:none;border:1px dashed rgb(229 72 77 / .55);background:linear-gradient(rgb(229 72 77 / .4),rgb(229 72 77 / .4)) 50% 0/1px 100% no-repeat,linear-gradient(rgb(229 72 77 / .4),rgb(229 72 77 / .4)) 0 50%/100% 1px no-repeat}
+.sl .el.lnk{cursor:pointer}
+/* panneaux ancrés à droite (Format, Animer) : la diapositive reste visible */
+@media (min-width:900px){
+  .drawer.side{left:auto;right:14px;top:70px;bottom:92px;transform:none;width:352px;max-height:none}
+  #app.has-side .ed-main{padding-right:366px}
+}
+
+/* présentation : dessin, loupe, aide */
+#pvInk{position:absolute;z-index:2;pointer-events:none;touch-action:none}
+#pvInk.on{pointer-events:auto}#pvInk.on.pen,#pvInk.on.hl{cursor:crosshair}#pvInk.on.erase{cursor:cell}
+#present.inking .pv-bar{opacity:1}
+.pv-bar button[aria-pressed="true"]{background:rgb(255 255 255 / .2);color:#fff;box-shadow:inset 0 0 0 1.5px rgb(255 255 255 / .6)}
+#pvLoupe{position:absolute;z-index:7;width:220px;height:220px;border-radius:50%;overflow:hidden;pointer-events:none;box-shadow:0 0 0 3px #fff,0 10px 40px rgb(0 0 0 / .5);background:#000}
+#pvLoupe .pv-slide{position:absolute}#present.loupe{cursor:none}
+#pvToast{position:absolute;z-index:9;left:50%;top:22px;transform:translate(-50%,-10px);padding:10px 16px;border-radius:99px;background:rgb(20 18 33 / .92);color:#fff;font:600 13px var(--f-body,system-ui);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
+#pvToast.on{opacity:1;transform:translate(-50%,0)}
+#pvHelp{position:absolute;inset:0;z-index:10;display:grid;place-items:center;background:rgb(10 8 20 / .6);backdrop-filter:blur(6px)}
+#pvHelp>div{position:relative;width:min(460px,92vw);max-height:88vh;overflow:auto;padding:22px 24px;border-radius:18px;background:#141221;color:#E9E6F5;box-shadow:0 0 0 1px #2A2540}
+#pvHelp b{font:700 18px var(--f-disp,system-ui)}#pvHelp button{position:absolute;right:14px;top:10px;border:0;background:none;color:#B8B3CE;font-size:26px;cursor:pointer}
+#pvHelp dl{display:grid;grid-template-columns:auto 1fr;gap:8px 18px;margin:16px 0 0;font-size:13.5px}#pvHelp dt{font:600 12px var(--f-mono,monospace);color:#fff;background:#2A2540;padding:3px 8px;border-radius:6px;justify-self:start}#pvHelp dd{margin:0;color:#B8B3CE;align-self:center}
 </style>
 </head><body>
 
@@ -1396,7 +1500,7 @@ body.ro .ray:not([data-panel="outline"]):not([data-panel="templates"]){opacity:.
   <aside class="pv-notes" id="pvNotes"><div class="pn-top"><b>Notes</b><span id="pvClock">0:00</span></div><p class="pn-txt"></p><div class="pn-next"></div></aside>
   <div class="pv-bar" id="pvBar">
     <button type="button" data-pv="prev" aria-label="Précédente"><svg viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg></button><span id="pvNum">1 / 1</span><button type="button" data-pv="next" aria-label="Suivante"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button>
-    <i></i><button type="button" data-pv="notes" title="Notes et minuteur (S)"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 9h8M8 13h8M8 17h5"/></svg></button><button type="button" data-pv="grid" title="Vue d'ensemble (G)"><svg viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg></button><button type="button" data-pv="laser" title="Pointeur laser (L)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></button><button type="button" data-pv="fs" title="Plein écran (F)"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button><button type="button" data-pv="exit" title="Quitter (Échap)"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <i></i><button type="button" data-pv="notes" title="Notes et minuteur (S)"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 9h8M8 13h8M8 17h5"/></svg></button><button type="button" data-pv="grid" title="Vue d'ensemble (G)"><svg viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg></button><button type="button" data-pv="laser" title="Pointeur laser (L)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></button><i></i><button type="button" data-pv="pen" title="Stylo (D)"><svg viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16zM14 6l3 3"/></svg></button><button type="button" data-pv="hl" title="Surligneur (H)"><svg viewBox="0 0 24 24"><path d="M9 14l6-6 4 4-6 6H9zM9 18H5l2-2M4 21h16"/></svg></button><button type="button" data-pv="erase" title="Gomme (E)"><svg viewBox="0 0 24 24"><path d="M8 19h12M5 15l8-8 6 6-5 5H8zM9 11l6 6"/></svg></button><button type="button" data-pv="loupe" title="Loupe (Z)"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5M11 8v6M8 11h6"/></svg></button><button type="button" data-pv="help" title="Raccourcis (?)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01"/></svg></button><i></i><button type="button" data-pv="fs" title="Plein écran (F)"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button><button type="button" data-pv="exit" title="Quitter (Échap)"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
   </div>
   <div class="pv-prog"><i id="pvProg"></i></div>
   <div class="pv-grid" id="pvGrid" hidden></div>
@@ -1761,6 +1865,39 @@ const SHAPES = {
 };
 const SHAPE_ORDER = ['rect', 'round', 'ellipse', 'pill', 'tri', 'diamond', 'hex', 'star', 'star4', 'arrow', 'chev', 'heart', 'bubble', 'blob', 'arch', 'arc', 'pent', 'oct', 'plus', 'rtri', 'line', 'arrowline'];
 
+/* ==== 26-shapes-extra.js ==== */
+/* ---------- Formes supplémentaires (chemins dans une boîte 100 × 100) et leur rangement par famille ---------- */
+(() => {
+  const r1 = n => Math.round(n * 10) / 10;
+  const poly = (n, rot = -90, rad = 50) => 'M' + Array.from({length:n}, (_, i) => { const a = (rot + i * 360 / n) * Math.PI / 180; return `${r1(50 + rad * Math.cos(a))} ${r1(50 + rad * Math.sin(a))}`; }).join('L') + 'Z';
+  const star = (n, k) => 'M' + Array.from({length:n * 2}, (_, i) => { const a = (-90 + i * 180 / n) * Math.PI / 180, r = i % 2 ? 50 * k : 50; return `${r1(50 + r * Math.cos(a))} ${r1(50 + r * Math.sin(a))}`; }).join('L') + 'Z';
+  const gear = n => { const pts = []; for (let i = 0; i < n; i++){ const a0 = i * 360 / n - 90, st = 360 / n; [[-.3, 40], [-.17, 50], [.17, 50], [.3, 40]].forEach(([f, r]) => { const a = (a0 + st * (f + .5)) * Math.PI / 180; pts.push(`${r1(50 + r * Math.cos(a))} ${r1(50 + r * Math.sin(a))}`); }); } return 'M' + pts.join('L') + 'ZM50 30A20 20 0 1 0 50 70A20 20 0 1 0 50 30Z'; };
+  const X = {
+    trap:['Trapèze', 'M20 0H80L100 100H0Z'], para:['Parallélogramme', 'M25 0H100L75 100H0Z'], hept:['Heptagone', poly(7)], deca:['Décagone', poly(10)], cutc:['Coin coupé', 'M0 0H75L100 25V100H0Z'],
+    snip:['Rectangle biseauté', 'M18 0H82L100 18V82L82 100H18L0 82V18Z'], doc:['Page cornée', 'M0 0H68L100 32V100H0Z'], tab:['Dossier', 'M0 100V12Q0 0 12 0H38L50 16H88Q100 16 100 28V100Z'], cyl:['Cylindre', 'M0 14C0 -5 100 -5 100 14V86C100 105 0 105 0 86Z'],
+    star5:['Étoile 5 branches', star(5, .42)], star6:['Étoile 6 branches', star(6, .55)], star8:['Étoile 8 branches', star(8, .62)], star12:['Étoile 12 branches', star(12, .75)], burst:['Explosion', star(16, .7)], seal:['Sceau', star(24, .88)], gear:['Engrenage', gear(10)],
+    arrowl:['Flèche gauche', 'M100 30H38V5L0 50L38 95V70H100Z'], arrowu:['Flèche haut', 'M30 100V38H5L50 0L95 38H70V100Z'], arrowd:['Flèche bas', 'M30 0V62H5L50 100L95 62H70V0Z'], arrowlr:['Double flèche', 'M0 50L28 8V32H72V8L100 50L72 92V68H28V92Z'], arrowud:['Flèche verticale', 'M50 0L92 28H68V72H92L50 100L8 72H32V28H8Z'],
+    home:['Pentagone flèche', 'M0 0H70L100 50L70 100H0Z'], uturn:['Demi-tour', 'M0 100V42A42 42 0 0 1 42 0H50A42 42 0 0 1 92 42V50H100L78 78L56 50H64V42A14 14 0 0 0 50 28H42A14 14 0 0 0 28 42V100Z'], bent:['Flèche coudée', 'M0 100V45A30 30 0 0 1 30 15H65V0L100 25L65 50V35H35V100Z'], notch:['Flèche crantée', 'M0 20H62V0L100 50L62 100V80H0L20 50Z'],
+    callout:['Bulle rectangulaire', 'M0 0H100V72H40L18 100V72H0Z'], bubble2:['Bulle ronde', 'M50 0C78 0 100 17 100 40S78 80 56 80L28 100L36 77C14 71 0 57 0 40C0 17 22 0 50 0Z'], thought:['Bulle de pensée', 'M30 62C8 62 5 38 24 33C22 12 52 5 62 20C78 8 100 24 90 42C106 52 92 70 74 62C66 74 40 74 30 62ZM20 80A7 7 0 1 0 20 94A7 7 0 1 0 20 80ZM6 96A3.5 3.5 0 1 0 6 103A3.5 3.5 0 1 0 6 96Z'],
+    banner:['Bandeau', 'M0 15H100L88 50L100 85H0L12 50Z'], ribbon:['Fanion', 'M0 0H100V76L50 100L0 76Z'], tag:['Étiquette', 'M0 10Q0 0 10 0H55L100 45V55L55 100H10Q0 100 0 90ZM20 42A8 8 0 1 0 20 58A8 8 0 1 0 20 42Z'],
+    cloud:['Nuage', 'M25 85C6 85 -4 62 14 52C4 32 26 16 42 26C50 6 80 8 84 30C104 30 108 62 90 70C98 88 78 94 70 84C60 92 40 94 25 85Z'], bolt:['Éclair', 'M58 0L14 56H42L34 100L86 40H56Z'], moon:['Lune', 'M68 0A50 50 0 1 0 68 100A60 60 0 0 1 68 0Z'], drop:['Goutte', 'M50 0C50 0 90 46 90 66A40 40 0 0 1 10 66C10 46 50 0 50 0Z'], wave:['Vague', 'M0 50C25 10 25 10 50 50S75 90 100 50V100H0Z'],
+    shield:['Bouclier', 'M50 0L95 14V50C95 78 72 92 50 100C28 92 5 78 5 50V14Z'], pin:['Repère', 'M50 100C50 100 10 62 10 38A40 38 0 0 1 90 38C90 62 50 100 50 100ZM50 22A16 16 0 1 0 50 54A16 16 0 1 0 50 22Z'], check:['Coche', 'M4 55L20 39L40 59L80 14L96 30L40 92Z'], xmark:['Croix', 'M20 5L50 35L80 5L95 20L65 50L95 80L80 95L50 65L20 95L5 80L35 50L5 20Z'],
+    ring:['Anneau', 'M50 0A50 50 0 1 1 50 100A50 50 0 1 1 50 0ZM50 22A28 28 0 1 0 50 78A28 28 0 1 0 50 22Z'], frame:['Cadre', 'M0 0H100V100H0ZM13 13V87H87V13Z'], pie:['Camembert', 'M50 50L100 50A50 50 0 1 0 50 100Z'], quart:['Quart de cercle', 'M0 100V0A100 100 0 0 1 100 100Z'], hring:['Arc épais', 'M0 100A50 100 0 0 1 100 100H72A22 70 0 0 0 28 100Z'],
+    cross:['Croix grecque', 'M33 0H67V33H100V67H67V100H33V67H0V33H33Z'], lblock:['Équerre', 'M0 0H38V62H100V100H0Z'], teardrop:['Larme', 'M50 0L88 38A44 44 0 1 1 12 38Z'], petal:['Pétale', 'M50 0C90 20 100 70 50 100C0 70 10 20 50 0Z'], leaf:['Feuille', 'M0 100C0 40 40 0 100 0C100 60 60 100 0 100Z'],
+  };
+  Object.assign(SHAPES, X);
+  /* familles pour le panneau Insérer et le menu des formes */
+  window.SHAPE_GROUPS = [
+    ['Formes de base', ['rect', 'round', 'ellipse', 'pill', 'tri', 'rtri', 'diamond', 'trap', 'para', 'pent', 'hex', 'hept', 'oct', 'deca', 'cutc', 'snip', 'doc', 'tab', 'cyl', 'arc', 'arch', 'pie', 'quart', 'ring', 'frame', 'hring', 'cross', 'lblock', 'plus']],
+    ['Flèches', ['arrow', 'arrowl', 'arrowu', 'arrowd', 'arrowlr', 'arrowud', 'chev', 'home', 'notch', 'bent', 'uturn', 'line', 'arrowline']],
+    ['Étoiles et sceaux', ['star4', 'star', 'star5', 'star6', 'star8', 'star12', 'burst', 'seal', 'gear']],
+    ['Bulles et bandeaux', ['bubble', 'bubble2', 'callout', 'thought', 'banner', 'ribbon', 'tag']],
+    ['Symboles', ['heart', 'blob', 'cloud', 'bolt', 'moon', 'drop', 'teardrop', 'petal', 'leaf', 'wave', 'shield', 'pin', 'check', 'xmark']],
+  ];
+  SHAPE_ORDER.length = 0; SHAPE_GROUPS.forEach(g => g[1].forEach(k => { if (!SHAPE_ORDER.includes(k)) SHAPE_ORDER.push(k); }));
+  window.SHAPE_SIZES = {pill:[320, 110], arrow:[300, 160], arrowl:[300, 160], arrowlr:[320, 160], chev:[300, 160], home:[300, 160], notch:[300, 160], bubble:[300, 220], bubble2:[300, 220], callout:[300, 220], thought:[300, 240], banner:[360, 160], ribbon:[360, 160], tag:[320, 160], para:[300, 180], trap:[300, 180], cloud:[320, 220], wave:[360, 180], tab:[300, 220], doc:[220, 280], cyl:[200, 260], arrowu:[160, 300], arrowd:[160, 300], arrowud:[160, 300], lblock:[240, 240]};
+})();
+
 /* ==== 30-model.js ==== */
 /* ---------- Modèle : présentation, diapositives, éléments, mises en page, historique ----------
    Présentation : {v, app, title, theme:{id,…}, size:'16:9', slides:[…], media:{id:dataURL}}
@@ -1993,29 +2130,26 @@ function txCss(st = {}){
   c += `font-weight:${st.b ? (st.f === 'h' ? 'var(--hw)' : '700') : (st.f === 'h' ? '500' : '400')};`;
   if (st.i) c += 'font-style:italic;'; if (st.u) c += 'text-decoration:underline;'; if (st.s) c += 'text-decoration:line-through;';
   if (st.ls) c += `letter-spacing:${st.ls}em;`; if (st.up) c += 'text-transform:uppercase;';
-  if (st.sh) c += `text-shadow:0 2px 14px rgb(0 0 0 / .35);`;
+  c += fxTextCss(st);
   if (st.hl) c += `--hl:${cssCol(st.hl)};`;
   return c;
 }
-function boxCss(e){
-  let c = `left:${Math.round(e.x)}px;top:${Math.round(e.y)}px;width:${Math.round(e.w)}px;height:${Math.round(e.h)}px;`;
-  if (e.rot) c += `transform:rotate(${+e.rot}deg);`;
-  if (e.op != null && e.op < 1) c += `opacity:${+e.op};`;
-  if (e.shadow) c += `filter:drop-shadow(0 ${Math.round(e.shadow * .5)}px ${e.shadow}px rgb(10 8 30 / .28));`;
-  return c;
-}
-const fillCss = e => !e.fill ? 'transparent' : e.g2 ? `linear-gradient(${e.ga ?? 135}deg,${cssCol(e.fill)},${cssCol(e.g2)})` : cssCol(e.fill);
+const fillCss = e => !e.fill ? 'transparent' : e.g2 ? gradCss(e) : cssCol(e.fill);
 let GRAD_N = 0;
 function shapeHTML(e, sv){
-  const k = e.k || 'rect', sw = +e.sw || 0, stroke = e.stroke && sw ? cssCol(e.stroke) : '';
+  const k = e.k || 'rect', sw = +e.sw || 0, stroke = e.stroke && sw ? cssCol(e.stroke) : '', pl = patLayer(e, sv), dash = e.sd === 'dot' ? 'dotted' : 'dashed';
   let g = '';
   if (['rect', 'round', 'ellipse', 'pill'].includes(k)){
     const r = k === 'ellipse' ? '50%' : k === 'pill' ? Math.min(e.w, e.h) / 2 + 'px' : k === 'round' ? (e.r ?? 18) + 'px' : (e.r || 0) + 'px';
-    g = `<div class="shp" style="background:${fillCss(e)};border-radius:${r};${stroke ? `box-shadow:inset 0 0 0 ${sw}px ${stroke};` : ''}"></div>`;
+    const bd = !stroke ? '' : e.sd ? `border:${sw}px ${dash} ${stroke};box-sizing:border-box;` : `box-shadow:inset 0 0 0 ${sw}px ${stroke};`;
+    g = `<div class="shp" style="background:${pl ? `${pl.url} 0 0/${pl.w}px ${pl.h}px,` : ''}${fillCss(e)};border-radius:${r};${bd}"></div>`;
   } else {
     const d = SHAPES[k]?.[1] || SHAPES.tri[1]; let fill = e.fill ? realCol(e.fill, sv) : 'none', defs = '';
-    if (e.fill && e.g2){ const id = 'sg' + (++GRAD_N).toString(36); const a = (e.ga ?? 135) * Math.PI / 180; defs = `<defs><linearGradient id="${id}" x1="${.5 - Math.cos(a - Math.PI / 2) / 2}" y1="${.5 - Math.sin(a - Math.PI / 2) / 2}" x2="${.5 + Math.cos(a - Math.PI / 2) / 2}" y2="${.5 + Math.sin(a - Math.PI / 2) / 2}"><stop offset="0" stop-color="${realCol(e.fill, sv)}"/><stop offset="1" stop-color="${realCol(e.g2, sv)}"/></linearGradient></defs>`; fill = `url(#${id})`; }
-    g = `<svg class="shp" viewBox="0 0 100 100" preserveAspectRatio="none">${defs}<path d="${d}" fill="${fill}"${stroke ? ` stroke="${realCol(e.stroke, sv)}" stroke-width="${sw}" vector-effect="non-scaling-stroke" stroke-linejoin="round"` : ''}/></svg>`;
+    if (e.fill && e.g2 && e.gt !== 'con'){ const id = 'sg' + (++GRAD_N).toString(36); defs = gradDefs(id, e, sv); fill = `url(#${id})`; }
+    else if (e.fill && e.g2) fill = realCol(e.fill, sv);
+    const sdA = e.sd ? ` stroke-dasharray="${e.sd === 'dot' ? `${sw} ${sw * 1.6}` : `${sw * 3} ${sw * 2}`}"` : '';
+    g = `<svg class="shp" viewBox="0 0 100 100" preserveAspectRatio="none">${defs}<path d="${d}" fill="${fill}"${stroke ? ` stroke="${realCol(e.stroke, sv)}" stroke-width="${sw}" vector-effect="non-scaling-stroke" stroke-linejoin="round"${sdA}` : ''}/></svg>`;
+    if (pl){ const m = `url('data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="${d}"/></svg>`).replace(/'/g, '%27')}') 0 0/100% 100% no-repeat`; g += `<div class="shp" style="background:${pl.url} 0 0/${pl.w}px ${pl.h}px;-webkit-mask:${m};mask:${m}"></div>`; }
   }
   if (e.html != null) g += `<div class="txw"><div class="tx in" style="${txCss({ha:'c', va:'m', fc:'t:on', fs:22, ...(e.st || {})})}">${e.html}</div></div>`;
   return g;
@@ -2120,23 +2254,31 @@ function elInner(e, sv, o){
   }
   return '';
 }
-function slideBg(s, sv, o = {}){
-  const b = s.bg || {};
-  if (b.g) return `linear-gradient(${b.a ?? 135}deg,${cssCol(b.g[0])},${cssCol(b.g[1])})`;
+const MESHES = [['Aurore', ['#7C3AED', '#06B6D4', '#EC4899', '#0F0B1E']], ['Coucher de soleil', ['#FF7A59', '#FFC83D', '#EC4899', '#2B1055']], ['Océan', ['#0EA5E9', '#22D3EE', '#6366F1', '#06213A']], ['Forêt', ['#34D399', '#A3E635', '#0EA5E9', '#0B2A20']],
+  ['Pastel', ['#FBCFE8', '#BAE6FD', '#DDD6FE', '#FFF7FB']], ['Pêche', ['#FED7AA', '#FBCFE8', '#FDE68A', '#FFF8F1']], ['Menthe', ['#A7F3D0', '#BFDBFE', '#FDE68A', '#F3FFFA']], ['Minuit', ['#4F46E5', '#7C3AED', '#0EA5E9', '#070A1A']]];
+const meshCss = m => `radial-gradient(at 15% 20%,${m[0]} 0,transparent 55%),radial-gradient(at 85% 15%,${m[1]} 0,transparent 55%),radial-gradient(at 75% 90%,${m[2]} 0,transparent 60%),radial-gradient(at 10% 90%,${m[0]} 0,transparent 45%),${m[3]}`;
+function bgBase(b, sv){
+  if (b.mesh) return meshCss(b.mesh.map(cssCol));
+  if (b.g){ const cs = b.g.map(cssCol); if (b.gt === 'rad') return `radial-gradient(circle at 50% 40%,${cs.join(',')})`; if (b.gt === 'con') return `conic-gradient(from ${b.a ?? 135}deg at 50% 50%,${[...cs, cs[0]].join(',')})`; return `linear-gradient(${b.a ?? 135}deg,${cs.join(',')})`; }
   if (b.c) return cssCol(b.c);
   return sv.bg;
+}
+function slideBg(s, sv, o = {}){
+  const b = s.bg || {}, base = bgBase(b, sv), t = b.pat && patTile(b.pat, realCol(b.pc || 't:ink', sv) || '#000', numIn(b.po, .03, 1, .12), numIn(b.ps, .5, 4, 1));
+  return t ? `${t.url} 0 0/${t.w}px ${t.h}px,${base}` : base;
 }
 /* opts : {edit, preview (sans images, pour les vignettes enregistrées), present, print, theme, size} */
 function renderSlide(s, o = {}){
   const th = dtheme(o.theme || D.theme), [W, H] = SIZES[o.size || D.size] || SIZES['16:9'], sv = slideVars(th, s.v || 'content');
-  if (s.bg?.c && !s.bg.c.startsWith?.('t:')){ const dk = luma(s.bg.c) < .45; if (dk !== sv.dark && (s.bg.ink !== false)){ sv.ink = dk ? '#FFFFFF' : th.ink === '#FFFFFF' ? '#16122B' : th.ink; sv.mut = mix(sv.ink, s.bg.c, .35); sv.line = mix(s.bg.c, sv.ink, .16); sv.soft = mix(s.bg.c, sv.ink, .06); sv.dark = dk; } sv.bg = s.bg.c; }
+  const bgc = s.bg && (s.bg.mesh ? realCol(s.bg.mesh[3], sv) : s.bg.g ? (() => { const a = realCol(s.bg.g[0], sv), b = realCol(s.bg.g[1], sv); return /^#[0-9a-f]{6}$/i.test(a) && /^#[0-9a-f]{6}$/i.test(b) ? mix(a, b, .5) : null; })() : s.bg.c && !s.bg.c.startsWith?.('t:') ? s.bg.c : null);
+  if (bgc && /^#[0-9a-f]{6}$/i.test(bgc)){ const dk = luma(bgc) < .45; if (dk !== sv.dark && (s.bg.ink !== false)){ sv.ink = dk ? '#FFFFFF' : th.ink === '#FFFFFF' ? '#16122B' : th.ink; sv.mut = mix(sv.ink, bgc, .35); sv.line = mix(bgc, sv.ink, .16); sv.soft = mix(bgc, sv.ink, .06); sv.dark = dk; } if (!s.bg.g && !s.bg.mesh) sv.bg = bgc; }
   let h = `<div class="sl${sv.dark ? ' dk' : ''}" style="width:${W}px;height:${H}px;${varsCss(sv)};background:${slideBg(s, sv, o)}">`;
   const bi = s.bg?.img && !o.preview ? mediaSrc(s.bg.img) : '';
   if (bi) h += `<div class="sl-bgi" style="background-image:url('${bi.replace(/'/g, '%27')}');${s.bg.dim ? '' : ''}"></div>${s.bg.dim ? `<div class="sl-bgi" style="background:#000;opacity:${s.bg.dim}"></div>` : ''}`;
   if (!s.nodeco && !s.bg?.img) h += decorSVG(th, s.v || 'content', W, H, sv);
   for (const e of s.els){
     if (o.present && e.t === 'img' && !mediaSrc(e.src) && e.w * e.h > W * H * .15) continue;
-    h += `<div class="el el-${e.t}${e.lock ? ' lk' : ''}" ${o.edit || o.present ? `data-id="${e.id}" ` : ''}style="${boxCss(e)}">${elInner(e, sv, o)}</div>`;
+    h += `<div class="el el-${e.t}${e.lock ? ' lk' : ''}${e.lk && o.present ? ' lnk' : ''}" ${o.edit || o.present ? `data-id="${e.id}" ` : ''}${e.lk && o.present ? `data-lk="${escH(e.lk)}" ` : ''}${e.alt ? `role="img" aria-label="${escH(e.alt)}" ` : ''}style="${boxCss(e)}">${elInner(e, sv, o)}</div>`;
   }
   return h + '</div>';
 }
@@ -2148,6 +2290,186 @@ function previewOfDeck(d, max = 5800){
     if (h.length > max) h = renderSlide({...s, nodeco:true, els:s.els.filter(e => e.t === 'text' || e.t === 'shape').slice(0, 8)}, {preview:true});
     return h.length > max ? '' : h;
   } finally { D = keep; }
+}
+
+/* ==== 42-fx.js ==== */
+/* ---------- Effets : ombres, lueur, reflet, flou, inclinaison 3D, ajustements ; effets de texte (WordArt) ; dégradés et motifs ----------
+   Élément : fx {sh:{x,y,b,c,o}, gl:{b,c,o}, rf, bl, sf, rx, ry, fh, fv, br, ct, sa, hu} · fond de forme : g2, g3, ga, gt('lin'|'rad'|'con'), pat, pc, ps, po · contour : sd ('dash'|'dot')
+   Texte (st) : tg [c1, c2, angle], to {w, c, f}, tl {b, c}, tsd {x, y, b, c, o}, t3 {n, c}, sc, tt, ws */
+const isCol = c => typeof c === 'string' && (/^t:[a-z0-9]+$/.test(c) || /^#[0-9a-f]{3,8}$/i.test(c));
+const numIn = (v, a, b, d = 0) => { v = +v; return isFinite(v) ? clamp(v, a, b) : d; };
+const withOp = (c, o) => { const col = cssCol(c); return o == null || o >= 1 ? col : `color-mix(in srgb,${col} ${Math.round(o * 100)}%,transparent)`; };
+/* motifs : [nom, largeur, hauteur, dessin(couleur)] */
+const PATS = {
+  dots:['Points', 20, 20, c => `<circle cx="10" cy="10" r="2.4" fill="${c}"/>`], dots2:['Grosse trame', 28, 28, c => `<circle cx="7" cy="7" r="4.5" fill="${c}"/><circle cx="21" cy="21" r="4.5" fill="${c}"/>`],
+  diag:['Rayures', 16, 16, c => `<path d="M-2 2L2 -2M0 16L16 0M14 18L18 14" stroke="${c}" stroke-width="3"/>`], hlines:['Lignes', 14, 14, c => `<rect width="14" height="3" fill="${c}"/>`], vlines:['Barres', 14, 14, c => `<rect width="3" height="14" fill="${c}"/>`],
+  grid:['Quadrillage', 24, 24, c => `<path d="M24 0V24H0" fill="none" stroke="${c}" stroke-width="1.6"/>`], check:['Damier', 32, 32, c => `<rect width="16" height="16" fill="${c}"/><rect x="16" y="16" width="16" height="16" fill="${c}"/>`],
+  zig:['Zigzag', 24, 20, c => `<path d="M0 14L6 6L12 14L18 6L24 14" fill="none" stroke="${c}" stroke-width="2.4"/>`], wave:['Vagues', 32, 24, c => `<path d="M0 12C8 0 8 0 16 12S24 24 32 12" fill="none" stroke="${c}" stroke-width="2.4"/>`],
+  cross:['Croix', 22, 22, c => `<path d="M11 6V16M6 11H16" stroke="${c}" stroke-width="2.4" stroke-linecap="round"/>`], tri:['Triangles', 24, 24, c => `<path d="M12 4L20 20H4Z" fill="${c}"/>`],
+  brick:['Briques', 40, 20, c => `<path d="M0 0H40M0 10H40M0 20H40M10 0V10M30 0V10M20 10V20" fill="none" stroke="${c}" stroke-width="1.6"/>`], scale:['Écailles', 24, 16, c => `<path d="M0 16A12 12 0 0 1 24 16M-12 8A12 12 0 0 1 12 8M12 8A12 12 0 0 1 36 8" fill="none" stroke="${c}" stroke-width="1.8"/>`],
+  conf:['Confettis', 40, 40, c => `<rect x="6" y="8" width="8" height="3" rx="1.5" fill="${c}" transform="rotate(30 10 9)"/><circle cx="28" cy="10" r="2.5" fill="${c}"/><rect x="26" y="28" width="9" height="3" rx="1.5" fill="${c}" transform="rotate(-40 30 29)"/><circle cx="10" cy="30" r="2" fill="${c}"/>`],
+};
+const PAT_ORDER = Object.keys(PATS);
+function patTile(k, col, op = .3, sc = 1){
+  const p = PATS[k]; if (!p) return null; const w = Math.round(p[1] * sc), h = Math.round(p[2] * sc);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${p[1]} ${p[2]}" opacity="${op}">${p[3](col)}</svg>`;
+  return {w, h, url:`url('data:image/svg+xml,${encodeURIComponent(svg).replace(/'/g, '%27')}')`};
+}
+/* dégradés : 2 ou 3 couleurs, linéaire, radial ou conique */
+function gradCss(e){
+  const cs = [e.fill, e.g2, e.g3].filter(Boolean).map(cssCol), a = e.ga ?? 135;
+  if (e.gt === 'rad') return `radial-gradient(circle at ${numIn(e.gx, 0, 100, 50)}% ${numIn(e.gy, 0, 100, 50)}%,${cs.join(',')})`;
+  if (e.gt === 'con') return `conic-gradient(from ${a}deg at 50% 50%,${[...cs, cs[0]].join(',')})`;
+  return `linear-gradient(${a}deg,${cs.join(',')})`;
+}
+function gradDefs(id, e, sv){
+  const cs = [e.fill, e.g2, e.g3].filter(Boolean).map(c => realCol(c, sv)), st = cs.map((c, i) => `<stop offset="${cs.length < 2 ? 0 : i / (cs.length - 1)}" stop-color="${c}"/>`).join('');
+  if (e.gt === 'rad') return `<defs><radialGradient id="${id}" cx="${numIn(e.gx, 0, 100, 50) / 100}" cy="${numIn(e.gy, 0, 100, 50) / 100}" r=".75">${st}</radialGradient></defs>`;
+  const a = (e.ga ?? 135) * Math.PI / 180, dx = Math.cos(a - Math.PI / 2) / 2, dy = Math.sin(a - Math.PI / 2) / 2;
+  return `<defs><linearGradient id="${id}" x1="${.5 - dx}" y1="${.5 - dy}" x2="${.5 + dx}" y2="${.5 + dy}">${st}</linearGradient></defs>`;
+}
+/* motif posé sur une forme : couches CSS (formes simples) ou masque en forme de tracé */
+function patLayer(e, sv){
+  const t = e.pat && patTile(e.pat, realCol(e.pc || 't:ink', sv) || '#000', numIn(e.po, .05, 1, .3), numIn(e.ps, .5, 4, 1)); return t;
+}
+/* ---------- boîte d'un élément : position, rotation, transparence, effets ---------- */
+function boxCss(e){
+  let c = `left:${Math.round(e.x)}px;top:${Math.round(e.y)}px;width:${Math.round(e.w)}px;height:${Math.round(e.h)}px;`;
+  const f = e.fx || {};
+  let tf = e.rot ? `rotate(${+e.rot}deg)` : '';
+  if (f.rx || f.ry) tf += ` perspective(1400px) rotateX(${numIn(f.rx, -70, 70)}deg) rotateY(${numIn(f.ry, -70, 70)}deg)`;
+  if (f.fh) tf += ' scaleX(-1)'; if (f.fv) tf += ' scaleY(-1)';
+  if (tf) c += `transform:${tf.trim()};`;
+  if (e.op != null && e.op < 1) c += `opacity:${+e.op};`;
+  const fl = [];
+  if (e.shadow) fl.push(`drop-shadow(0 ${Math.round(e.shadow * .5)}px ${e.shadow}px rgb(10 8 30 / .28))`);
+  if (f.sh) fl.push(`drop-shadow(${numIn(f.sh.x, -200, 200)}px ${numIn(f.sh.y, -200, 200)}px ${numIn(f.sh.b, 0, 200)}px ${withOp(f.sh.c || '#000000', numIn(f.sh.o, 0, 1, .35))})`);
+  if (f.gl){ const b = numIn(f.gl.b, 0, 150, 20), col = withOp(f.gl.c || 't:ac', numIn(f.gl.o, 0, 1, .9)); fl.push(`drop-shadow(0 0 ${b / 2}px ${col}) drop-shadow(0 0 ${b}px ${col})`); }
+  if (f.bl) fl.push(`blur(${numIn(f.bl, 0, 60)}px)`);
+  if (f.br != null && f.br !== 100) fl.push(`brightness(${numIn(f.br, 0, 250, 100) / 100})`);
+  if (f.ct != null && f.ct !== 100) fl.push(`contrast(${numIn(f.ct, 0, 250, 100) / 100})`);
+  if (f.sa != null && f.sa !== 100) fl.push(`saturate(${numIn(f.sa, 0, 300, 100) / 100})`);
+  if (f.hu) fl.push(`hue-rotate(${numIn(f.hu, -180, 180)}deg)`);
+  if (fl.length) c += `filter:${fl.join(' ')};`;
+  if (f.rf) c += `-webkit-box-reflect:below 6px linear-gradient(transparent ${Math.round(100 - 45 * numIn(f.rf, 0, 1, .5))}%,rgb(255 255 255 / ${numIn(f.rf, 0, 1, .5) * .6}));`;
+  if (f.sf){ const s = numIn(f.sf, 0, 200), m = `linear-gradient(90deg,transparent,#000 ${s}px,#000 calc(100% - ${s}px),transparent),linear-gradient(180deg,transparent,#000 ${s}px,#000 calc(100% - ${s}px),transparent)`; c += `-webkit-mask-image:${m};mask-image:${m};-webkit-mask-composite:source-in;mask-composite:intersect;`; }
+  return c;
+}
+/* ---------- texte : effets WordArt ---------- */
+function fxTextCss(st){
+  let c = '';
+  if (st.tg && st.tg[0] && st.tg[1]) c += `background-image:linear-gradient(${numIn(st.tg[2], 0, 360, 90)}deg,${cssCol(st.tg[0])},${cssCol(st.tg[1])}${st.tg[3] ? ',' + cssCol(st.tg[3]) : ''});-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;`;
+  if (st.to){ const w = numIn(st.to.w, 0, 24, 2); c += `-webkit-text-stroke:${w}px ${cssCol(st.to.c || 't:ink')};paint-order:stroke fill;`; if (st.to.f === 0) c += '-webkit-text-fill-color:transparent;'; }
+  const sd = [];
+  if (st.sh) sd.push('0 2px 14px rgb(0 0 0 / .35)');
+  if (st.tl){ const b = numIn(st.tl.b, 0, 80, 12), col = cssCol(st.tl.c || 't:ac'); sd.push(`0 0 ${b / 2}px ${col}`, `0 0 ${b}px ${col}`, `0 0 ${b * 2}px ${col}`); }
+  if (st.tsd) sd.push(`${numIn(st.tsd.x, -60, 60)}px ${numIn(st.tsd.y, -60, 60)}px ${numIn(st.tsd.b, 0, 80)}px ${withOp(st.tsd.c || '#000000', numIn(st.tsd.o, 0, 1, .4))}`);
+  if (st.t3){ const n = numIn(st.t3.n, 1, 40, 10), col = cssCol(st.t3.c || 't:ac'); for (let i = 1; i <= n; i++) sd.push(`${i}px ${i}px 0 ${col}`); }
+  if (sd.length) c += `text-shadow:${sd.join(',')};`;
+  if (st.sc) c += 'font-variant-caps:small-caps;'; if (st.tt === 'cap') c += 'text-transform:capitalize;'; if (st.tt === 'low') c += 'text-transform:lowercase;';
+  if (st.ws) c += `word-spacing:${numIn(st.ws, -.3, 2)}em;`;
+  return c;
+}
+/* styles WordArt : [nom, effets, aperçu] — 't:' suit le thème */
+const WORDART = [
+  ['Aucun', {}], ['Néon', {fc:'t:on', tl:{b:14, c:'t:ac'}}], ['Contour', {to:{w:2, c:'t:ink', f:0}}], ['Dégradé', {tg:['t:ac', 't:ac2', 90]}], ['Arc-en-ciel', {tg:['#FF4D8D', '#FFC83D', 90, '#00C2FF']}],
+  ['Ombre dure', {tsd:{x:4, y:4, b:0, c:'t:ac', o:1}}], ['Extrusion', {t3:{n:12, c:'t:ac'}}], ['Rétro', {fc:'#FFFFFF', to:{w:3, c:'#16122B'}, tsd:{x:5, y:5, b:0, c:'#FF4D8D', o:1}}], ['Chrome', {tg:['#F4F7FB', '#7C8798', 180, '#DCE3EE'], to:{w:1, c:'#4B5466'}}],
+  ['Or', {tg:['#FFE08A', '#B7791F', 180, '#FFD34D']}], ['Feu', {tg:['#FFE259', '#FF3D2E', 180], tl:{b:10, c:'#FF7A00'}}], ['Glace', {tg:['#FFFFFF', '#5CC8FF', 180], tl:{b:10, c:'#38BDF8'}}],
+  ['Autocollant', {fc:'#16122B', to:{w:8, c:'#FFFFFF'}, tsd:{x:0, y:6, b:14, c:'#000000', o:.35}}], ['Verre', {fc:'#FFFFFF', to:{w:1.5, c:'#FFFFFF', f:0}, tsd:{x:0, y:6, b:18, c:'#000000', o:.3}}], ['Surbrillance', {fc:'#16122B', tsd:{x:0, y:0, b:0, c:'#FFD34D', o:1}, tl:{b:6, c:'#FFD34D'}}],
+];
+const WORDART_KEYS = ['tg', 'to', 'tl', 'tsd', 't3', 'sh'];
+/* nettoyage d'un élément venant de l'extérieur : valeurs bornées, couleurs vérifiées */
+function cleanFx(e){
+  const ok = c => isCol(c) ? c : undefined, col = (o, k, d) => ok(o?.[k]) || d;
+  if (e.fx && typeof e.fx === 'object'){
+    const f = e.fx, o = {};
+    if (f.sh && typeof f.sh === 'object') o.sh = {x:numIn(f.sh.x, -200, 200), y:numIn(f.sh.y, -200, 200), b:numIn(f.sh.b, 0, 200), c:col(f.sh, 'c', '#000000'), o:numIn(f.sh.o, 0, 1, .35)};
+    if (f.gl && typeof f.gl === 'object') o.gl = {b:numIn(f.gl.b, 0, 150, 20), c:col(f.gl, 'c', 't:ac'), o:numIn(f.gl.o, 0, 1, .9)};
+    for (const [k, a, b] of [['rf', 0, 1], ['bl', 0, 60], ['sf', 0, 200], ['rx', -70, 70], ['ry', -70, 70], ['br', 0, 250], ['ct', 0, 250], ['sa', 0, 300], ['hu', -180, 180]]) if (f[k] != null && isFinite(+f[k])) o[k] = numIn(f[k], a, b);
+    if (f.fh) o.fh = 1; if (f.fv) o.fv = 1;
+    if (Object.keys(o).length) e.fx = o; else delete e.fx;
+  } else delete e.fx;
+  if (e.gt && !['lin', 'rad', 'con'].includes(e.gt)) delete e.gt; if (e.g3 && !ok(e.g3)) delete e.g3; if (e.pc && !ok(e.pc)) delete e.pc; if (e.pat && !PATS[e.pat]) delete e.pat;
+  for (const k of ['ga', 'gx', 'gy', 'ps', 'po']) if (k in e) e[k] = numIn(e[k], k === 'ps' ? .5 : k === 'po' ? .05 : -720, k === 'ps' ? 4 : k === 'po' ? 1 : 720);
+  if (e.sd && !['dash', 'dot'].includes(e.sd)) delete e.sd;
+  if (e.alt != null) e.alt = String(e.alt).slice(0, 300); if (e.lk != null){ e.lk = String(e.lk).slice(0, 500); if (!/^(https?:\/\/|#\d+$)/i.test(e.lk)) delete e.lk; }
+  if (e.an && typeof e.an === 'object'){ const a = e.an; e.an = {k:String(a.k || '').replace(/[^\w]/g, '').slice(0, 20), click:!!a.click}; if (a.t === 'em' || a.t === 'out') e.an.t = a.t; if (a.dur) e.an.dur = numIn(a.dur, .1, 8, .7); if (a.del) e.an.del = numIn(a.del, 0, 20); if (a.ease && /^[\w-]+$/.test(a.ease)) e.an.ease = a.ease.slice(0, 12); if (a.rep) e.an.rep = numIn(a.rep, 1, 99, 1); if (a.loop) e.an.loop = 1; if (!e.an.k) delete e.an; }
+  const st = e.st; if (st){
+    if (Array.isArray(st.tg)){ const g = st.tg.slice(0, 4).map((c, i) => i === 2 ? numIn(c, 0, 360, 90) : ok(c)); if (g[0] && g[1]) st.tg = g.filter(x => x != null); else delete st.tg; } else delete st.tg;
+    if (st.to && typeof st.to === 'object') st.to = {w:numIn(st.to.w, 0, 24, 2), c:col(st.to, 'c', 't:ink'), f:st.to.f === 0 ? 0 : undefined}; else delete st.to;
+    if (st.tl && typeof st.tl === 'object') st.tl = {b:numIn(st.tl.b, 0, 80, 12), c:col(st.tl, 'c', 't:ac')}; else delete st.tl;
+    if (st.tsd && typeof st.tsd === 'object') st.tsd = {x:numIn(st.tsd.x, -60, 60), y:numIn(st.tsd.y, -60, 60), b:numIn(st.tsd.b, 0, 80), c:col(st.tsd, 'c', '#000000'), o:numIn(st.tsd.o, 0, 1, .4)}; else delete st.tsd;
+    if (st.t3 && typeof st.t3 === 'object') st.t3 = {n:numIn(st.t3.n, 1, 40, 10), c:col(st.t3, 'c', 't:ac')}; else delete st.t3;
+    if (st.tt && !['cap', 'low'].includes(st.tt)) delete st.tt; if (st.ws) st.ws = numIn(st.ws, -.3, 2);
+  }
+  return e;
+}
+
+/* ==== 44-anim.js ==== */
+/* ---------- Animations d'éléments (entrée, emphase, sortie), transitions et leur panneau ----------
+   Élément : an {k, click, dur (s), del (s), ease, rep, loop} · Diapositive : tr (transition), trd (durée, s), an (apparition automatique), adv (avance seule après n s) */
+const EASES = {soft:['Douce', 'cubic-bezier(.2,.75,.25,1)'], lin:['Linéaire', 'linear'], bounce:['Rebond', 'cubic-bezier(.34,1.56,.64,1)'], elastic:['Élastique', 'cubic-bezier(.68,-.55,.27,1.55)'], acc:['Accélérée', 'cubic-bezier(.5,0,1,.5)'], inout:['Progressive', 'ease-in-out']};
+/* [clé, nom, type, keyframes, durée, courbe] */
+const ANIM_LIST = [
+  ['fade', 'Fondu', 'in', 'an-fade', .7], ['rise', 'Monter', 'in', 'an-rise', .7], ['drop', 'Descendre', 'in', 'an-drop', .7], ['left', 'Glisser', 'in', 'an-left', .7], ['right', 'Glisser à gauche', 'in', 'an-right', .7],
+  ['zoom', 'Zoom', 'in', 'an-zoom', .7], ['grow', 'Grandir', 'in', 'an-grow', .7], ['pop', 'Rebond', 'in', 'an-pop', .75], ['bounce', 'Chute rebondie', 'in', 'an-bounce', .95, 'linear'], ['swing', 'Balancier', 'in', 'an-swing', .9],
+  ['flip', 'Retourner', 'in', 'an-flip', .8], ['spin', 'Tourbillon', 'in', 'an-spin', .9], ['stretch', 'Étirer', 'in', 'an-stretch', .7], ['wipe', 'Balayage', 'in', 'an-wipe', .9], ['wipev', 'Rideau', 'in', 'an-wipev', .9], ['blur', 'Mise au point', 'in', 'an-blur', .9], ['type', 'Machine à écrire', 'in', 'an-wipe', 1.4, 'steps(28)'],
+  ['pulse', 'Pulsation', 'em', 'an-pulse', .8], ['beat', 'Battement', 'em', 'an-beat', 1], ['shake', 'Secousse', 'em', 'an-shake', .7], ['wobble', 'Vacillement', 'em', 'an-wobble', 1], ['tada', 'Tada', 'em', 'an-tada', 1], ['jello', 'Gélatine', 'em', 'an-jello', 1], ['flash', 'Clignotement', 'em', 'an-flash', 1], ['turn', 'Tour complet', 'em', 'an-turn', 1, 'inout'], ['float', 'Flottement', 'em', 'an-float', 2.4, 'inout'],
+  ['fadeout', 'Fondu de sortie', 'out', 'an-fadeout', .6], ['zoomout', 'Zoom arrière', 'out', 'an-zoomout', .6], ['shrink', 'Disparaître', 'out', 'an-shrink', .6], ['fall', 'Chute', 'out', 'an-fall', .8, 'acc'], ['slideout', 'Sortir', 'out', 'an-slideout', .6], ['spinout', 'Tourbillon de sortie', 'out', 'an-spinout', .8], ['blurout', 'Flou de sortie', 'out', 'an-blurout', .7],
+];
+const ANIM_BY = Object.fromEntries(ANIM_LIST.map(a => [a[0], a]));
+const ANIM_TYPES = [['in', 'Entrée'], ['em', 'Emphase'], ['out', 'Sortie']];
+const TRANS = [['', 'Aucune'], ['fade', 'Fondu'], ['slide', 'Glisser'], ['push', 'Pousser'], ['zoom', 'Zoom'], ['flip', 'Retourner'], ['wipe', 'Balayer'], ['rise', 'Monter'], ['blur', 'Flou'],
+  ['cube', 'Cube'], ['circle', 'Iris'], ['diamond', 'Losange'], ['curtain', 'Rideau'], ['split', 'Ouverture'], ['blinds', 'Stores'], ['uncover', 'Découvrir'], ['spin', 'Rotation'], ['fall', 'Chute'], ['roll', 'Rouleau']];
+const SLIDE_ANIMS = [['', 'Aucune'], ['rise', 'Cascade'], ['fade', 'Fondu'], ['pop', 'Rebond'], ['zoom', 'Zoom'], ['left', 'Glisser'], ['grow', 'Grandir'], ['blur', 'Mise au point'], ['flip', 'Retourner']];
+const isCoverEl = (e, W, H) => (e.t === 'img' && e.w >= W * .95) || (e.t === 'shape' && e.w >= W * .95 && e.h >= H * .95);
+/* applique une animation à un nœud : variables CSS lues par .an-run */
+function animSet(n, an, delayMs){
+  const def = ANIM_BY[an.k]; if (!def) return false;
+  n.dataset.an = an.k; n.dataset.at = def[2];
+  n.style.setProperty('--an', def[3]); n.style.setProperty('--dur', (an.dur ?? def[4]) + 's');
+  n.style.setProperty('--ease', EASES[an.ease]?.[1] || def[5] || EASES.soft[1]); n.style.setProperty('--rep', an.loop ? 'infinite' : String(an.rep || 1));
+  n.style.setProperty('--d', Math.round(delayMs + (an.del || 0) * 1000) + 'ms'); return true;
+}
+function animClear(n){ n.classList.remove('an-run', 'an-wait'); ['an', 'at'].forEach(k => delete n.dataset[k]); ['--an', '--dur', '--ease', '--rep', '--d'].forEach(k => n.style.removeProperty(k)); }
+function previewAnim(list){
+  list.forEach((e, i) => { const n = elNode(e.id); if (!n || !e.an?.k) return; const a = e.an; n.classList.remove('an-run', 'an-wait'); void n.offsetWidth; if (!animSet(n, a, i * 90)) return; n.classList.add('an-run');
+    setTimeout(() => animClear(n), ((a.dur ?? ANIM_BY[a.k][4]) * (a.rep || 1) + (a.del || 0)) * 1000 + 600 + i * 90); });
+}
+function previewSlideAnim(){
+  const s = cur(), [W, H] = dims(); let i = 0;
+  [...s.els].sort((a, b) => (a.y - b.y) || (a.x - b.x)).forEach(e => { const k = e.an?.k || s.an; if (!k || !ANIM_BY[k] || (!e.an?.k && isCoverEl(e, W, H))) return; const n = elNode(e.id); if (!n) return;
+    animClear(n); void n.offsetWidth; const a = e.an?.k ? e.an : {k}; animSet(n, a, i++ * 110 + 120); n.classList.add('an-run'); setTimeout(() => animClear(n), 2600 + i * 110); });
+}
+function animPanelHTML(){
+  const s = cur(), l = selEls(), e = l[0], a = e?.an || {}, def = ANIM_BY[a.k], rg = (k, t, min, max, step, v, u) => `<label class="pn-rg"><span>${t} <b id="${k}V">${v}${u}</b></span><input type="range" data-ak="${k}" min="${min}" max="${max}" step="${step}" value="${v}"></label>`;
+  let h = `<h4 class="pn-h">Transition vers cette diapositive</h4><div class="pn-chips big">${TRANS.map(([k, t]) => `<button type="button" data-tr="${k}" aria-pressed="${(s.tr || '') === k}">${t}</button>`).join('')}</div>
+    ${s.tr ? `<div class="pn-grid2">${rg('trd', 'Durée', .2, 3, .1, s.trd ?? .7, ' s')}</div>` : ''}
+    <div class="pn-grid2"><label class="pn-num"><span>Avancer seule après</span><input type="number" min="0" max="600" step="1" placeholder="Au clic" data-ak="adv" value="${s.adv || ''}"><em>s</em></label>
+    <label class="pop-toggle"><input type="checkbox" data-ak="loop" ${D.loop ? 'checked' : ''}><div><b>Boucle</b><small>Recommencer à la fin</small></div></label></div>
+    <h4 class="pn-h">Apparition des éléments <small>automatique, l'un après l'autre</small></h4><div class="pn-chips big">${SLIDE_ANIMS.map(([k, t]) => `<button type="button" data-san="${k}" aria-pressed="${(s.an || '') === k}">${t}</button>`).join('')}</div>`;
+  if (l.length){
+    h += `<h4 class="pn-h">Élément sélectionné <small>prioritaire sur l'apparition automatique</small></h4>`
+      + ANIM_TYPES.map(([ty, tn]) => `<p class="pn-sub">${tn}</p><div class="pn-chips big">${ty === 'in' ? `<button type="button" data-ean="" aria-pressed="${!a.k}">Aucune</button>` : ''}${ANIM_LIST.filter(x => x[2] === ty).map(x => `<button type="button" data-ean="${x[0]}" aria-pressed="${a.k === x[0]}">${x[1]}</button>`).join('')}</div>`).join('');
+    if (def) h += `<div class="pn-box"><label class="pop-toggle"><input type="checkbox" data-ak="click" ${a.click ? 'checked' : ''}><div><b>Au clic</b><small>${def[2] === 'in' ? 'Apparaît quand vous avancez' : 'Se déclenche quand vous avancez'}</small></div></label>
+      <div class="pn-grid2">${rg('dur', 'Durée', .1, 5, .1, a.dur ?? def[4], ' s')}${rg('del', 'Délai', 0, 8, .1, a.del || 0, ' s')}</div>
+      <div class="pn-grid2"><label class="pn-num"><span>Courbe</span><select data-ak="ease">${Object.entries(EASES).map(([k, v]) => `<option value="${k}" ${(a.ease || '') === k ? 'selected' : ''}>${v[0]}</option>`).join('')}<option value="" ${!a.ease ? 'selected' : ''}>Par défaut</option></select></label>
+      <label class="pn-num"><span>Répéter</span><select data-ak="rep">${[1, 2, 3, 5].map(n => `<option value="${n}" ${!a.loop && (a.rep || 1) === n ? 'selected' : ''}>${n} fois</option>`).join('')}<option value="inf" ${a.loop ? 'selected' : ''}>En boucle</option></select></label></div></div>`;
+  }
+  return h + `<div class="pn-acts"><button type="button" class="pn-wide" data-a="preview">${ICX.present} Aperçu</button><button type="button" class="pn-wide" data-a="all">${IC.copy} Appliquer à toutes les diapositives</button><button type="button" class="pn-wide" data-a="magic">${ICX.fx} Animer toute la présentation</button><button type="button" class="pn-wide" data-a="none">${IC.trash} Retirer toutes les animations</button></div>`;
+}
+/* réglages du panneau Animer (curseurs, listes, cases) */
+function animPanelInput(ev, final){
+  const t = ev.target, k = t.dataset.ak; if (!k || V.ro) return; const s = cur(), v = t.type === 'checkbox' ? t.checked : t.value;
+  const show = (id, txt) => { const o = g$(id); if (o) o.textContent = txt; };
+  if (k === 'trd'){ s.trd = +v === .7 ? undefined : +v; show('trdV', (+v).toFixed(1) + ' s'); if (final) commit('Durée de la transition'); return; }
+  if (k === 'adv'){ s.adv = +v > 0 ? clamp(+v, 1, 600) : undefined; if (final) commit('Avance automatique'); return; }
+  if (k === 'loop'){ D.loop = v || undefined; commit('Boucle'); return; }
+  const l = selEls().filter(e => e.an); if (!l.length) return;
+  l.forEach(e => { const a = e.an;
+    if (k === 'click') a.click = !!v; else if (k === 'dur'){ a.dur = +v; show('durV', (+v).toFixed(1) + ' s'); } else if (k === 'del'){ a.del = +v || undefined; show('delV', (+v).toFixed(1) + ' s'); }
+    else if (k === 'ease') a.ease = v || undefined; else if (k === 'rep'){ if (v === 'inf'){ a.loop = 1; delete a.rep; } else { delete a.loop; a.rep = +v > 1 ? +v : undefined; } } });
+  if (final){ commit('Animation'); previewAnim(l); }
 }
 
 /* ==== 45-templates.js ==== */
@@ -2297,7 +2619,7 @@ window.SW_TEMPLATES = SS_TEMPLATES.map(t => ({id:t.id, name:t.name, cat:t.cat, d
 /* ==== 50-stage.js ==== */
 /* ---------- La scène : la diapositive au centre, sélection, déplacement, redimensionnement, rotation, repères, édition du texte ---------- */
 const g$ = id => document.getElementById(id);
-const V = {z:1, zoom:0, ro:false};          // zoom 0 = ajusté à la fenêtre
+const V = {z:1, zoom:0, ro:false, grid:false, snapGrid:false, guides:false, ...(lsGet('ss.view') || {})};          // zoom 0 = ajusté à la fenêtre
 const DRAG = {mode:null};
 let EDT = null;                              // élément dont le texte est en cours d'édition : {id, node}
 const PAD = () => innerWidth < 760 ? 14 : 44;
@@ -2309,7 +2631,7 @@ function stageFit(){
 function layoutStage(){
   const [W, H] = dims(), fit = stageFit(); V.z = V.zoom ? V.zoom : fit;
   const host = g$('slideHost'), st = g$('stage');
-  host.style.width = Math.round(W * V.z) + 'px'; host.style.height = Math.round(H * V.z) + 'px';
+  host.style.setProperty('--z', V.z); host.style.width = Math.round(W * V.z) + 'px'; host.style.height = Math.round(H * V.z) + 'px';
   g$('slideView').style.transform = `scale(${V.z})`;
   const inn = g$('stageIn'); const padB = innerWidth < 760 ? 140 : 110;
   inn.style.width = Math.max(st.clientWidth, Math.round(W * V.z) + PAD() * 2) + 'px';
@@ -2322,7 +2644,7 @@ function renderStage(){
   if (EDT) stopEdit(true);
   layoutStage();
   g$('slideView').innerHTML = renderSlide(cur(), {edit:true});
-  fitTexts(); renderSel(); updateStat();
+  fitTexts(); renderSel(); updateStat(); applyView();
 }
 /* la hauteur d'un texte suit son contenu (jamais tronqué) */
 function fitTexts(ids){
@@ -2377,6 +2699,7 @@ function snapMove(b, dx, dy, skip){
   const xs = [0, W / 2, W, M, W - M], ys = [0, H / 2, H, Math.round(64 * H / 720), H - M];
   for (const e of cur().els){ if (skip.has(e.id)) continue; const r = bbox([e]); xs.push(r.x, r.x + r.w / 2, r.x + r.w); ys.push(r.y, r.y + r.h / 2, r.y + r.h); }
   const nx = b.x + dx, ny = b.y + dy, gd = []; let best = null;
+  if (V.snapGrid){ const g = 20; [nx, nx + b.w / 2, nx + b.w].forEach(c => xs.push(Math.round(c / g) * g)); [ny, ny + b.h / 2, ny + b.h].forEach(c => ys.push(Math.round(c / g) * g)); }
   for (const [off, cand] of [[0, nx], [b.w / 2, nx + b.w / 2], [b.w, nx + b.w]]) for (const t of xs){ const d = t - cand; if (Math.abs(d) <= th && (!best || Math.abs(d) < Math.abs(best.d))) best = {d, p:t}; }
   let bestY = null;
   for (const cand of [ny, ny + b.h / 2, ny + b.h]) for (const t of ys){ const d = t - cand; if (Math.abs(d) <= th && (!bestY || Math.abs(d) < Math.abs(bestY.d))) bestY = {d, p:t}; }
@@ -2546,7 +2869,7 @@ function addText(kind = 'body'){
   addEls([e], name); setTimeout(() => startEdit(e.id, 'all'), 30);
 }
 function addShape(k){
-  const s = k === 'line' || k === 'arrowline' ? null : (k === 'pill' ? [320, 110] : k === 'arrow' || k === 'chev' ? [300, 160] : k === 'bubble' ? [300, 220] : [240, 240]);
+  const s = k === 'line' || k === 'arrowline' ? null : (SHAPE_SIZES[k] || [240, 240]);
   if (!s){ const p = centerBox(400, 20); return addEls([LN(p.x, p.y + 10, 400, 't:ink', 4, {k, a2:k === 'arrowline' ? 'arrow' : ''})], 'Ligne'); }
   const p = centerBox(s[0], s[1]); addEls([SH(k, p.x, p.y, s[0], s[1], 't:ac', k === 'round' ? {r:24} : {})], SHAPES[k]?.[0] || 'Forme');
 }
@@ -2806,6 +3129,7 @@ let popClose = null;
 function openPop(anchor, html, wire, cls = ''){
   closePop(); const p = g$('edPop'); p.className = 'pop ' + cls; p.innerHTML = html; p.hidden = false;
   const r = anchor.getBoundingClientRect ? anchor.getBoundingClientRect() : {left:anchor.x, right:anchor.x, top:anchor.y, bottom:anchor.y};
+  p.style.maxHeight = Math.max(240, innerHeight - 100) + 'px'; p.style.overflowY = 'auto';
   const w = p.offsetWidth, h = p.offsetHeight;
   p.style.left = clamp(r.left, 8, innerWidth - w - 8) + 'px'; p.style.top = (r.bottom + h + 8 > innerHeight ? Math.max(8, r.top - h - 8) : r.bottom + 6) + 'px';
   wire && wire(p);
@@ -2893,35 +3217,6 @@ function posPop(anchor){
     <button type="button" data-x="lock">${iconSVG('lock')}${l.every(e => e.lock) ? 'Déverrouiller' : 'Verrouiller la position'}</button></div>`, p => {
     p.onclick = e => { const a = e.target.closest('[data-al]'), y = e.target.closest('[data-ly]'), x = e.target.closest('[data-x]'); if (!a && !y && !x) return; closePop();
       if (a) alignSel(a.dataset.al); if (y) layer(y.dataset.ly); if (x?.dataset.x === 'group') groupSel(); if (x?.dataset.x === 'ungroup') ungroupSel(); if (x?.dataset.x === 'lock') lockSel(); };
-  }, 'wide');
-}
-const ANIMS = [['', 'Aucune'], ['fade', 'Fondu'], ['rise', 'Monter'], ['drop', 'Descendre'], ['left', 'Glisser'], ['zoom', 'Zoom'], ['pop', 'Rebond'], ['wipe', 'Balayage'], ['blur', 'Mise au point'], ['type', 'Machine à écrire']];
-function animPop(anchor){
-  const l = selEls(); if (!l.length) return; const an = l[0].an || {};
-  openPop(anchor, `<p class="pop-h">Animation d'entrée <small>pendant la présentation</small></p><div class="pop-chips">${ANIMS.map(([k, t]) => `<button type="button" data-an="${k}" aria-pressed="${(an.k || '') === k}">${t}</button>`).join('')}</div>
-    <div class="pop-list"><hr><label class="pop-toggle"><input type="checkbox" id="anClick" ${an.click ? 'checked' : ''}><div><b>Au clic</b><small>Apparaît quand vous avancez, au lieu d'apparaître tout seul</small></div></label></div>`, p => {
-    p.onclick = e => { const b = e.target.closest('[data-an]'); if (!b) return; const k = b.dataset.an; setProps(x => { if (!k) delete x.an; else x.an = {k, click:p.querySelector('#anClick').checked}; }, 'Animation', false); p.querySelectorAll('[data-an]').forEach(x => x.setAttribute('aria-pressed', x === b)); if (k) previewAnim(selEls()); };
-    p.querySelector('#anClick').onchange = e => setProps(x => { if (x.an) x.an.click = e.target.checked; }, 'Animation au clic', false);
-  });
-}
-function previewAnim(list){ list.forEach((e, i) => { const n = elNode(e.id); if (!n || !e.an) return; n.classList.remove('an-run'); n.style.removeProperty('--d'); void n.offsetWidth; n.dataset.an = e.an.k; n.style.setProperty('--d', i * 90 + 'ms'); n.classList.add('an-run'); setTimeout(() => { n.classList.remove('an-run'); delete n.dataset.an; }, 1400 + i * 90); }); }
-/* fond de la diapositive */
-function bgPop(anchor){
-  const s = cur(), sv = curVars();
-  openPop(anchor, `<p class="pop-h">Fond de la diapositive</p><div class="pop-sw">${['', 't:soft', 't:ac', 't:ac2', 't:ink', ...STD_COLORS.slice(0, 7)].map(c => `<button type="button" data-c="${c}" title="${c ? T_NAMES[c] || c : 'Fond du thème'}" style="background:${c ? realCol(c, sv) : `linear-gradient(135deg,${sv.bg} 50%,${sv.soft} 50%)`}"${(s.bg?.c || '') === c && !s.bg?.g && !s.bg?.img ? ' class="on"' : ''}></button>`).join('')}</div>
-    <p class="pop-h">Dégradés</p><div class="pop-sw grad">${GRADS.map((g, i) => `<button type="button" data-g="${i}" style="background:linear-gradient(135deg,${realCol(g[0], sv)},${realCol(g[1], sv)})"></button>`).join('')}</div>
-    <div class="pop-list"><hr><button type="button" data-b="img">${IC.img}Image de fond…</button>${s.bg?.img ? `<label class="pop-toggle"><input type="range" id="bgDim" min="0" max=".8" step=".05" value="${s.bg.dim || 0}"><div><b>Assombrir l'image</b></div></label>` : ''}
-    <label class="pop-toggle"><input type="checkbox" id="bgDeco" ${s.nodeco ? '' : 'checked'}><div><b>Décor du thème</b><small>Les formes dessinées par le thème</small></div></label>
-    <button type="button" data-b="custom">${IC.color}Couleur personnalisée…</button><button type="button" data-b="all">${IC.copy}Appliquer ce fond à toutes les diapositives</button></div>`, p => {
-    p.onclick = e => { const c = e.target.closest('[data-c]'), g = e.target.closest('[data-g]'), b = e.target.closest('[data-b]');
-      if (c){ closePop(); s.bg = c.dataset.c ? {c:c.dataset.c} : undefined; if (!s.bg) delete s.bg; renderAll(); commit('Fond'); }
-      if (g){ closePop(); s.bg = {g:GRADS[+g.dataset.g], a:135}; renderAll(); commit('Fond dégradé'); }
-      if (b?.dataset.b === 'img'){ closePop(); imgTarget = '@bg'; g$('edImgFile').click(); }
-      if (b?.dataset.b === 'custom'){ colorPop(anchor, s.bg?.c, v => { if (v){ s.bg = {c:v}; renderAll(); commit('Fond'); } }, {none:false}); }
-      if (b?.dataset.b === 'all'){ closePop(); D.slides.forEach(x => { if (x !== s){ if (s.bg) x.bg = JSON.parse(JSON.stringify(s.bg)); else delete x.bg; x.nodeco = s.nodeco; } }); renderAll(); commit('Fond pour toutes'); toast('Fond appliqué à toutes les diapositives'); } };
-    p.querySelector('#bgDeco').onchange = e => { s.nodeco = !e.target.checked || undefined; renderAll(); commit('Décor'); };
-    p.querySelector('#bgDim')?.addEventListener('input', e => { s.bg.dim = +e.target.value; renderStage(); });
-    p.querySelector('#bgDim')?.addEventListener('change', () => { commit('Fond'); renderRail(true); });
   }, 'wide');
 }
 function layoutMini(k){
@@ -3047,13 +3342,14 @@ function chartTypePop(anchor){
   });
 }
 /* ---------- La barre Prisme ---------- */
-const RAYS = [['insert', 'Insérer', 'plus', '#7B3FF2'], ['design', 'Design', 'palette', '#12B5E5'], ['layout', 'Mises en page', 'grid', '#2FBF71'], ['anim', 'Animer', 'sparkle', '#F5B82E'], ['templates', 'Modèles', 'layers', '#F2387A']];
+const RAYS = [['insert', 'Insérer', 'plus', '#7B3FF2'], ['design', 'Design', 'palette', '#12B5E5'], ['layout', 'Mises en page', 'grid', '#2FBF71'], ['anim', 'Animer', 'sparkle', '#F5B82E'], ['format', 'Format', 'tool', '#E5484D'], ['templates', 'Modèles', 'layers', '#F2387A']];
 const ICX = {
   shape:'<svg viewBox="0 0 24 24"><circle cx="8.5" cy="8.5" r="5"/><rect x="11" y="11" width="9" height="9" rx="1.5"/></svg>', text:'<svg viewBox="0 0 24 24"><path d="M5 6V4h14v2M12 4v16M9 20h6"/></svg>',
   slide:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M12 9v4M10 11h4"/></svg>', layout:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M10 9v11"/></svg>',
   bg:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m3 16 5-5 4 4 3-3 6 6"/></svg>', present:'<svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg>',
   op:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>', pos:'<svg viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 13h7v7h-7z"/><path d="M15 4h5v5M9 20H4v-5"/></svg>',
   anim:'<svg viewBox="0 0 24 24"><path d="M5 19c2-6 5-9 14-14M14 5h5v5"/><circle cx="6" cy="18" r="1.5"/></svg>', fx:'<svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>',
+  fmt:'<svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>',
   stroke:'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3" stroke-dasharray="3 2.5"/></svg>', crop:'<svg viewBox="0 0 24 24"><path d="M6 2v16h16M2 6h16v16"/></svg>',
   filter:'<svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="5"/><circle cx="15" cy="10" r="5"/><circle cx="12" cy="15" r="5"/></svg>', mask:'<svg viewBox="0 0 24 24"><path d="M12 3l8.7 5v8L12 21l-8.7-5V8z"/></svg>',
   replace:'<svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 14-5.3L20 8M20 4v4h-4M20 12a8 8 0 0 1-14 5.3L4 16M4 20v-4h4"/></svg>', data:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/></svg>',
@@ -3072,7 +3368,7 @@ function refreshToolbar(){
     <div class="tg">${tb('b', IC.b, 'Gras (Ctrl + B)', st.b ? ' aria-pressed="true"' : '')}${tb('i', IC.i, 'Italique (Ctrl + I)', st.i ? ' aria-pressed="true"' : '')}${tb('u', IC.u, 'Souligné (Ctrl + U)', st.u ? ' aria-pressed="true"' : '')}
       <button type="button" class="tb" data-k="fc" title="Couleur du texte">${colI('fc', st.fc || 't:ink')}</button></div>
     <div class="tg">${tb('align', IC[{l:'al', c:'ac', r:'ar', j:'aj'}[st.ha || 'l']], 'Alignement')}${tb('list', IC.ul, 'Liste à puces')}${tb('spacing', IC.spacing, 'Espacement')}${tb('fx', ICX.fx, 'Effets du texte')}</div>`;
-  const common = `<div class="tg">${tb('op', ICX.op, 'Transparence et ombre')}${tb('anim', ICX.anim, 'Animation', e?.an ? ' aria-pressed="true"' : '')}${tb('pos', ICX.pos, 'Position, alignement et plans')}${tb('dup', IC.copy, 'Dupliquer (Ctrl + D)')}${tb('del', IC.trash, 'Supprimer (Suppr)')}</div>`;
+  const common = `<div class="tg">${tb('fmt', ICX.fmt, 'Format et effets')}${tb('op', ICX.op, 'Transparence et ombre')}${tb('anim', ICX.anim, 'Animation', e?.an ? ' aria-pressed="true"' : '')}${tb('pos', ICX.pos, 'Position, alignement et plans')}${tb('dup', IC.copy, 'Dupliquer (Ctrl + D)')}${tb('del', IC.trash, 'Supprimer (Suppr)')}</div>`;
   if (k === 'slide'){
     h += `<div class="tg"><button type="button" class="tb tb-txt" data-k="newslide" title="Nouvelle diapositive (Ctrl + M)">${ICX.slide}<span>Diapo</span></button>${tb('layout', ICX.layout, 'Mise en page')}${tb('bg', ICX.bg, 'Fond de la diapositive')}</div>
       <div class="tg">${tb('text', ICX.text, 'Ajouter du texte (T)')}${tb('shape', ICX.shape, 'Ajouter une forme')}${tb('img', IC.img, 'Ajouter une image')}${tb('icon', iconSVG('star'), 'Ajouter une icône')}${tb('table', IC.table, 'Ajouter un tableau')}${tb('chart', iconSVG('chart'), 'Ajouter un graphique')}</div>`;
@@ -3091,14 +3387,15 @@ function refreshToolbar(){
   const fi = g$('fsIn'); if (fi){ fi.onkeydown = ev => { ev.stopPropagation(); if (ev.key === 'Enter'){ ev.preventDefault(); const v = +fi.value.replace(',', '.'); if (v > 0) setSt({fs:clamp(v, 4, 600)}, 'Taille du texte'); fi.blur(); } }; fi.onmousedown = ev => ev.stopPropagation(); }
   bar.querySelector('[data-k="undo"]').disabled = UNDO.i <= 0; bar.querySelector('[data-k="redo"]').disabled = UNDO.i >= UNDO.list.length - 1;
   updateStat();
+  if (panel === 'format' && !g$('edPanel').hidden) renderPanel();
 }
 function onToolbar(ev){
   const b = ev.target.closest('[data-k]'); if (!b || b.disabled) return; const k = b.dataset.k, l = selEls(), e = l[0];
   const A = {
-    undo, redo, newslide:() => layoutPop(b, true), layout:() => layoutPop(b, false), bg:() => bgPop(b), text:() => addText('body'), shape:() => shapePop(b), img:() => pickImage(), icon:() => iconPop(b), table:() => tablePop(b), chart:() => chartAddPop(b), present:() => present(CUR),
+    undo, redo, newslide:() => layoutPop(b, true), layout:() => layoutPop(b, false), bg:() => openPanel('format'), text:() => addText('body'), shape:() => shapePop(b), img:() => pickImage(), icon:() => iconPop(b), table:() => tablePop(b), chart:() => chartAddPop(b), present:() => present(CUR),
     font:() => fontPop(b), 'fs-':() => sizeStep(-1), 'fs+':() => sizeStep(1), b:() => setSt({b:e?.st?.b ? null : 1}, 'Gras'), i:() => setSt({i:e?.st?.i ? null : 1}, 'Italique'), u:() => setSt({u:e?.st?.u ? null : 1}, 'Souligné'),
     fc:() => colorPop(b, e?.st?.fc, v => setSt({fc:v || 't:ink'}, 'Couleur du texte'), {noneLabel:'Automatique'}), align:() => alignPop(b), list:toggleList, spacing:() => spacingPop(b), fx:() => effectsPop(b),
-    op:() => opacityPop(b), anim:() => animPop(b), pos:() => posPop(b), dup:dupSel, del:delSel, group:groupSel,
+    fmt:() => openPanel('format'), op:() => opacityPop(b), anim:() => openPanel('anim'), pos:() => posPop(b), dup:dupSel, del:delSel, group:groupSel,
     fill:() => colorPop(b, e.fill, (v, g) => setProps(x => { if (g){ x.fill = g[0]; x.g2 = g[1]; } else { x.fill = v || ''; delete x.g2; } }, 'Remplissage'), {grad:true}),
     stroke:() => strokePop(b), shapek:() => shapePop(b, true), addtxt:() => startEdit(e.id),
     lcol:() => colorPop(b, e.stroke, v => setProps(x => { x.stroke = v || 't:ink'; }, 'Couleur'), {none:false}), lstyle:() => linePop(b),
@@ -3117,10 +3414,13 @@ function toggleList(){
   else { const lines = (e.html || '').split(/<br\s*\/?>/).map(x => x.trim()).filter(Boolean); e.html = `<ul>${(lines.length ? lines : ['']).map(x => `<li>${x}</li>`).join('')}</ul>`; }
   updateEl(e, true); fitTexts([e.id]); renderSel(); commit(isList ? 'Retirer la liste' : 'Liste à puces'); refreshToolbar();
 }
+function shapeGroupsHTML(change, attr, cls = 'pop-shapes', color = ''){
+  return SHAPE_GROUPS.map(([t, ks]) => { const l = ks.filter(k => !change || (k !== 'line' && k !== 'arrowline')); return l.length ? `<p class="pop-h">${t}</p><div class="${cls}">${l.map(k => `<button type="button" ${attr}="${k}" title="${escH(SHAPES[k][0])}"${color}>${shapeIcon(k)}</button>`).join('')}</div>` : ''; }).join('');
+}
 function shapePop(anchor, change){
-  openPop(anchor, `<p class="pop-h">${change ? 'Changer de forme' : 'Formes'}</p><div class="pop-shapes">${SHAPE_ORDER.filter(k => !change || (k !== 'line' && k !== 'arrowline')).map(k => `<button type="button" data-sh="${k}" title="${escH(SHAPES[k][0])}">${shapeIcon(k)}</button>`).join('')}</div>`, p => {
+  openPop(anchor, shapeGroupsHTML(change, 'data-sh'), p => {
     p.onclick = e => { const b = e.target.closest('[data-sh]'); if (!b) return; closePop(); if (change) setProps(x => { x.k = b.dataset.sh; }, 'Forme'); else addShape(b.dataset.sh); };
-  }, 'wide');
+  }, 'wide shapes');
 }
 function shapeIcon(k){
   if (k === 'line') return '<svg viewBox="0 0 40 40"><path d="M4 20h32" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>';
@@ -3157,7 +3457,7 @@ function ctxMenu(ev){
   openPop(anchor, html, p => { p.onclick = e => { const b = e.target.closest('[data-cm]'); if (!b || b.disabled) return; closePop(); const k = b.dataset.cm;
     if (k === 'cut') copySel(null, true); else if (k === 'copy') copySel(); else if (k === 'paste') pasteEls(); else if (k === 'dup') dupSel(); else if (k === 'front' || k === 'back') layer(k);
     else if (k === 'group') groupSel(); else if (k === 'ungroup') ungroupSel(); else if (k === 'lock') lockSel(); else if (k === 'del') delSel(); else if (k === 'anim') animPop(anchor);
-    else if (k === 'layout') layoutPop(anchor); else if (k === 'bg') bgPop(anchor); else if (k === 'newslide') layoutPop(anchor, true); else if (k === 'dupslide') dupSlide();
+    else if (k === 'layout') layoutPop(anchor); else if (k === 'bg') openPanel('format'); else if (k === 'newslide') layoutPop(anchor, true); else if (k === 'dupslide') dupSlide();
     else if (k === 'rimg') pickImage(selEls()[0]?.id); else if (k === 'align') alignObjPop(anchor); else if (k === 'present') present(CUR); else if (k === 'hideslide') toggleHide(); }; }, 'menu');
 }
 /* aligner sur la diapositive (un élément) ou entre eux (plusieurs) ; répartir à partir de 3 éléments */
@@ -3170,13 +3470,15 @@ function alignObjPop(anchor){
 /* ---------- Tiroirs : Insérer, Design, Mises en page, Animer, Modèles ---------- */
 let panel = null;
 function openPanel(k){
-  if (panel === k || !k){ panel = null; g$('edPanel').hidden = true; g$('edRail').querySelectorAll('.ray').forEach(r => r.setAttribute('aria-pressed', 'false')); return; }
-  panel = k; const p = g$('edPanel'); p.hidden = false; const ray = RAYS.find(r => r[0] === k); p.style.setProperty('--ray', ray[3]);
+  const sideChange = () => { const on = !!panel && SIDE_PANELS.includes(panel) && !g$('edPanel').hidden; if (g$('app').classList.contains('has-side') !== on){ g$('app').classList.toggle('has-side', on); layoutStage(); renderSel(); } };
+  if (panel === k || !k){ panel = null; g$('edPanel').hidden = true; g$('edRail').querySelectorAll('.ray').forEach(r => r.setAttribute('aria-pressed', 'false')); sideChange(); return; }
+  panel = k; const p = g$('edPanel'); p.hidden = false; p.classList.toggle('side', SIDE_PANELS.includes(k)); const ray = RAYS.find(r => r[0] === k); p.style.setProperty('--ray', ray[3]);
   g$('edRail').querySelectorAll('.ray').forEach(r => r.setAttribute('aria-pressed', r.dataset.panel === k));
-  renderPanel();
+  renderPanel(); sideChange();
 }
+const SIDE_PANELS = ['format', 'anim'];
 const PANEL_SUB = {insert:'Textes, formes, icônes, images, tableaux et graphiques', design:'Thème, couleurs, polices et format de toute la présentation', layout:'Réorganisez la diapositive en un clic : le contenu est conservé',
-  anim:'Transitions entre diapositives et apparition des éléments', templates:'Partez d\'une présentation conçue par Studio Prism'};
+  anim:'Transitions, apparition, emphase et sortie des éléments', format:'Position, remplissage, ombres, effets de texte et fond', templates:'Partez d\'une présentation conçue par Studio Prism'};
 const BLOCKS = [['stat', 'Chiffre clé'], ['badge', 'Pastille'], ['cta', 'Bouton'], ['iconcard', 'Carte avec icône'], ['numbered', 'Point numéroté'], ['progress', 'Barre de progression'], ['divider', 'Séparateur'], ['quoteb', 'Citation']];
 function blockEls(k){
   const [W, H] = dims(), g = 'g' + uidS(), at = (w, h) => centerBox(w, h);
@@ -3197,8 +3499,6 @@ function themeCard(t){
 }
 const PALETTES = [['#6D3BFF', '#00A6E8', '#FF4D8D'], ['#0A5E8E', '#03A2AC', '#F2A541'], ['#E8505B', '#F9A26C', '#14B8A6'], ['#2F7D4E', '#8BBF6A', '#E0A526'], ['#1D4ED8', '#F59E0B', '#10B981'], ['#7C3AED', '#EC4899', '#F59E0B'], ['#0F766E', '#F97316', '#64748B'], ['#B42318', '#1D2939', '#E8A33D'], ['#111827', '#6B7280', '#EF4444'], ['#9A7B4F', '#2E2A26', '#C9A96E'], ['#00E5FF', '#FF2BD6', '#C6FF3D'], ['#E63946', '#1D4ED8', '#F4B400']];
 const PAIRS = [['Bricolage Grotesque', 'Inter'], ['Outfit', 'Inter'], ['Sora', 'Inter'], ['Montserrat', 'Inter'], ['Syne', 'Space Grotesk'], ['Unbounded', 'DM Sans'], ['Fraunces', 'DM Sans'], ['Playfair Display', 'Lora'], ['Instrument Serif', 'DM Sans'], ['DM Serif Display', 'Source Serif 4'], ['Manrope', 'Manrope'], ['Poppins', 'Poppins'], ['Caveat', 'Nunito'], ['Space Grotesk', 'Space Grotesk']];
-const TRANS = [['', 'Aucune'], ['fade', 'Fondu'], ['slide', 'Glisser'], ['push', 'Pousser'], ['zoom', 'Zoom'], ['flip', 'Retourner'], ['wipe', 'Balayer'], ['rise', 'Monter'], ['blur', 'Flou']];
-const SLIDE_ANIMS = [['', 'Aucune'], ['rise', 'Cascade'], ['fade', 'Fondu'], ['pop', 'Rebond'], ['zoom', 'Zoom'], ['left', 'Glisser'], ['blur', 'Mise au point']];
 function renderPanel(){
   const b = g$('edPanelBody'), ray = RAYS.find(r => r[0] === panel); if (!ray) return;
   g$('edPanelTitle').textContent = ray[1]; g$('edPanelSub').textContent = PANEL_SUB[panel] || '';
@@ -3206,7 +3506,7 @@ function renderPanel(){
   if (panel === 'insert'){
     h += `<h4 class="pn-h">Textes</h4><div class="pn-texts">${Object.entries(TEXT_STYLES).map(([k, [t, st, x]]) => `<button type="button" data-ins="text:${k}" style="${txCss({...st, fs:Math.min(st.fs, k === 'big' ? 44 : 30)}).replace(/justify-content:[^;]+;/, '')}${st.bg ? `background:${realCol(st.bg, sv)};` : ''}--fh:${fontStack(th.fh).replace(/"/g, "'")};--fb:${fontStack(th.fb).replace(/"/g, "'")};--ac:${th.ac};--ink:${th.ink};--mut:${th.mut};--on:${onColor(th.ac)};--hw:${th.hw}">${k === 'list' ? '• Liste à puces' : escH(x)}</button>`).join('')}</div>
       <h4 class="pn-h">Éléments prêts à l'emploi <small>groupés, à personnaliser</small></h4><div class="pn-chips big">${BLOCKS.map(([k, t]) => `<button type="button" data-ins="block:${k}">${t}</button>`).join('')}</div>
-      <h4 class="pn-h">Formes</h4><div class="pn-shapes2">${SHAPE_ORDER.map(k => `<button type="button" data-ins="shape:${k}" title="${escH(SHAPES[k][0])}" style="color:${th.ac}">${shapeIcon(k)}</button>`).join('')}</div>
+      <h4 class="pn-h">Formes <small>${SHAPE_ORDER.length} formes, remplissage et effets au choix</small></h4>${SHAPE_GROUPS.map(([t, ks]) => `<p class="pn-sub">${t}</p><div class="pn-shapes2">${ks.map(k => `<button type="button" data-ins="shape:${k}" title="${escH(SHAPES[k][0])}" style="color:${th.ac}">${shapeIcon(k)}</button>`).join('')}</div>`).join('')}
       <h4 class="pn-h">Images</h4><div class="pn-imgs2"><button type="button" class="pn-drop" data-ins="img">${IC.img}<b>Importer une image</b><span>ou glissez-la sur la diapositive · Ctrl + V</span></button>${Object.entries(D.media || {}).filter(([k]) => usedMedia().has(k)).slice(0, 12).map(([k, v]) => `<button type="button" class="pn-imgthumb" data-ins="media:${k}"><img src="${escH(v)}" alt=""></button>`).join('')}</div>
       <h4 class="pn-h">Tableaux et graphiques</h4><div class="pn-chips big"><button type="button" data-ins="table:3x3">Tableau 3 × 3</button><button type="button" data-ins="table:5x4">Tableau 4 × 5</button>${CHART_TYPES.map(([k, t]) => `<button type="button" data-ins="chart:${k}">${iconSVG(k === 'pie' || k === 'donut' ? 'pie' : k === 'line' || k === 'area' ? 'trend' : 'chart')} ${t}</button>`).join('')}</div>
       <h4 class="pn-h">Icônes <small>${Object.keys(ICONS).length} icônes, aux couleurs du thème</small></h4><label class="pn-search">${IC.search}<input id="pnIcQ" placeholder="Chercher : équipe, argent, idée, maison…"></label><div class="pn-icons" id="pnIc" style="color:${th.ac}">${Object.keys(ICONS).map(k => `<button type="button" data-ins="icon:${k}" title="${escH(ICONS[k][0].split(' ')[0])}">${iconSVG(k)}</button>`).join('')}</div>`;
@@ -3223,17 +3523,17 @@ function renderPanel(){
       <h4 class="pn-h">Ajouter une diapositive</h4><div class="lay-grid big">${LAYOUTS.map(([k, t]) => `<button type="button" data-newlay="${k}"><span class="lay-m" style="color:${th.ac2}">${layoutMini(k)}</span><b>${escH(t)}</b></button>`).join('')}</div>
       <h4 class="pn-h">Couleurs de la diapositive</h4><div class="seg">${[['content', 'Contenu'], ['title', 'Titre'], ['section', 'Section']].map(([k, t]) => `<button type="button" data-var="${k}" aria-checked="${(cur().v || 'content') === k || (k === 'title' && cur().v === 'end')}">${t}</button>`).join('')}</div>`;
   } else if (panel === 'anim'){
-    const s = cur(), l = selEls();
-    h += `<h4 class="pn-h">Transition vers cette diapositive</h4><div class="pn-chips big">${TRANS.map(([k, t]) => `<button type="button" data-tr="${k}" aria-pressed="${(s.tr || '') === k}">${t}</button>`).join('')}</div>
-      <h4 class="pn-h">Apparition des éléments <small>automatique, l'un après l'autre</small></h4><div class="pn-chips big">${SLIDE_ANIMS.map(([k, t]) => `<button type="button" data-san="${k}" aria-pressed="${(s.an || '') === k}">${t}</button>`).join('')}</div>
-      ${l.length ? `<h4 class="pn-h">Élément sélectionné <small>prioritaire sur l'apparition automatique</small></h4><div class="pn-chips big">${ANIMS.map(([k, t]) => `<button type="button" data-ean="${k}" aria-pressed="${(l[0].an?.k || '') === k}">${t}</button>`).join('')}</div><label class="pop-toggle"><input type="checkbox" id="eanClick" ${l[0].an?.click ? 'checked' : ''}><div><b>Au clic</b><small>Apparaît quand vous avancez</small></div></label>` : '<p class="pn-hint">Sélectionnez un élément pour lui donner sa propre animation, ou « Au clic » pour le faire apparaître quand vous avancez.</p>'}
-      <div class="pn-acts"><button type="button" class="pn-wide" data-a="preview">${ICX.present} Aperçu</button><button type="button" class="pn-wide" data-a="all">${IC.copy} Appliquer à toutes les diapositives</button><button type="button" class="pn-wide" data-a="magic">${IC.sparkle} Animer toute la présentation</button><button type="button" class="pn-wide" data-a="none">Tout retirer</button></div>`;
+    h += animPanelHTML();
+  } else if (panel === 'format'){
+    h += formatPanelHTML();
   } else if (panel === 'templates'){
     const mine = E2.userLib.templates || [];
     h += (mine.length ? `<h4 class="pn-h">Mes modèles</h4><div class="pn-tpls">${mine.map(t => `<button type="button" class="pn-tpl" data-tpl="${escH(t.id)}"><span class="tthumb">${tplMini(t)}</span><b>${escH(t.name)}</b></button>`).join('')}</div>` : '')
       + `<h4 class="pn-h">Modèles Studio Prism <small>une nouvelle présentation, ou leurs diapositives ajoutées ici</small></h4><div class="pn-tpls">${SS_TEMPLATES.filter(t => t.id !== 'blank').map(t => `<button type="button" class="pn-tpl" data-tpl="${t.id}"><span class="tthumb">${tplMini(t)}</span><b>${escH(t.name)}</b></button>`).join('')}</div>`;
   }
   b.innerHTML = h;
+  if (panel === 'format') wireFormat(b);
+  if (panel === 'anim') b.querySelectorAll('[data-ak]').forEach(i => { i.oninput = i.type === 'range' ? ev => animPanelInput(ev, false) : null; i.onchange = ev => animPanelInput(ev, true); });
   if (panel === 'design') b.querySelectorAll('.th-mini').forEach(m => m.querySelector('.th-s').style.transform = `scale(${m.style.getPropertyValue('--k')})`);
   if (panel === 'templates') window.SWScaleMinis?.(b);
 }
@@ -3256,7 +3556,7 @@ function onPanelClick(ev){
   if (d.var){ cur().v = d.var; renderAll(); commit('Couleurs de la diapositive'); return; }
   if (d.tr != null){ cur().tr = d.tr || undefined; renderPanel(); commit('Transition'); if (d.tr) previewTransition(); return; }
   if (d.san != null){ cur().an = d.san || undefined; renderPanel(); commit('Animation'); if (d.san) previewSlideAnim(); return; }
-  if (d.ean != null){ const k = d.ean, click = g$('eanClick')?.checked; setProps(x => { if (!k) delete x.an; else x.an = {k, click}; }, 'Animation', false); renderPanel(); if (k) previewAnim(selEls()); return; }
+  if (d.ean != null){ const k = d.ean, keep = selEls()[0]?.an; setProps(x => { if (!k) delete x.an; else x.an = {...(keep && ANIM_BY[keep.k]?.[2] === ANIM_BY[k][2] ? keep : {click:keep?.click}), k}; }, 'Animation', false); renderPanel(); if (k) previewAnim(selEls()); return; }
   if (d.a === 'preview'){ previewSlideAnim(); return; }
   if (d.a === 'all'){ const s = cur(); D.slides.forEach(x => { x.tr = s.tr; x.an = s.an; }); commit('Animations pour toutes'); toast('Transition et animation appliquées à toutes les diapositives'); renderPanel(); return; }
   if (d.a === 'magic'){ D.slides.forEach((x, i) => { x.tr = VARIANT_DARK[x.v] ? 'zoom' : 'fade'; x.an = VARIANT_DARK[x.v] ? 'blur' : 'rise'; }); commit('Animer la présentation'); renderPanel(); previewSlideAnim(); toast('Toute la présentation est animée · F5 pour voir'); return; }
@@ -3282,6 +3582,140 @@ function resizeDeck(size){
   D.size = size; THUMB.clear(); renderAll(); commit('Format'); toast(`Format ${SIZE_NAMES[size]}`);
 }
 
+/* ==== 63-format.js ==== */
+/* ---------- Panneau Format : position, remplissage, contour, effets, ajustements, texte (WordArt), fond de la diapositive ----------
+   Chaque réglage porte un chemin (« fx.sh.b », « st.tl.c », « bg.pat »…) : les mêmes fonctions lisent et écrivent éléments et fond. */
+const FDEF = {'fx.sh':{x:0, y:10, b:24, c:'#000000', o:.35}, 'fx.gl':{b:24, c:'t:ac', o:.9}, 'st.to':{w:2, c:'t:ink'}, 'st.tl':{b:14, c:'t:ac'}, 'st.tsd':{x:3, y:3, b:6, c:'#000000', o:.4}, 'st.t3':{n:10, c:'t:ac'}, 'st.tg':['t:ac', 't:ac2', 90]};
+const FM_OPEN = {pos:true};
+const getPath = (o, p) => p.split('.').reduce((a, k) => a?.[k], o);
+function setPath(o, p, v){
+  const ks = p.split('.'); let a = o;
+  for (let i = 0; i < ks.length - 1; i++){ if (a[ks[i]] == null) a[ks[i]] = FDEF[ks.slice(0, i + 1).join('.')] ? JSON.parse(JSON.stringify(FDEF[ks.slice(0, i + 1).join('.')])) : {}; a = a[ks[i]]; }
+  const k = ks[ks.length - 1]; if (v == null || v === '') delete a[k]; else a[k] = v;
+}
+/* retire les réglages neutres pour garder les documents légers */
+function tidyEl(e){
+  const f = e.fx; if (f){ for (const [k, d] of [['rf', 0], ['bl', 0], ['sf', 0], ['rx', 0], ['ry', 0], ['br', 100], ['ct', 100], ['sa', 100], ['hu', 0]]) if (f[k] === d) delete f[k]; if (!f.fh) delete f.fh; if (!f.fv) delete f.fv; if (!Object.keys(f).length) delete e.fx; }
+  if (e.st){ if (e.st.to && !e.st.to.w && e.st.to.f !== 0) delete e.st.to; for (const k of ['ls', 'ws']) if (!e.st[k]) delete e.st[k]; }
+  if (e.pat && !PATS[e.pat]) delete e.pat; if (!e.alt) delete e.alt; if (!e.lk) delete e.lk;
+}
+const fNum = v => Math.round(v * 100) / 100;
+const FM_SHADOWS = [['Aucune', null], ['Douce', {x:0, y:8, b:24, c:'#000000', o:.25}], ['Marquée', {x:0, y:14, b:34, c:'#000000', o:.4}], ['Proche', {x:0, y:3, b:6, c:'#000000', o:.3}], ['Décalée', {x:12, y:12, b:0, c:'#000000', o:.3}], ['Lointaine', {x:0, y:34, b:60, c:'#000000', o:.3}], ['Colorée', {x:0, y:14, b:30, c:'t:ac', o:.55}]];
+const FM_GRADS = [...GRADS, ['#FDE68A', '#F472B6'], ['#A7F3D0', '#3B82F6'], ['#1E1B4B', '#7C3AED'], ['#FFFFFF', '#CBD5E1']];
+function formatPanelHTML(){
+  const l = selEls(), e = l[0], sv = curVars();
+  const sec = (key, title, body, open) => `<details class="fm-sec" data-sec="${key}"${(FM_OPEN[key] ?? open) ? ' open' : ''}><summary>${title}</summary><div class="fm-body">${body}</div></details>`;
+  const rg = (p, t, min, max, step, val, unit = '') => `<label class="fm-rg"><span>${t}<b>${fNum(val)}${unit}</b></span><input type="range" data-f="${p}" data-u="${unit}" min="${min}" max="${max}" step="${step}" value="${val}"></label>`;
+  const sw = (p, t, c) => `<div class="fm-row"><span>${t}</span><button type="button" class="fm-sw" data-fcol="${p}" aria-label="${escH(t)}" style="--c:${c ? realCol(c, sv) : 'transparent'}"${c ? '' : ' data-none="1"'}></button></div>`;
+  const chips = (p, items, cur) => `<div class="pn-chips">${items.map(([v, t]) => `<button type="button" data-fv="${p}" data-v="${v}" aria-pressed="${String(cur ?? '') === String(v)}">${t}</button>`).join('')}</div>`;
+  const tog = (p, t, sub, on) => `<label class="pop-toggle"><input type="checkbox" data-fg="${p}"${on ? ' checked' : ''}><div><b>${t}</b>${sub ? `<small>${sub}</small>` : ''}</div></label>`;
+  let h = '';
+  if (!e){
+    /* fond de la diapositive */
+    const s = cur(), b = s.bg || {}, kind = b.mesh ? 'mesh' : b.g ? 'g' : b.c ? 'c' : '';
+    h += `<h4 class="pn-h">Fond de la diapositive</h4>
+      <div class="fm-grid g6">${['', 't:soft', 't:ac', 't:ac2', 't:ink', '#FFFFFF', '#F5F3FF', '#FEF3C7', '#DCFCE7', '#DBEAFE', '#FCE7F3', '#16122B'].map(c => `<button type="button" class="fm-c${(b.c || '') === c && !b.g && !b.mesh ? ' on' : ''}" data-bgc="${c}" title="${c ? T_NAMES[c] || c : 'Fond du thème'}" style="background:${c ? realCol(c, sv) : `linear-gradient(135deg,${sv.bg} 50%,${sv.soft} 50%)`}"></button>`).join('')}</div>
+      ${sw('bgp.c', 'Couleur personnalisée', b.c)}
+      <h4 class="pn-h">Dégradés <small>cliquez pour appliquer</small></h4><div class="fm-grid g4">${FM_GRADS.map((g, i) => `<button type="button" class="fm-c wide" data-bgg="${i}" style="background:linear-gradient(135deg,${realCol(g[0], sv)},${realCol(g[1], sv)})"></button>`).join('')}</div>
+      <h4 class="pn-h">Ambiances <small>dégradés maillés</small></h4><div class="fm-grid g4">${MESHES.map((m, i) => `<button type="button" class="fm-c wide${b.mesh && b.mesh[3] === m[1][3] ? ' on' : ''}" data-bgm="${i}" title="${m[0]}" style="background:${meshCss(m[1])}"></button>`).join('')}</div>`;
+    if (b.g) h += `<div class="fm-box">${sw('bgp.g.0', 'Couleur 1', b.g[0])}${sw('bgp.g.1', 'Couleur 2', b.g[1])}${chips('bg.gt', [['', 'Linéaire'], ['rad', 'Radial'], ['con', 'Conique']], b.gt || '')}${b.gt === 'rad' ? '' : rg('bg.a', 'Angle', 0, 360, 5, b.a ?? 135, '°')}</div>`;
+    h += `<h4 class="pn-h">Motif <small>par-dessus le fond</small></h4><div class="pn-chips"><button type="button" data-fv="bg.pat" data-v="" aria-pressed="${!b.pat}">Aucun</button>${PAT_ORDER.map(k => `<button type="button" data-fv="bg.pat" data-v="${k}" aria-pressed="${b.pat === k}">${PATS[k][0]}</button>`).join('')}</div>`;
+    if (b.pat) h += `<div class="fm-box">${sw('bgp.pc', 'Couleur du motif', b.pc || 't:ink')}${rg('bg.po', 'Intensité', .03, .6, .01, b.po ?? .12)}${rg('bg.ps', 'Taille', .5, 4, .1, b.ps ?? 1, '×')}</div>`;
+    h += `<div class="pn-acts"><button type="button" class="pn-wide" data-fa="bgimg">${IC.img} Image de fond…</button>${b.img ? `<button type="button" class="pn-wide" data-fa="bgnoimg">Retirer l'image</button>` : ''}<button type="button" class="pn-wide" data-fa="bgall">${IC.copy} Appliquer à toutes</button><button type="button" class="pn-wide" data-fa="bgreset">Fond du thème</button></div>`;
+    if (b.img) h += `<div class="fm-box">${rg('bg.dim', 'Assombrir l\'image', 0, .8, .05, b.dim || 0)}</div>`;
+    h += tog('deco', 'Décor du thème', 'Les formes dessinées par le thème', !s.nodeco)
+      + `<h4 class="pn-h">Affichage <small>aide à l'alignement</small></h4>${tog('view.grid', 'Grille', 'Quadrillage discret sur la diapositive', V.grid)}${tog('view.snapgrid', 'Magnétisme de la grille', 'Les éléments se calent sur la grille', V.snapGrid)}${tog('view.rulers', 'Marges et centre', 'Repères de la zone sûre et du milieu', V.guides)}`
+      + `<p class="pn-hint">Sélectionnez un élément pour régler sa position, son remplissage, ses ombres, ses effets et son animation.</p>`;
+    return h;
+  }
+  const st = e.st || {}, hasTxt = e.t === 'text' || (e.t === 'shape' && e.html != null), f = e.fx || {}, one = l.length === 1;
+  if (one) h += sec('pos', 'Position et taille', `<div class="fm-geo">${[['x', 'X'], ['y', 'Y'], ['w', 'L'], ['h', 'H'], ['rot', '°']].map(([k, t]) => `<label><span>${t}</span><input type="number" data-geo="${k}" value="${fNum(k === 'rot' ? e.rot || 0 : e[k])}" step="${k === 'rot' ? 5 : 1}"></label>`).join('')}</div>
+      <div class="pn-chips"><button type="button" data-fv="fx.fh" data-v="${f.fh ? '' : 1}" aria-pressed="${!!f.fh}">${ICX.pos} Miroir horizontal</button><button type="button" data-fv="fx.fv" data-v="${f.fv ? '' : 1}" aria-pressed="${!!f.fv}">Miroir vertical</button></div>
+      <label class="fm-txt"><span>Texte alternatif <small>description pour l'accessibilité</small></span><input type="text" data-ft="alt" maxlength="300" value="${escH(e.alt || '')}" placeholder="Décrivez cet élément"></label>
+      <label class="fm-txt"><span>Lien <small>ouvert en cliquant en présentation</small></span><input type="text" data-ft="lk" maxlength="500" value="${escH(e.lk || '')}" placeholder="https://… ou #3 (diapositive 3)"></label>`, true);
+  if (e.t === 'shape'){
+    const kind = e.g2 ? (e.gt || 'lin') : e.fill ? 'solid' : 'none';
+    h += sec('fill', 'Remplissage', `${chips('fillkind', [['none', 'Aucun'], ['solid', 'Uni'], ['lin', 'Dégradé'], ['rad', 'Radial'], ['con', 'Conique']], kind)}
+      ${sw('fill', 'Couleur 1', e.fill)}${e.g2 ? sw('g2', 'Couleur 2', e.g2) + sw('g3', 'Couleur 3 (facultative)', e.g3) + (kind === 'rad' ? rg('gx', 'Centre horizontal', 0, 100, 5, e.gx ?? 50, ' %') + rg('gy', 'Centre vertical', 0, 100, 5, e.gy ?? 50, ' %') : rg('ga', 'Angle', 0, 360, 5, e.ga ?? 135, '°')) : ''}
+      <p class="pn-sub">Motif</p><div class="pn-chips"><button type="button" data-fv="pat" data-v="" aria-pressed="${!e.pat}">Aucun</button>${PAT_ORDER.map(k => `<button type="button" data-fv="pat" data-v="${k}" aria-pressed="${e.pat === k}">${PATS[k][0]}</button>`).join('')}</div>
+      ${e.pat ? sw('pc', 'Couleur du motif', e.pc || 't:ink') + rg('po', 'Intensité', .05, 1, .05, e.po ?? .3) + rg('ps', 'Taille', .5, 4, .1, e.ps ?? 1, '×') : ''}`, true);
+  }
+  if (e.t === 'shape' || e.t === 'img'){
+    h += sec('stroke', 'Contour', `${rg('sw', 'Épaisseur', 0, 30, 1, e.sw || 0, ' px')}${sw('stroke', 'Couleur', e.stroke)}${chips('sd', [['', 'Continu'], ['dash', 'Tirets'], ['dot', 'Points']], e.sd || '')}`);
+  }
+  const shOn = !!f.sh, glOn = !!f.gl, sh = f.sh || FDEF['fx.sh'], gl = f.gl || FDEF['fx.gl'];
+  h += sec('fx', 'Effets', `<p class="pn-sub">Ombre</p><div class="pn-chips">${FM_SHADOWS.map(([t, v], i) => `<button type="button" data-fshadow="${i}" aria-pressed="${v ? shOn && f.sh.y === v.y && f.sh.b === v.b && f.sh.x === v.x : !shOn && !e.shadow}">${t}</button>`).join('')}</div>
+    ${shOn ? `<div class="fm-box">${rg('fx.sh.x', 'Décalage horizontal', -80, 80, 1, sh.x, ' px')}${rg('fx.sh.y', 'Décalage vertical', -80, 80, 1, sh.y, ' px')}${rg('fx.sh.b', 'Flou', 0, 100, 1, sh.b, ' px')}${rg('fx.sh.o', 'Opacité', 0, 1, .05, sh.o)}${sw('fx.sh.c', 'Couleur', sh.c)}</div>` : ''}
+    ${tog('fx.gl', 'Lueur', 'Un halo coloré autour de l\'élément', glOn)}${glOn ? `<div class="fm-box">${rg('fx.gl.b', 'Rayon', 2, 100, 1, gl.b, ' px')}${rg('fx.gl.o', 'Intensité', .1, 1, .05, gl.o)}${sw('fx.gl.c', 'Couleur', gl.c)}</div>` : ''}
+    ${rg('fx.rf', 'Reflet', 0, 1, .05, f.rf || 0)}${rg('fx.sf', 'Contour progressif', 0, 120, 2, f.sf || 0, ' px')}${rg('fx.bl', 'Flou', 0, 30, 1, f.bl || 0, ' px')}${rg('fx.rx', 'Inclinaison verticale (3D)', -60, 60, 1, f.rx || 0, '°')}${rg('fx.ry', 'Inclinaison horizontale (3D)', -60, 60, 1, f.ry || 0, '°')}`);
+  h += sec('adj', 'Ajustements', `${rg('fx.br', 'Luminosité', 30, 200, 1, f.br ?? 100, ' %')}${rg('fx.ct', 'Contraste', 30, 200, 1, f.ct ?? 100, ' %')}${rg('fx.sa', 'Saturation', 0, 250, 1, f.sa ?? 100, ' %')}${rg('fx.hu', 'Teinte', -180, 180, 1, f.hu || 0, '°')}`);
+  if (hasTxt){
+    const to = st.to, tl = st.tl, tsd = st.tsd, t3 = st.t3, tg = st.tg;
+    h += sec('txt', 'Effets de texte', `<p class="pn-sub">Styles prêts à l'emploi</p><div class="wa-grid">${WORDART.map(([t, x], i) => `<button type="button" data-wa="${i}" title="${t}"><span style="${txCss({f:'h', fs:26, b:1, fc:'#FFFFFF', ...x})}">Abc</span><em>${t}</em></button>`).join('')}</div>
+      ${tog('st.to', 'Contour du texte', '', !!to)}${to ? `<div class="fm-box">${rg('st.to.w', 'Épaisseur', 0, 12, .5, to.w, ' px')}${sw('st.to.c', 'Couleur', to.c)}${tog('st.to.f0', 'Texte creux', 'Seul le contour reste visible', to.f === 0)}</div>` : ''}
+      ${tog('st.tg', 'Dégradé dans le texte', '', !!tg)}${tg ? `<div class="fm-box">${sw('st.tg.0', 'Couleur 1', tg[0])}${sw('st.tg.1', 'Couleur 2', tg[1])}${rg('st.tg.2', 'Angle', 0, 360, 5, tg[2] ?? 90, '°')}</div>` : ''}
+      ${tog('st.tl', 'Lueur du texte', '', !!tl)}${tl ? `<div class="fm-box">${rg('st.tl.b', 'Rayon', 2, 60, 1, tl.b, ' px')}${sw('st.tl.c', 'Couleur', tl.c)}</div>` : ''}
+      ${tog('st.tsd', 'Ombre du texte', '', !!tsd)}${tsd ? `<div class="fm-box">${rg('st.tsd.x', 'Horizontal', -30, 30, 1, tsd.x, ' px')}${rg('st.tsd.y', 'Vertical', -30, 30, 1, tsd.y, ' px')}${rg('st.tsd.b', 'Flou', 0, 40, 1, tsd.b, ' px')}${rg('st.tsd.o', 'Opacité', 0, 1, .05, tsd.o)}${sw('st.tsd.c', 'Couleur', tsd.c)}</div>` : ''}
+      ${tog('st.t3', 'Extrusion 3D', 'Profondeur derrière les lettres', !!t3)}${t3 ? `<div class="fm-box">${rg('st.t3.n', 'Profondeur', 1, 30, 1, t3.n, ' px')}${sw('st.t3.c', 'Couleur', t3.c)}</div>` : ''}
+      <p class="pn-sub">Casse et espacement</p>${chips('st.tt', [['', 'Normale'], ['cap', 'Initiales'], ['low', 'minuscules']], st.tt || '')}${chips('st.up', [['', 'Casse libre'], ['1', 'CAPITALES']], st.up ? '1' : '')}${chips('st.sc', [['', 'Normal'], ['1', 'Petites capitales']], st.sc ? '1' : '')}
+      ${rg('st.ls', 'Espacement des lettres', -.1, .6, .01, st.ls || 0, ' em')}${rg('st.ws', 'Espacement des mots', -.3, 1.5, .05, st.ws || 0, ' em')}`, e.t === 'text');
+  }
+  h += `<div class="pn-acts"><button type="button" class="pn-wide" data-fa="fxreset">Réinitialiser les effets</button></div>`;
+  return h;
+}
+/* écriture d'un réglage sur la sélection (éléments) ou la diapositive (fond) */
+function fmApply(p, v, live){
+  if (V.ro) return;
+  const isBg = p.startsWith('bg.'), targets = isBg ? [cur()] : selEls();
+  targets.forEach(t => {
+    if (p === 'st.to.f0'){ if (!t.st?.to) return; if (v) t.st.to.f = 0; else delete t.st.to.f; return; }
+    if (p === 'st.up' || p === 'st.sc') v = v ? 1 : null;
+    if (p === 'sw' && v > 0 && !t.stroke) t.stroke = 't:ink';
+    if (isBg && !t.bg) t.bg = {};
+    setPath(t, p, v); if (isBg){ if (!Object.keys(t.bg).length) delete t.bg; } else { if (p.startsWith('st.') && !t.st) t.st = {}; tidyEl(t); }
+  });
+  if (isBg){ renderStage(); if (!live) renderRail(true); return; }
+  targets.forEach(t => updateEl(t, true)); fitTexts(targets.map(t => t.id)); renderSel();
+}
+const fmCommit = label => { commit(label); renderRail(true); renderPanel(); refreshToolbar(); };
+function fmVal(raw){ if (raw === '' || raw == null) return null; return /^-?\d+(\.\d+)?$/.test(raw) ? +raw : raw; }
+function fmGroupToggle(p, on){
+  if (p === 'deco'){ cur().nodeco = on ? undefined : true; if (on) delete cur().nodeco; renderAll(); commit('Décor'); return; }
+  if (p.startsWith('view.')){ if (p === 'view.grid') V.grid = on; else if (p === 'view.snapgrid'){ V.snapGrid = on; if (on) V.grid = true; } else V.guides = on; lsSet('ss.view', {grid:V.grid, snapGrid:V.snapGrid, guides:V.guides}); applyView(); renderPanel(); return; }
+  if (p === 'st.to.f0') return fmApply(p, on), fmCommit('Texte creux');
+  fmApply(p, on ? JSON.parse(JSON.stringify(FDEF[p] || {})) : null); fmCommit('Effet');
+}
+function applyView(){ const h = g$('slideHost'); if (!h) return; h.classList.toggle('show-grid', !!V.grid); h.classList.toggle('show-guides', !!V.guides); }
+function wireFormat(b){
+  b.querySelectorAll('details.fm-sec').forEach(d => d.addEventListener('toggle', () => { FM_OPEN[d.dataset.sec] = d.open; }));
+  b.querySelectorAll('input[data-f]').forEach(i => { i.oninput = () => { const v = +i.value, bt = i.previousElementSibling?.querySelector('b'); if (bt) bt.textContent = fNum(v) + (i.dataset.u || ''); fmApply(i.dataset.f, v, true); }; i.onchange = () => fmCommit('Réglage'); });
+  b.querySelectorAll('input[data-fg]').forEach(i => { i.onchange = () => fmGroupToggle(i.dataset.fg, i.checked); });
+  b.querySelectorAll('input[data-geo]').forEach(i => { i.onchange = () => { const k = i.dataset.geo, v = +i.value; if (!isFinite(v)) return; setProps(e => { if (k === 'rot'){ if (v) e.rot = v; else delete e.rot; } else e[k] = k === 'w' || k === 'h' ? Math.max(8, v) : v; }, 'Position', true); renderPanel(); }; });
+  b.querySelectorAll('input[data-ft]').forEach(i => { i.onchange = () => { const k = i.dataset.ft; let v = i.value.trim(); if (k === 'lk' && v && !/^(https?:\/\/|#\d+$)/i.test(v)){ if (/^[\w.-]+\.[a-z]{2,}/i.test(v)) v = 'https://' + v; else { toast('Lien : une adresse https://… ou #3 pour une diapositive'); i.value = ''; v = ''; } } setProps(e => { if (v) e[k] = v; else delete e[k]; }, k === 'lk' ? 'Lien' : 'Texte alternatif', false); }; });
+  b.querySelectorAll('[data-fv]').forEach(x => { x.onclick = () => { fmApply(x.dataset.fv, fmVal(x.dataset.v)); fmCommit('Réglage'); }; });
+  b.querySelectorAll('[data-fcol]').forEach(x => { x.onclick = () => {
+    const p = x.dataset.fcol, isBgp = p.startsWith('bgp.'), path = isBgp ? p.slice(4) : p, root = isBgp ? (cur().bg || {}) : selEls()[0], none = path === 'fill' || path === 'g3' || path === 'stroke' || path === 'bg.c' || path === 'c' || path === 'pc' ? undefined : false;
+    colorPop(x, getPath(root, path), v => {
+      if (isBgp){ const s = cur(); s.bg = s.bg || {}; if (path === 'c'){ const keep = {pat:s.bg.pat, pc:s.bg.pc, po:s.bg.po, ps:s.bg.ps}; s.bg = {...(v ? {c:v} : {})}; Object.entries(keep).forEach(([k, q]) => q != null && (s.bg[k] = q)); } else if (path === 'pc') s.bg.pc = v || undefined; else setPath(s.bg, path, v); if (!Object.keys(s.bg).length) delete s.bg; renderStage(); renderRail(true); fmCommit('Fond'); return; }
+      if (path === 'fill' && !v){ fmApply('fill', ''); } else fmApply(path, v || null); fmCommit('Couleur');
+    }, {none:none !== false, noneLabel:'Aucune'}); }; });
+  b.querySelectorAll('[data-fshadow]').forEach(x => { x.onclick = () => { const v = FM_SHADOWS[+x.dataset.fshadow][1]; setProps(e => { delete e.shadow; if (!e.fx) e.fx = {}; if (v) e.fx.sh = {...v}; else delete e.fx.sh; tidyEl(e); }, 'Ombre', false); renderPanel(); }; });
+  b.querySelectorAll('[data-wa]').forEach(x => { x.onclick = () => { const w = WORDART[+x.dataset.wa][1]; setProps(e => { if (!e.st) e.st = {}; WORDART_KEYS.forEach(k => delete e.st[k]); Object.entries(w).forEach(([k, v]) => e.st[k] = JSON.parse(JSON.stringify(v))); if (e.html) e.html = stripInline(e.html, ['fc']); tidyEl(e); }, 'Style de texte', true); renderPanel(); }; });
+  b.querySelectorAll('[data-fv="fillkind"]').forEach(x => { x.onclick = () => { const k = x.dataset.v; setProps(e => { const c = e.fill || 't:ac';
+    if (k === 'none'){ e.fill = ''; delete e.g2; delete e.g3; delete e.gt; } else if (k === 'solid'){ e.fill = c; delete e.g2; delete e.g3; delete e.gt; }
+    else { e.fill = c; if (!e.g2) e.g2 = e.fill === 't:ac' ? 't:ac2' : 't:ac'; if (k === 'lin') delete e.gt; else e.gt = k; } }, 'Remplissage', true); renderPanel(); }; });
+  b.querySelectorAll('[data-bgc]').forEach(x => { x.onclick = () => { const s = cur(), c = x.dataset.bgc, keep = {pat:s.bg?.pat, pc:s.bg?.pc, po:s.bg?.po, ps:s.bg?.ps}; s.bg = c ? {c} : {}; Object.entries(keep).forEach(([k, q]) => q != null && (s.bg[k] = q)); if (!Object.keys(s.bg).length) delete s.bg; renderAll(); fmCommit('Fond'); }; });
+  const bgSet = (obj, label) => { const s = cur(), keep = {pat:s.bg?.pat, pc:s.bg?.pc, po:s.bg?.po, ps:s.bg?.ps}; s.bg = obj; Object.entries(keep).forEach(([k, q]) => q != null && (s.bg[k] = q)); renderAll(); fmCommit(label); };
+  b.querySelectorAll('[data-bgg]').forEach(x => { x.onclick = () => bgSet({g:[...FM_GRADS[+x.dataset.bgg]], a:135}, 'Fond dégradé'); });
+  b.querySelectorAll('[data-bgm]').forEach(x => { x.onclick = () => bgSet({mesh:[...MESHES[+x.dataset.bgm][1]]}, 'Fond ambiance'); });
+  b.querySelectorAll('[data-fa]').forEach(x => { x.onclick = () => { const a = x.dataset.fa, s = cur();
+    if (a === 'bgimg'){ imgTarget = '@bg'; g$('edImgFile').click(); }
+    else if (a === 'bgnoimg'){ delete s.bg.img; delete s.bg.dim; if (!Object.keys(s.bg).length) delete s.bg; renderAll(); fmCommit('Fond'); }
+    else if (a === 'bgreset'){ delete s.bg; renderAll(); fmCommit('Fond du thème'); }
+    else if (a === 'bgall'){ D.slides.forEach(q => { if (q !== s){ if (s.bg) q.bg = JSON.parse(JSON.stringify(s.bg)); else delete q.bg; q.nodeco = s.nodeco; } }); renderAll(); commit('Fond pour toutes'); toast('Fond appliqué à toutes les diapositives'); }
+    else if (a === 'fxreset'){ setProps(e => { delete e.fx; delete e.shadow; delete e.pat; delete e.sd; if (e.st) WORDART_KEYS.forEach(k => delete e.st[k]); }, 'Effets réinitialisés', true); renderPanel(); } }; });
+}
+
 /* ==== 65-present.js ==== */
 /* ---------- Mode présentation : plein écran, transitions, animations, notes, vue d'ensemble, pointeur ---------- */
 const PV = {on:false, i:0, list:[], step:0, steps:[], idle:0, num:'', laser:false, notes:false, t0:0, timer:0};
@@ -3289,14 +3723,14 @@ function visibleSlides(){ const l = D.slides.map((s, i) => s.hide ? -1 : i).filt
 function present(from = 0, opts = {}){
   if (!D) return; if (EDT) stopEdit(); closePop(); if (panel) openPanel(null);
   PV.list = visibleSlides(); let k = PV.list.indexOf(from); if (k < 0) k = PV.list.findIndex(i => i > from); if (k < 0) k = 0;
-  PV.on = true; PV.notes = !!opts.notes; PV.t0 = Date.now(); const p = g$('present'); p.hidden = false; p.classList.toggle('with-notes', PV.notes);
+  inkReset(); PV.on = true; PV.notes = !!opts.notes; PV.t0 = Date.now(); const p = g$('present'); p.hidden = false; p.classList.toggle('with-notes', PV.notes);
   ensureThemeFonts(); g$('pvStage').innerHTML = '';
   if (!opts.window && p.requestFullscreen && !document.fullscreenElement) p.requestFullscreen().catch(() => {});
   showSlide(k, 0); wake(); clearInterval(PV.timer); PV.timer = setInterval(pvClock, 1000); pvClock();
   p.focus();
 }
 function exitPresent(){
-  if (!PV.on) return; PV.on = false; clearInterval(PV.timer);
+  if (!PV.on) return; inkSave(); PV.on = false; clearInterval(PV.timer); inkReset();
   if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
   g$('present').hidden = true; g$('pvStage').innerHTML = ''; g$('pvGrid').hidden = true; g$('pvBlack').hidden = true;
   goSlide(PV.list[PV.i] ?? CUR); g$('stage').focus({preventScroll:true});
@@ -3306,15 +3740,15 @@ function slideLayer(i){
   const s = D.slides[i], {k, w, h, W, H} = pvScale(), d = document.createElement('div');
   d.className = 'pv-slide'; d.innerHTML = renderSlide(s, {present:true}); const sl = d.firstElementChild;
   sl.style.transform = `scale(${k})`; d.style.width = W * k + 'px'; d.style.height = H * k + 'px'; d.style.left = (w - W * k) / 2 + 'px'; d.style.top = (h - H * k) / 2 + 'px';
-  // animations : automatiques (avec délai) ou au clic (étapes)
-  const order = s.els.map((e, j) => ({e, j})); const steps = []; let auto = 0;
-  const pos = [...order].sort((a, b) => (a.e.y - b.e.y) || (a.e.x - b.e.x));
-  for (const {e} of pos){
+  // animations : automatiques (avec délai) ou au clic (étapes) ; entrée, emphase ou sortie
+  const steps = []; let auto = 0;
+  const pos = [...s.els].sort((a, b) => (a.y - b.y) || (a.x - b.x));
+  for (const e of pos){
     const n = d.querySelector(`.el[data-id="${CSS.escape(e.id)}"]`); if (!n) continue;
-    const an = e.an?.k || (s.an && !(e.t === 'img' && e.w >= W * .95) && !(e.t === 'shape' && e.w >= W * .95 && e.h >= H * .95) ? s.an : '');
-    if (!an) continue; n.dataset.an = an;
-    if (e.an?.click){ n.classList.add('an-wait'); steps.push(n); }
-    else { n.style.setProperty('--d', (auto * (s.an === 'fade' ? 120 : 110) + 250) + 'ms'); n.classList.add('an-run'); auto++; }
+    const a = e.an?.k ? e.an : (s.an && !isCoverEl(e, W, H) ? {k:s.an} : null); if (!a || !ANIM_BY[a.k]) continue;
+    const ty = ANIM_BY[a.k][2];
+    if (a.click){ if (ty === 'in') n.classList.add('an-wait'); steps.push({n, a}); }
+    else { if (animSet(n, a, auto * (s.an === 'fade' ? 120 : 110) + 250)) n.classList.add('an-run'); auto++; }
   }
   return {d, steps};
 }
@@ -3325,15 +3759,16 @@ function showSlide(k, dir){
   if (tr && old.length){ d.classList.add('tr-in', 'tr-' + tr); d.style.setProperty('--dir', dir > 0 ? 1 : -1); old.forEach(o => { o.classList.add('tr-out', 'tr-' + tr); o.style.setProperty('--dir', dir > 0 ? 1 : -1); }); }
   st.appendChild(d);
   if (tr && old.length) setTimeout(() => old.forEach(o => o.remove()), 720); else old.forEach(o => o.remove());
-  PV.i = k; PV.steps = steps; PV.step = 0;
+  if (old.length) inkSave();
+  PV.i = k; PV.steps = steps; PV.step = 0; pvAfterShow();
   g$('pvNum').textContent = `${k + 1} / ${PV.list.length}`;
   g$('pvProg').style.width = ((k + 1) / PV.list.length * 100) + '%';
   const nt = g$('pvNotes'); if (nt){ nt.querySelector('.pn-txt').textContent = s.notes || 'Pas de notes pour cette diapositive.'; const nx = PV.list[k + 1]; nt.querySelector('.pn-next').innerHTML = nx != null ? `<span>Suivante</span><div class="pn-nm">${renderSlide(D.slides[nx], {present:true})}</div>` : '<span>Fin de la présentation</span>'; const m = nt.querySelector('.pn-nm'); if (m){ const [W] = dims(); m.firstElementChild.style.transform = `scale(${200 / W})`; } }
 }
 function pvNext(){
   if (!g$('pvBlack').hidden){ g$('pvBlack').hidden = true; return; }
-  if (PV.step < PV.steps.length){ const n = PV.steps[PV.step++]; n.classList.remove('an-wait'); n.style.setProperty('--d', '0ms'); n.classList.add('an-run'); return; }
-  if (PV.i < PV.list.length - 1) showSlide(PV.i + 1, 1); else pvEnd();
+  if (PV.step < PV.steps.length){ const {n, a} = PV.steps[PV.step++]; n.classList.remove('an-wait', 'an-run'); void n.offsetWidth; if (animSet(n, a, 0)) n.classList.add('an-run'); return; }
+  if (PV.i < PV.list.length - 1) showSlide(PV.i + 1, 1); else if (D.loop) showSlide(0, 1); else pvEnd();
 }
 function pvPrev(){ if (!g$('pvBlack').hidden){ g$('pvBlack').hidden = true; return; } if (PV.i > 0) showSlide(PV.i - 1, -1); }
 function pvEnd(){ const b = g$('pvBlack'); if (!b.hidden && b.classList.contains('end')) return exitPresent(); b.className = 'pv-black end'; b.innerHTML = '<p>Fin de la présentation<br><small>Cliquez ou appuyez sur Échap pour quitter</small></p>'; b.hidden = false; }
@@ -3351,6 +3786,7 @@ function pvKey(e){
   if (/^[0-9]$/.test(k)){ PV.num += k; return; }
   if (k === 'Enter' && PV.num){ e.preventDefault(); showSlide(+PV.num - 1, +PV.num - 1 > PV.i ? 1 : -1); PV.num = ''; return; }
   PV.num = '';
+  if (pvExtraKey(e)){ e.preventDefault(); return; }
   if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter', 'n', 'N'].includes(k)){ e.preventDefault(); pvNext(); }
   else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace', 'p', 'P'].includes(k)){ e.preventDefault(); pvPrev(); }
   else if (k === 'Home'){ e.preventDefault(); showSlide(0, -1); } else if (k === 'End'){ e.preventDefault(); showSlide(PV.list.length - 1, 1); }
@@ -3363,14 +3799,16 @@ function pvKey(e){
 function wirePresent(){
   const p = g$('present');
   p.addEventListener('keydown', pvKey);
-  p.addEventListener('mousemove', e => { wake(); if (PV.laser){ const l = g$('pvLaser'); l.style.left = e.clientX + 'px'; l.style.top = e.clientY + 'px'; } });
-  g$('pvStage').addEventListener('click', e => { if (e.target.closest('a')) return; pvNext(); });
+  p.addEventListener('mousemove', e => { wake(); if (INK.loupe) loupeMove(e); if (PV.laser){ const l = g$('pvLaser'); l.style.left = e.clientX + 'px'; l.style.top = e.clientY + 'px'; } });
+  g$('pvStage').addEventListener('click', e => { if (e.target.closest('a')) return; const lk = e.target.closest('[data-lk]'); if (lk){ pvLink(lk); return; } pvNext(); });
   g$('pvBlack').addEventListener('click', () => { if (g$('pvBlack').classList.contains('end')) exitPresent(); else g$('pvBlack').hidden = true; });
   p.addEventListener('contextmenu', e => { e.preventDefault(); pvPrev(); });
   g$('pvGrid').addEventListener('click', e => { const b = e.target.closest('[data-k]'); if (!b) return; g$('pvGrid').hidden = true; const k = +b.dataset.k; showSlide(k, k > PV.i ? 1 : -1); });
   g$('pvBar').addEventListener('click', e => { const b = e.target.closest('[data-pv]'); if (!b) return; e.stopPropagation(); const k = b.dataset.pv;
     if (k === 'prev') pvPrev(); else if (k === 'next') pvNext(); else if (k === 'grid') pvGrid(); else if (k === 'exit') exitPresent(); else if (k === 'notes') pvKey({key:'s', stopPropagation(){}, preventDefault(){}}); else if (k === 'laser') pvKey({key:'l', stopPropagation(){}, preventDefault(){}});
-    else if (k === 'fs') pvKey({key:'f', stopPropagation(){}, preventDefault(){}}); });
+    else if (k === 'fs') pvKey({key:'f', stopPropagation(){}, preventDefault(){}});
+    else if (k === 'pen') pvKey({key:'d', stopPropagation(){}, preventDefault(){}}); else if (k === 'hl') pvKey({key:'h', stopPropagation(){}, preventDefault(){}}); else if (k === 'erase') pvKey({key:'e', stopPropagation(){}, preventDefault(){}});
+    else if (k === 'loupe') pvKey({key:'z', stopPropagation(){}, preventDefault(){}}); else if (k === 'help') pvKey({key:'?', stopPropagation(){}, preventDefault(){}}); });
   let tx = null; p.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, {passive:true});
   p.addEventListener('touchend', e => { if (tx == null) return; const dx = e.changedTouches[0].clientX - tx; tx = null; if (Math.abs(dx) > 50){ dx < 0 ? pvNext() : pvPrev(); } }, {passive:true});
   addEventListener('resize', debounce(() => { if (PV.on) showSlide(PV.i, 0); }, 150));
@@ -3378,10 +3816,80 @@ function wirePresent(){
 }
 /* aperçus dans l'éditeur */
 function previewTransition(){ const v = g$('slideView'); const tr = cur().tr; if (!tr) return; v.classList.remove('tr-in'); void v.offsetWidth; v.className = 'slide-view tr-in tr-' + tr; v.style.setProperty('--dir', 1); setTimeout(() => { v.className = 'slide-view'; }, 800); previewSlideAnim(); }
-function previewSlideAnim(){
-  const s = cur(), [W, H] = dims(); let i = 0;
-  [...s.els].sort((a, b) => (a.y - b.y) || (a.x - b.x)).forEach(e => { const an = e.an?.k || s.an; if (!an || (e.t === 'img' && e.w >= W * .95) || (e.t === 'shape' && e.w >= W * .95 && e.h >= H * .95)) return; const n = elNode(e.id); if (!n) return;
-    n.classList.remove('an-run'); void n.offsetWidth; n.dataset.an = an; n.style.setProperty('--d', (i++ * 110 + 120) + 'ms'); n.classList.add('an-run'); setTimeout(() => { n.classList.remove('an-run'); delete n.dataset.an; n.style.removeProperty('--d'); }, 1600 + i * 110); });
+
+/* ==== 66-present-extra.js ==== */
+/* ---------- Présentation : stylo, surligneur, gomme, loupe, avance automatique, liens, aide ----------
+   D stylo · H surligneur · E gomme · C couleur · Z loupe · X effacer le dessin · ? aide */
+const INK = {tool:null, col:0, drawing:false, last:null, byslide:{}, cv:null, ctx:null, loupe:false};
+const INK_COLS = ['#E5484D', '#FFC53D', '#30A46C', '#0090FF', '#FFFFFF', '#16122B'];
+function inkEnsure(){
+  const p = g$('present'); let cv = g$('pvInk');
+  if (!cv){ cv = document.createElement('canvas'); cv.id = 'pvInk'; p.insertBefore(cv, g$('pvBar')); cv.addEventListener('pointerdown', inkDown); cv.addEventListener('pointermove', inkMove); addEventListener('pointerup', inkUp); }
+  const st = g$('pvStage'), r = st.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(r.width * dpr), h = Math.round(r.height * dpr);
+  if (cv.width !== w || cv.height !== h){ const keep = INK.cv === cv && cv.width ? cv.toDataURL() : null; cv.width = w; cv.height = h; if (keep) inkDraw(keep); }
+  cv.style.left = r.left + 'px'; cv.style.top = r.top + 'px'; cv.style.width = r.width + 'px'; cv.style.height = r.height + 'px';
+  INK.cv = cv; INK.ctx = cv.getContext('2d'); return cv;
+}
+function inkDraw(url){ const im = new Image(); im.onload = () => { INK.ctx?.drawImage(im, 0, 0, INK.cv.width, INK.cv.height); }; im.src = url; }
+function inkSave(){ if (INK.cv && PV.list[PV.i] != null){ const blank = !INK.ctx.getImageData(0, 0, INK.cv.width, INK.cv.height).data.some((v, i) => i % 4 === 3 && v); INK.byslide[PV.list[PV.i]] = blank ? null : INK.cv.toDataURL(); } }
+function inkLoad(i){ if (!INK.cv) return; INK.ctx.clearRect(0, 0, INK.cv.width, INK.cv.height); if (INK.byslide[i]) inkDraw(INK.byslide[i]); }
+function inkTool(t){
+  INK.tool = INK.tool === t ? null : t; const cv = inkEnsure(), p = g$('present');
+  cv.className = INK.tool ? 'on ' + INK.tool : ''; p.classList.toggle('inking', !!INK.tool);
+  p.querySelectorAll('[data-pv="pen"],[data-pv="hl"],[data-pv="erase"]').forEach(b => b.setAttribute('aria-pressed', b.dataset.pv === ({pen:'pen', hl:'hl', erase:'erase'})[INK.tool] || false));
+  pvToast(INK.tool ? ({pen:'Stylo', hl:'Surligneur', erase:'Gomme'})[INK.tool] + ' · C pour changer de couleur · X pour tout effacer' : 'Stylo désactivé');
+}
+function inkPt(e){ const r = INK.cv.getBoundingClientRect(), k = INK.cv.width / r.width; return [(e.clientX - r.left) * k, (e.clientY - r.top) * k, k]; }
+function inkDown(e){ if (!INK.tool) return; e.preventDefault(); e.stopPropagation(); INK.drawing = true; INK.cv.setPointerCapture?.(e.pointerId); INK.last = inkPt(e); inkSeg(INK.last, INK.last); }
+function inkMove(e){ if (!INK.drawing) return; const q = inkPt(e); inkSeg(INK.last, q); INK.last = q; }
+function inkUp(){ if (INK.drawing){ INK.drawing = false; inkSave(); } }
+function inkSeg(a, b){
+  const c = INK.ctx, k = a[2], col = INK_COLS[INK.col % INK_COLS.length]; c.lineCap = c.lineJoin = 'round';
+  if (INK.tool === 'erase'){ c.globalCompositeOperation = 'destination-out'; c.lineWidth = 34 * k; c.strokeStyle = '#000'; c.globalAlpha = 1; }
+  else if (INK.tool === 'hl'){ c.globalCompositeOperation = 'source-over'; c.lineWidth = 26 * k; c.strokeStyle = col; c.globalAlpha = .32; }
+  else { c.globalCompositeOperation = 'source-over'; c.lineWidth = 4.5 * k; c.strokeStyle = col; c.globalAlpha = 1; }
+  c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); c.stroke(); c.globalAlpha = 1; c.globalCompositeOperation = 'source-over';
+}
+function inkClear(){ if (!INK.cv) return; INK.ctx.clearRect(0, 0, INK.cv.width, INK.cv.height); const i = PV.list[PV.i]; if (i != null) INK.byslide[i] = null; }
+function inkReset(){ INK.tool = null; INK.byslide = {}; INK.drawing = false; const cv = g$('pvInk'); if (cv){ cv.className = ''; cv.getContext('2d').clearRect(0, 0, cv.width, cv.height); } g$('present')?.classList.remove('inking'); loupeOff(); clearTimeout(PV.adv); }
+function pvToast(t){ let n = g$('pvToast'); if (!n){ n = document.createElement('div'); n.id = 'pvToast'; g$('present').appendChild(n); } n.textContent = t; n.classList.add('on'); clearTimeout(n._t); n._t = setTimeout(() => n.classList.remove('on'), 2200); }
+/* loupe */
+function loupeOff(){ INK.loupe = false; g$('pvLoupe')?.remove(); g$('present')?.classList.remove('loupe'); }
+function loupeToggle(){
+  if (INK.loupe) return loupeOff(); INK.loupe = true; const p = g$('present'); p.classList.add('loupe');
+  const lp = document.createElement('div'); lp.id = 'pvLoupe'; p.appendChild(lp); loupeFill(lp); pvToast('Loupe · Z pour la retirer');
+}
+function loupeFill(lp){ const cur = g$('pvStage').lastElementChild; if (!cur) return; const c = cur.cloneNode(true); c.className = 'pv-slide'; c.querySelectorAll('.el').forEach(n => { n.classList.remove('an-run', 'an-wait'); delete n.dataset.an; }); lp.innerHTML = ''; lp.appendChild(c); lp._c = c; lp._src = cur; }
+function loupeMove(e){
+  const lp = g$('pvLoupe'); if (!lp || !lp._c) return; const r = lp._src.getBoundingClientRect(), Z = 2.4, s = 90;
+  lp.style.left = e.clientX - 110 + 'px'; lp.style.top = e.clientY - 110 + 'px';
+  lp._c.style.transformOrigin = '0 0'; lp._c.style.transform = `translate(${110 - (e.clientX - r.left) * Z}px,${110 - (e.clientY - r.top) * Z}px) scale(${Z})`; lp._c.style.left = '0'; lp._c.style.top = '0'; lp._c.style.width = r.width + 'px'; lp._c.style.height = r.height + 'px';
+}
+/* aide */
+function pvHelp(){
+  let h = g$('pvHelp'); if (h){ h.remove(); return; }
+  h = document.createElement('div'); h.id = 'pvHelp'; h.innerHTML = `<div><b>Raccourcis</b><button type="button" aria-label="Fermer">×</button><dl>${[['→  Espace  N', 'Suivant'], ['←  P', 'Précédent'], ['Numéro + Entrée', 'Aller à une diapositive'], ['G', 'Vue d\'ensemble'], ['S', 'Notes et minuteur'], ['D', 'Stylo'], ['H', 'Surligneur'], ['E', 'Gomme'], ['C', 'Couleur du stylo'], ['X', 'Effacer le dessin'], ['Z', 'Loupe'], ['L', 'Pointeur laser'], ['B  W', 'Écran noir / blanc'], ['F', 'Plein écran'], ['Échap', 'Quitter']].map(([k, t]) => `<dt>${k}</dt><dd>${t}</dd>`).join('')}</dl></div>`;
+  h.onclick = () => h.remove(); g$('present').appendChild(h);
+}
+/* touches : renvoie true si la touche est traitée ici */
+function pvExtraKey(e){
+  const k = e.key, K = k.length === 1 ? k.toLowerCase() : k;
+  if (k === 'Escape'){ if (g$('pvHelp')){ g$('pvHelp').remove(); return true; } if (INK.tool){ inkTool(INK.tool); return true; } if (INK.loupe){ loupeOff(); return true; } return false; }
+  if (K === 'd'){ inkTool('pen'); return true; } if (K === 'h'){ inkTool('hl'); return true; } if (K === 'e'){ inkTool('erase'); return true; }
+  if (K === 'c' && INK.tool){ INK.col = (INK.col + 1) % INK_COLS.length; pvToast('Couleur ' + (INK.col + 1) + ' / ' + INK_COLS.length); return true; }
+  if (K === 'x'){ inkClear(); return true; } if (K === 'z'){ loupeToggle(); return true; } if (k === '?'){ pvHelp(); return true; }
+  return false;
+}
+/* à chaque diapositive : dessin de la diapositive, avance automatique */
+function pvAfterShow(){
+  inkEnsure(); inkLoad(PV.list[PV.i]);
+  if (INK.loupe) loupeFill(g$('pvLoupe'));
+  clearTimeout(PV.adv); const s = D.slides[PV.list[PV.i]];
+  if (s?.adv) PV.adv = setTimeout(() => { if (!PV.on) return; if (PV.i < PV.list.length - 1) showSlide(PV.i + 1, 1); else if (D.loop) showSlide(0, 1); }, s.adv * 1000);
+}
+function pvLink(el){
+  const u = el.dataset.lk || ''; if (/^#\d+$/.test(u)){ const n = +u.slice(1) - 1, k = PV.list.indexOf(n); if (k >= 0) showSlide(k, k > PV.i ? 1 : -1); return; }
+  if (/^https?:\/\//i.test(u)) window.open(u, '_blank', 'noopener,noreferrer');
 }
 
 /* ==== 70-io.js ==== */
@@ -3450,7 +3958,7 @@ function htmlRuns(html, base, sv){
 function shapeSVG(e, sv){
   const k = e.k || 'rect', w = e.w, h = e.h, sw = +e.sw || 0, stroke = e.stroke && sw ? ` stroke="${realCol(e.stroke, sv)}" stroke-width="${sw}"` : '';
   let defs = '', fill = e.fill ? realCol(e.fill, sv) : 'none';
-  if (e.fill && e.g2){ const a = (e.ga ?? 135) * Math.PI / 180; defs = `<defs><linearGradient id="g" x1="${.5 - Math.cos(a - Math.PI / 2) / 2}" y1="${.5 - Math.sin(a - Math.PI / 2) / 2}" x2="${.5 + Math.cos(a - Math.PI / 2) / 2}" y2="${.5 + Math.sin(a - Math.PI / 2) / 2}"><stop offset="0" stop-color="${realCol(e.fill, sv)}"/><stop offset="1" stop-color="${realCol(e.g2, sv)}"/></linearGradient></defs>`; fill = 'url(#g)'; }
+  if (e.fill && e.g2 && e.gt !== 'con'){ defs = gradDefs('g', e, sv); fill = 'url(#g)'; }
   let body;
   if (k === 'ellipse') body = `<ellipse cx="${w / 2}" cy="${h / 2}" rx="${w / 2 - sw / 2}" ry="${h / 2 - sw / 2}" fill="${fill}"${stroke}/>`;
   else if (['rect', 'round', 'pill'].includes(k)){ const r = k === 'pill' ? Math.min(w, h) / 2 : k === 'round' ? (e.r ?? 18) : (e.r || 0); body = `<rect x="${sw / 2}" y="${sw / 2}" width="${w - sw}" height="${h - sw}" rx="${r}" fill="${fill}"${stroke}/>`; }
@@ -3459,7 +3967,18 @@ function shapeSVG(e, sv){
 }
 const hx = c => String(c || '#000000').replace('#', '').slice(0, 6).toUpperCase();
 const pxIn = v => v / 96, pxPt = v => v * .75;
-const PPT_SHAPES = {rect:'rect', round:'roundRect', ellipse:'ellipse', pill:'roundRect', tri:'triangle', rtri:'rtTriangle', diamond:'diamond', hex:'hexagon', oct:'octagon', star:'star5', star4:'star4', arrow:'rightArrow', chev:'chevron', plus:'mathPlus', heart:'heart', bubble:'wedgeRoundRectCallout', pent:'pentagon'};
+const PPT_SHAPES = {rect:'rect', round:'roundRect', ellipse:'ellipse', pill:'roundRect', tri:'triangle', rtri:'rtTriangle', diamond:'diamond', hex:'hexagon', oct:'octagon', star:'star5', star4:'star4', arrow:'rightArrow', chev:'chevron', plus:'mathPlus', heart:'heart', bubble:'wedgeRoundRectCallout', pent:'pentagon', trap:'trapezoid', para:'parallelogram', hept:'heptagon', deca:'decagon', star5:'star5', star6:'star6', star8:'star8', star12:'star12', seal:'star24', arrowl:'leftArrow', arrowu:'upArrow', arrowd:'downArrow', arrowlr:'leftRightArrow', arrowud:'upDownArrow', home:'homePlate', callout:'wedgeRectCallout', bubble2:'wedgeEllipseCallout', thought:'cloudCallout', cloud:'cloud', bolt:'lightningBolt', moon:'moon', ring:'donut', frame:'frame', cross:'plus'};
+function pptShadow(e, sv){ const f = e.fx?.sh || (e.shadow ? {x:0, y:e.shadow * .5, b:e.shadow, c:'#0A081E', o:.28} : null); if (!f || e.t === 'img' || e.t === 'table' || e.t === 'chart') return undefined; return {type:'outer', color:hx(realCol(f.c, sv) || '#000000'), blur:pxPt(f.b), offset:pxPt(Math.hypot(f.x, f.y)), angle:Math.round((Math.atan2(f.y, f.x) * 180 / Math.PI + 360) % 360), opacity:f.o ?? .35}; }
+/* fond d'une diapositive en SVG (export PowerPoint) : couleur, dégradé, ambiance maillée et motif */
+function bgSVG(s, sv, W, H){
+  const b = s.bg || {}, c = x => realCol(x, sv); let o = '';
+  if (b.mesh){ const m = b.mesh.map(c), pos = [[15, 20], [85, 15], [75, 90], [10, 90]]; o += `<rect width="${W}" height="${H}" fill="${m[3]}"/><defs>${pos.map((p, i) => `<radialGradient id="bm${i}" cx="${p[0]}%" cy="${p[1]}%" r="62%"><stop offset="0" stop-color="${m[i]}"/><stop offset="1" stop-color="${m[i]}" stop-opacity="0"/></radialGradient>`).join('')}</defs>${pos.map((_, i) => `<rect width="${W}" height="${H}" fill="url(#bm${i})"/>`).join('')}`; }
+  else if (b.g){ const a = (b.a ?? 135) * Math.PI / 180, dx = Math.cos(a - Math.PI / 2) / 2, dy = Math.sin(a - Math.PI / 2) / 2;
+    o += `<defs>${b.gt === 'rad' ? `<radialGradient id="bgg" cx=".5" cy=".4" r=".8">` : `<linearGradient id="bgg" x1="${.5 - dx}" y1="${.5 - dy}" x2="${.5 + dx}" y2="${.5 + dy}">`}<stop offset="0" stop-color="${c(b.g[0])}"/><stop offset="1" stop-color="${c(b.g[1])}"/>${b.gt === 'rad' ? '</radialGradient>' : '</linearGradient>'}</defs><rect width="${W}" height="${H}" fill="url(#bgg)"/>`; }
+  else o += `<rect width="${W}" height="${H}" fill="${c(b.c) || sv.bg}"/>`;
+  const pt = b.pat && PATS[b.pat]; if (pt) o += `<defs><pattern id="bgp" width="${pt[1]}" height="${pt[2]}" patternUnits="userSpaceOnUse" patternTransform="scale(${numIn(b.ps, .5, 4, 1)})">${pt[3](c(b.pc || 't:ink') || '#000')}</pattern></defs><rect width="${W}" height="${H}" fill="url(#bgp)" opacity="${numIn(b.po, .03, 1, .12)}"/>`;
+  return o;
+}
 async function exportPptx(){
   toast('Préparation du fichier PowerPoint…');
   const P = await loadLib(LIB_PPTX, 'PptxGenJS'); const p = new P(); const [W, H] = dims(), th = dtheme(D.theme);
@@ -3469,20 +3988,20 @@ async function exportPptx(){
     // fond : couleur simple, ou image (dégradé, décor du thème, photo)
     const deco = !s.nodeco && !s.bg?.img ? decorSVG(th, s.v || 'content', W, H, sv) : '';
     if (s.bg?.img){ const src = mediaSrc(s.bg.img); if (src) sl.background = {data:src.replace(/^data:/, '')}; if (s.bg.dim) sl.addShape(p.ShapeType.rect, {x:0, y:0, w:pxIn(W), h:pxIn(H), fill:{color:'000000', transparency:Math.round(100 - s.bg.dim * 100)}, line:{type:'none'}}); }
-    else if (deco || s.bg?.g){ const bgc = s.bg?.g ? `<defs><linearGradient id="bgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${realCol(s.bg.g[0], sv)}"/><stop offset="1" stop-color="${realCol(s.bg.g[1], sv)}"/></linearGradient></defs><rect width="${W}" height="${H}" fill="url(#bgg)"/>` : `<rect width="${W}" height="${H}" fill="${realCol(s.bg?.c, sv) || sv.bg}"/>`;
+    else if (deco || s.bg?.g || s.bg?.mesh || s.bg?.pat){ const bgc = bgSVG(s, sv, W, H);
       const png = await svgToPng(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">${bgc}${deco.replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '')}</svg>`, W, H, 1.5); if (png) sl.background = {data:png.replace(/^data:/, '')}; else sl.background = {color:hx(sv.bg)}; }
     else sl.background = {color:hx(realCol(s.bg?.c, sv) || sv.bg)};
     for (const e of s.els){
       const pos = {x:pxIn(e.x), y:pxIn(e.y), w:pxIn(e.w), h:pxIn(e.h), rotate:e.rot || 0};
-      const tr = e.op != null && e.op < 1 ? Math.round((1 - e.op) * 100) : 0;
+      const tr = e.op != null && e.op < 1 ? Math.round((1 - e.op) * 100) : 0, shd = pptShadow(e, sv);
       const txtOpts = st => ({fontFace:fontOf(st.f, sv), fontSize:pxPt(st.fs || 24), color:hx(realCol(st.fc || 't:ink', sv)), bold:!!st.b, italic:!!st.i, underline:st.u ? {style:'sng'} : undefined,
         align:{l:'left', c:'center', r:'right', j:'justify'}[st.ha || 'l'], valign:{t:'top', m:'middle', b:'bottom'}[st.va || 't'], lineSpacingMultiple:st.lh || 1.3, charSpacing:st.ls ? pxPt(st.ls * st.fs) : undefined, margin:0, paraSpaceAfter:0, fit:'none'});
       try {
-        if (e.t === 'text'){ const st = e.st || {}; const o = {...pos, ...txtOpts(st)}; if (st.bg){ o.fill = {color:hx(realCol(st.bg, sv))}; o.margin = pxPt(st.pad ?? 16); o.rectRadius = pxIn(st.r ?? 10); o.shape = p.ShapeType.roundRect; } if (tr) o.transparency = tr; sl.addText(htmlRuns(e.html, st, sv), o); }
+        if (e.t === 'text'){ const st = e.st || {}; const o = {...pos, ...txtOpts(st), shadow:shd}; if (st.bg){ o.fill = {color:hx(realCol(st.bg, sv))}; o.margin = pxPt(st.pad ?? 16); o.rectRadius = pxIn(st.r ?? 10); o.shape = p.ShapeType.roundRect; } if (tr) o.transparency = tr; sl.addText(htmlRuns(e.html, st, sv), o); }
         else if (e.t === 'shape'){
           const st = e.st || {}, fill = e.fill ? {color:hx(realCol(e.fill, sv)), transparency:tr} : {type:'none'}, line = e.sw && e.stroke ? {color:hx(realCol(e.stroke, sv)), width:pxPt(e.sw)} : {type:'none'};
           const prst = PPT_SHAPES[e.k];
-          if (prst && !e.g2){ const o = {...pos, fill, line, shape:p.ShapeType[prst] || prst, rectRadius:e.k === 'pill' ? pxIn(Math.min(e.w, e.h) / 2) : e.k === 'round' ? pxIn(e.r ?? 18) : undefined};
+          if (prst && !e.g2){ const o = {...pos, fill, line, shadow:shd, shape:p.ShapeType[prst] || prst, rectRadius:e.k === 'pill' ? pxIn(Math.min(e.w, e.h) / 2) : e.k === 'round' ? pxIn(e.r ?? 18) : undefined};
             if (e.html) sl.addText(htmlRuns(e.html, st, sv), {...o, ...txtOpts({ha:'c', va:'m', fc:'t:on', fs:22, ...st}), margin:4}); else sl.addShape(o.shape, o); }
           else { const png = await svgToPng(shapeSVG(e, sv), e.w, e.h);
             if (png) sl.addImage({data:png, ...pos, transparency:tr || undefined}); if (e.html) sl.addText(htmlRuns(e.html, st, sv), {...pos, ...txtOpts({ha:'c', va:'m', fc:'t:on', fs:22, ...st})}); }
@@ -3513,17 +4032,24 @@ async function exportPptx(){
 /* ---------- Page web autonome : la présentation se lit dans n'importe quel navigateur ---------- */
 async function exportHTML(){
   const [W, H] = dims(), th = dtheme(D.theme), list = visibleSlides();
-  const css = [...document.querySelectorAll('style')].map(s => s.textContent).join('\n').match(/\/\* @slide-css \*\/[^]*?\/\* @end-slide-css \*\//)?.[0] || '';
+  const css = [...document.querySelectorAll('style')].map(s => s.textContent).join('\n').match(/\/\* @slide-css \*\/[^]*?\/\* @end-slide-css \*\//g)?.join('\n') || '';
   const fonts = [th.fh, th.fb].filter(f => FONT_Q[f]).map(f => `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=${encodeURIComponent(f).replace(/%20/g, '+')}:${FONT_Q[f]}&display=swap">`).join('');
-  const slides = list.map(i => { const s = D.slides[i]; return `<section class="pv-slide" data-tr="${s.tr || ''}"><div class="anchor">${renderSlide(s, {present:true})}</div></section>`; }).join('');
+  const slides = list.map(i => { const s = D.slides[i]; return `<section class="pv-slide" data-tr="${s.tr || ''}" data-trd="${s.trd || ''}"><div class="anchor">${renderSlide(s, {present:true})}</div></section>`; }).join('');
+  const plans = list.map(i => { const s = D.slides[i]; return [...s.els].sort((a, b) => (a.y - b.y) || (a.x - b.x)).map(e => { const a = e.an?.k ? e.an : (s.an && !isCoverEl(e, W, H) ? {k:s.an} : null); return a && ANIM_BY[a.k] ? {id:e.id, k:a.k, c:a.click ? 1 : 0, dur:a.dur, del:a.del, ease:a.ease, rep:a.rep, loop:a.loop} : null; }).filter(Boolean); });
+  const AN = Object.fromEntries(ANIM_LIST.map(a => [a[0], [a[3], a[4], a[5] || '', a[2]]])), EA = Object.fromEntries(Object.entries(EASES).map(([k, v]) => [k, v[1]])), ADV = list.map(i => D.slides[i].adv || 0);
   const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escH(D.title)}</title>${fonts}<style>${css}
-html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:system-ui,sans-serif}.deck{position:fixed;inset:0}.pv-slide{position:absolute;display:none}.pv-slide.on{display:block}.pv-slide .sl{transform-origin:0 0}
+html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:system-ui,sans-serif}.deck{position:fixed;inset:0}.pv-slide{position:absolute;display:none;overflow:hidden}.pv-slide.on{display:block}.pv-slide .sl{transform-origin:0 0}
 .bar{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:6px;align-items:center;padding:6px 10px;border-radius:99px;background:rgb(20 16 40 / .7);color:#fff;font:600 13px system-ui;opacity:0;transition:opacity .3s}body:hover .bar{opacity:1}.bar button{border:0;background:none;color:#fff;font-size:16px;cursor:pointer;padding:4px 8px}.made{position:fixed;right:12px;bottom:10px;font:500 11px system-ui;color:#fff8}</style></head>
-<body><div class="deck">${slides}</div><div class="bar"><button onclick="go(i-1)" aria-label="Précédente">‹</button><span id="n"></span><button onclick="go(i+1)" aria-label="Suivante">›</button><button onclick="document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen()" aria-label="Plein écran">⤢</button></div><span class="made">SPECTRA Slide · Studio Prism</span>
-<script>var S=[].slice.call(document.querySelectorAll('.pv-slide')),i=0,W=${W},H=${H};function fit(){var k=Math.min(innerWidth/W,innerHeight/H);S.forEach(function(s){s.style.width=W*k+'px';s.style.height=H*k+'px';s.style.left=(innerWidth-W*k)/2+'px';s.style.top=(innerHeight-H*k)/2+'px';s.firstChild.firstChild.style.transform='scale('+k+')'})}
-function go(n){if(n<0||n>=S.length)return;S[i].classList.remove('on');i=n;var s=S[i];s.classList.add('on');[].forEach.call(s.querySelectorAll('.el'),function(e,j){e.classList.remove('an-run');void e.offsetWidth});var t=s.dataset.tr;s.className='pv-slide on'+(t?' tr-in tr-'+t:'');s.style.setProperty('--dir',1);document.getElementById('n').textContent=(i+1)+' / '+S.length}
-addEventListener('keydown',function(e){if(['ArrowRight','ArrowDown',' ','PageDown','Enter'].indexOf(e.key)>=0)go(i+1);if(['ArrowLeft','ArrowUp','PageUp','Backspace'].indexOf(e.key)>=0)go(i-1);if(e.key==='Home')go(0);if(e.key==='End')go(S.length-1)});
-addEventListener('click',function(e){if(!e.target.closest('.bar'))go(i+1)});addEventListener('resize',fit);fit();go(0);<\/script></body></html>`;
+<body><div class="deck">${slides}</div><div class="bar"><button onclick="go(i-1)" aria-label="Précédente">‹</button><span id="n"></span><button onclick="nx()" aria-label="Suivante">›</button><button onclick="document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen()" aria-label="Plein écran">⤢</button></div><span class="made">SPECTRA Slide · Studio Prism</span>
+<script>var S=[].slice.call(document.querySelectorAll('.pv-slide')),i=0,W=${W},H=${H},P=${JSON.stringify(plans)},AN=${JSON.stringify(AN)},EA=${JSON.stringify(EA)},ADV=${JSON.stringify(ADV)},LOOP=${D.loop ? 1 : 0},steps=[],tm=0;
+function fit(){var k=Math.min(innerWidth/W,innerHeight/H);S.forEach(function(s){s.style.width=W*k+'px';s.style.height=H*k+'px';s.style.left=(innerWidth-W*k)/2+'px';s.style.top=(innerHeight-H*k)/2+'px';s.firstChild.firstChild.style.transform='scale('+k+')'})}
+function sa(n,a,d){var f=AN[a.k];if(!f)return 0;n.dataset.an=a.k;n.style.setProperty('--an',f[0]);n.style.setProperty('--dur',(a.dur||f[1])+'s');n.style.setProperty('--ease',EA[a.ease]||f[2]||EA.soft);n.style.setProperty('--rep',a.loop?'infinite':(a.rep||1));n.style.setProperty('--d',Math.round(d+(a.del||0)*1000)+'ms');return 1}
+function go(n){if(n<0||n>=S.length)return;S[i].classList.remove('on');i=n;var s=S[i],t=s.dataset.tr;s.className='pv-slide on'+(t?' tr-in tr-'+t:'');s.style.setProperty('--dir',1);if(s.dataset.trd)s.style.setProperty('--trd',s.dataset.trd+'s');document.getElementById('n').textContent=(i+1)+' / '+S.length;
+steps=[];var auto=0;clearTimeout(tm);(P[i]||[]).forEach(function(a){var e=s.querySelector('[data-id="'+a.id+'"]');if(!e)return;e.classList.remove('an-run','an-wait');void e.offsetWidth;if(a.c){if(AN[a.k][3]==='in')e.classList.add('an-wait');steps.push([e,a])}else{if(sa(e,a,auto*110+250))e.classList.add('an-run');auto++}});
+if(ADV[i])tm=setTimeout(function(){if(i<S.length-1)go(i+1);else if(LOOP)go(0)},ADV[i]*1000)}
+function nx(){if(steps.length){var q=steps.shift();q[0].classList.remove('an-wait','an-run');void q[0].offsetWidth;if(sa(q[0],q[1],0))q[0].classList.add('an-run');return}if(i<S.length-1)go(i+1);else if(LOOP)go(0)}
+addEventListener('keydown',function(e){if(['ArrowRight','ArrowDown',' ','PageDown','Enter'].indexOf(e.key)>=0)nx();if(['ArrowLeft','ArrowUp','PageUp','Backspace'].indexOf(e.key)>=0)go(i-1);if(e.key==='Home')go(0);if(e.key==='End')go(S.length-1)});
+addEventListener('click',function(e){if(e.target.closest('.bar'))return;var l=e.target.closest('[data-lk]');if(l){var u=l.dataset.lk;if(/^#\d+$/.test(u))go(+u.slice(1)-1);else if(/^https?:/i.test(u))window.open(u,'_blank','noopener');return}nx()});addEventListener('resize',fit);fit();go(0);<\/script></body></html>`;
   await window.SWDownload(fileBase() + '.html', new Blob([html], {type:'text/html'})); toast('Page web prête : elle s\'ouvre dans n\'importe quel navigateur');
 }
 async function doExport(kind){
@@ -3691,12 +4217,13 @@ async function importPptx(file){
 /* présentation chargée depuis l'extérieur : HTML assaini, valeurs vérifiées */
 function cleanDeck(j){
   const d = {v:1, app:'spectraslide', title:String(j.title || 'Présentation sans titre').slice(0, 120), theme:j.theme && typeof j.theme === 'object' ? j.theme : {id:'spectra'}, size:SIZES[j.size] ? j.size : '16:9', slides:[], media:{}};
+  if (j.loop) d.loop = true;
   for (const [k, v] of Object.entries(j.media || {})) if (/^data:image\/(png|jpe?g|gif|webp|svg\+xml);base64,/.test(String(v))) d.media[k] = v;
   const okCol = c => c == null || c === '' || /^t:[a-z0-9]+$/.test(c) || /^#[0-9a-f]{3,8}$/i.test(c) ? c : undefined;
   for (const s0 of (j.slides || []).slice(0, 400)){
     if (!s0 || !Array.isArray(s0.els)) continue;
     const s = {id:String(s0.id || sid()), v:['title', 'section', 'content', 'end'].includes(s0.v) ? s0.v : 'content', lay:String(s0.lay || ''), els:[], notes:String(s0.notes || '').slice(0, 20000), tr:s0.tr ? String(s0.tr) : undefined, an:s0.an ? String(s0.an) : undefined, hide:!!s0.hide || undefined, nodeco:!!s0.nodeco || undefined};
-    if (s0.bg && typeof s0.bg === 'object'){ const b = {}; if (okCol(s0.bg.c)) b.c = s0.bg.c; if (Array.isArray(s0.bg.g)) b.g = s0.bg.g.map(okCol).filter(Boolean).slice(0, 2); if (/^m:\w+$/.test(s0.bg.img || '')) b.img = s0.bg.img; if (+s0.bg.dim) b.dim = clamp(+s0.bg.dim, 0, .9); if (b.g && b.g.length < 2) delete b.g; if (Object.keys(b).length) s.bg = b; }
+    if (s0.bg && typeof s0.bg === 'object'){ const b = {}; if (okCol(s0.bg.c)) b.c = s0.bg.c; if (Array.isArray(s0.bg.g)) b.g = s0.bg.g.map(okCol).filter(Boolean).slice(0, 2); if (/^m:\w+$/.test(s0.bg.img || '')) b.img = s0.bg.img; if (+s0.bg.dim) b.dim = clamp(+s0.bg.dim, 0, .9); if (b.g && b.g.length < 2) delete b.g; if (b.g && ['rad', 'con'].includes(s0.bg.gt)) b.gt = s0.bg.gt; if (b.g && isFinite(+s0.bg.a)) b.a = numIn(s0.bg.a, -720, 720); if (Array.isArray(s0.bg.mesh) && s0.bg.mesh.length === 4 && s0.bg.mesh.every(isCol)) b.mesh = s0.bg.mesh; if (PATS[s0.bg.pat]){ b.pat = s0.bg.pat; if (isCol(s0.bg.pc)) b.pc = s0.bg.pc; b.po = numIn(s0.bg.po, .03, 1, .12); b.ps = numIn(s0.bg.ps, .5, 4, 1); } if (s0.adv) s.adv = numIn(s0.adv, 1, 600); if (s0.trd) s.trd = numIn(s0.trd, .2, 3); if (Object.keys(b).length) s.bg = b; }
     for (const e0 of s0.els.slice(0, 300)){
       if (!e0 || !['text', 'shape', 'line', 'img', 'icon', 'table', 'chart'].includes(e0.t)) continue;
       const e = {...e0}; e.id = String(e.id || nid()); for (const k of ['x', 'y', 'w', 'h']) e[k] = +e[k] || 0; e.w = Math.max(1, e.w); e.h = Math.max(1, e.h);
@@ -3704,7 +4231,7 @@ function cleanDeck(j){
       for (const k of ['fill', 'g2', 'stroke', 'fc', 'hc']) if (k in e && okCol(e[k]) === undefined) delete e[k];
       if (e.st){ e.st = {...e.st}; for (const k of ['fc', 'bg', 'hl']) if (k in e.st && okCol(e.st[k]) === undefined) delete e.st[k]; if (e.st.f && !['h', 'b'].includes(e.st.f) && !FONTS.some(f => f[0] === e.st.f)) e.st.f = 'b'; }
       if (e.t === 'img' && e.src && !/^m:\w+$/.test(e.src)){ if (/^data:image\/(png|jpe?g|gif|webp);base64,/.test(e.src)){ const id = uidS(); d.media[id] = e.src; e.src = 'm:' + id; } else e.src = ''; }
-      if (e.t === 'icon' && !ICONS[e.n]) e.n = 'star'; if (e.t === 'shape' && !SHAPES[e.k]) e.k = 'rect';
+      if (e.t === 'icon' && !ICONS[e.n]) e.n = 'star'; if (e.t === 'shape' && !SHAPES[e.k]) e.k = 'rect'; cleanFx(e);
       if (e.t === 'chart'){ e.labels = (e.labels || []).map(String).slice(0, 60); e.series = (e.series || []).slice(0, 12).map(x => ({n:String(x.n || ''), v:(x.v || []).slice(0, 60).map(v => v == null || isNaN(+v) ? null : +v)})); }
       s.els.push(e);
     }
@@ -3730,7 +4257,7 @@ function spectreActions(){
   BLOCKS.forEach(([k, t]) => add('Insérer', 'Élément : ' + t.toLowerCase(), () => addEls(blockEls(k), t)));
   DTHEMES.forEach(t => add('Design', 'Thème ' + t.name, () => { D.theme = {id:t.id}; ensureThemeFonts(); THUMB.clear(); renderAll(); commit('Thème'); }, 'couleurs style'));
   Object.entries(SIZE_NAMES).forEach(([k, t]) => add('Design', 'Format ' + t, () => resizeDeck(k), 'taille'));
-  add('Design', 'Fond de la diapositive…', () => bgPop(g$('edBar')), 'couleur arrière-plan');
+  add('Design', 'Fond de la diapositive…', () => openPanel('format'), 'couleur arrière-plan');
   add('Animer', 'Animer toute la présentation', () => { openPanel('anim'); g$('edPanelBody').querySelector('[data-a="magic"]')?.click(); }, 'animation transition'); TRANS.slice(1).forEach(([k, t]) => add('Animer', 'Transition : ' + t.toLowerCase(), () => { cur().tr = k; commit('Transition'); previewTransition(); }));
   add('Fichier', 'Exporter en PDF', () => doExport('pdf'), 'imprimer'); add('Fichier', 'Exporter en PowerPoint (.pptx)', () => doExport('pptx'), 'ppt'); add('Fichier', 'Exporter en page web', () => doExport('html'));
   add('Fichier', 'Ouvrir un fichier PowerPoint…', () => g$('homeFile').click(), 'importer pptx'); add('Fichier', 'Enregistrer comme modèle', saveTplDlg); add('Fichier', 'Publier dans la Communauté', () => window.SWHome?.publishCurrent?.()); add('Fichier', 'Partager…', () => window.SWShareCurrent?.());

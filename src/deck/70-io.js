@@ -63,7 +63,7 @@ function htmlRuns(html, base, sv){
 function shapeSVG(e, sv){
   const k = e.k || 'rect', w = e.w, h = e.h, sw = +e.sw || 0, stroke = e.stroke && sw ? ` stroke="${realCol(e.stroke, sv)}" stroke-width="${sw}"` : '';
   let defs = '', fill = e.fill ? realCol(e.fill, sv) : 'none';
-  if (e.fill && e.g2){ const a = (e.ga ?? 135) * Math.PI / 180; defs = `<defs><linearGradient id="g" x1="${.5 - Math.cos(a - Math.PI / 2) / 2}" y1="${.5 - Math.sin(a - Math.PI / 2) / 2}" x2="${.5 + Math.cos(a - Math.PI / 2) / 2}" y2="${.5 + Math.sin(a - Math.PI / 2) / 2}"><stop offset="0" stop-color="${realCol(e.fill, sv)}"/><stop offset="1" stop-color="${realCol(e.g2, sv)}"/></linearGradient></defs>`; fill = 'url(#g)'; }
+  if (e.fill && e.g2 && e.gt !== 'con'){ defs = gradDefs('g', e, sv); fill = 'url(#g)'; }
   let body;
   if (k === 'ellipse') body = `<ellipse cx="${w / 2}" cy="${h / 2}" rx="${w / 2 - sw / 2}" ry="${h / 2 - sw / 2}" fill="${fill}"${stroke}/>`;
   else if (['rect', 'round', 'pill'].includes(k)){ const r = k === 'pill' ? Math.min(w, h) / 2 : k === 'round' ? (e.r ?? 18) : (e.r || 0); body = `<rect x="${sw / 2}" y="${sw / 2}" width="${w - sw}" height="${h - sw}" rx="${r}" fill="${fill}"${stroke}/>`; }
@@ -72,7 +72,18 @@ function shapeSVG(e, sv){
 }
 const hx = c => String(c || '#000000').replace('#', '').slice(0, 6).toUpperCase();
 const pxIn = v => v / 96, pxPt = v => v * .75;
-const PPT_SHAPES = {rect:'rect', round:'roundRect', ellipse:'ellipse', pill:'roundRect', tri:'triangle', rtri:'rtTriangle', diamond:'diamond', hex:'hexagon', oct:'octagon', star:'star5', star4:'star4', arrow:'rightArrow', chev:'chevron', plus:'mathPlus', heart:'heart', bubble:'wedgeRoundRectCallout', pent:'pentagon'};
+const PPT_SHAPES = {rect:'rect', round:'roundRect', ellipse:'ellipse', pill:'roundRect', tri:'triangle', rtri:'rtTriangle', diamond:'diamond', hex:'hexagon', oct:'octagon', star:'star5', star4:'star4', arrow:'rightArrow', chev:'chevron', plus:'mathPlus', heart:'heart', bubble:'wedgeRoundRectCallout', pent:'pentagon', trap:'trapezoid', para:'parallelogram', hept:'heptagon', deca:'decagon', star5:'star5', star6:'star6', star8:'star8', star12:'star12', seal:'star24', arrowl:'leftArrow', arrowu:'upArrow', arrowd:'downArrow', arrowlr:'leftRightArrow', arrowud:'upDownArrow', home:'homePlate', callout:'wedgeRectCallout', bubble2:'wedgeEllipseCallout', thought:'cloudCallout', cloud:'cloud', bolt:'lightningBolt', moon:'moon', ring:'donut', frame:'frame', cross:'plus'};
+function pptShadow(e, sv){ const f = e.fx?.sh || (e.shadow ? {x:0, y:e.shadow * .5, b:e.shadow, c:'#0A081E', o:.28} : null); if (!f || e.t === 'img' || e.t === 'table' || e.t === 'chart') return undefined; return {type:'outer', color:hx(realCol(f.c, sv) || '#000000'), blur:pxPt(f.b), offset:pxPt(Math.hypot(f.x, f.y)), angle:Math.round((Math.atan2(f.y, f.x) * 180 / Math.PI + 360) % 360), opacity:f.o ?? .35}; }
+/* fond d'une diapositive en SVG (export PowerPoint) : couleur, dégradé, ambiance maillée et motif */
+function bgSVG(s, sv, W, H){
+  const b = s.bg || {}, c = x => realCol(x, sv); let o = '';
+  if (b.mesh){ const m = b.mesh.map(c), pos = [[15, 20], [85, 15], [75, 90], [10, 90]]; o += `<rect width="${W}" height="${H}" fill="${m[3]}"/><defs>${pos.map((p, i) => `<radialGradient id="bm${i}" cx="${p[0]}%" cy="${p[1]}%" r="62%"><stop offset="0" stop-color="${m[i]}"/><stop offset="1" stop-color="${m[i]}" stop-opacity="0"/></radialGradient>`).join('')}</defs>${pos.map((_, i) => `<rect width="${W}" height="${H}" fill="url(#bm${i})"/>`).join('')}`; }
+  else if (b.g){ const a = (b.a ?? 135) * Math.PI / 180, dx = Math.cos(a - Math.PI / 2) / 2, dy = Math.sin(a - Math.PI / 2) / 2;
+    o += `<defs>${b.gt === 'rad' ? `<radialGradient id="bgg" cx=".5" cy=".4" r=".8">` : `<linearGradient id="bgg" x1="${.5 - dx}" y1="${.5 - dy}" x2="${.5 + dx}" y2="${.5 + dy}">`}<stop offset="0" stop-color="${c(b.g[0])}"/><stop offset="1" stop-color="${c(b.g[1])}"/>${b.gt === 'rad' ? '</radialGradient>' : '</linearGradient>'}</defs><rect width="${W}" height="${H}" fill="url(#bgg)"/>`; }
+  else o += `<rect width="${W}" height="${H}" fill="${c(b.c) || sv.bg}"/>`;
+  const pt = b.pat && PATS[b.pat]; if (pt) o += `<defs><pattern id="bgp" width="${pt[1]}" height="${pt[2]}" patternUnits="userSpaceOnUse" patternTransform="scale(${numIn(b.ps, .5, 4, 1)})">${pt[3](c(b.pc || 't:ink') || '#000')}</pattern></defs><rect width="${W}" height="${H}" fill="url(#bgp)" opacity="${numIn(b.po, .03, 1, .12)}"/>`;
+  return o;
+}
 async function exportPptx(){
   toast('Préparation du fichier PowerPoint…');
   const P = await loadLib(LIB_PPTX, 'PptxGenJS'); const p = new P(); const [W, H] = dims(), th = dtheme(D.theme);
@@ -82,20 +93,20 @@ async function exportPptx(){
     // fond : couleur simple, ou image (dégradé, décor du thème, photo)
     const deco = !s.nodeco && !s.bg?.img ? decorSVG(th, s.v || 'content', W, H, sv) : '';
     if (s.bg?.img){ const src = mediaSrc(s.bg.img); if (src) sl.background = {data:src.replace(/^data:/, '')}; if (s.bg.dim) sl.addShape(p.ShapeType.rect, {x:0, y:0, w:pxIn(W), h:pxIn(H), fill:{color:'000000', transparency:Math.round(100 - s.bg.dim * 100)}, line:{type:'none'}}); }
-    else if (deco || s.bg?.g){ const bgc = s.bg?.g ? `<defs><linearGradient id="bgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${realCol(s.bg.g[0], sv)}"/><stop offset="1" stop-color="${realCol(s.bg.g[1], sv)}"/></linearGradient></defs><rect width="${W}" height="${H}" fill="url(#bgg)"/>` : `<rect width="${W}" height="${H}" fill="${realCol(s.bg?.c, sv) || sv.bg}"/>`;
+    else if (deco || s.bg?.g || s.bg?.mesh || s.bg?.pat){ const bgc = bgSVG(s, sv, W, H);
       const png = await svgToPng(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">${bgc}${deco.replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '')}</svg>`, W, H, 1.5); if (png) sl.background = {data:png.replace(/^data:/, '')}; else sl.background = {color:hx(sv.bg)}; }
     else sl.background = {color:hx(realCol(s.bg?.c, sv) || sv.bg)};
     for (const e of s.els){
       const pos = {x:pxIn(e.x), y:pxIn(e.y), w:pxIn(e.w), h:pxIn(e.h), rotate:e.rot || 0};
-      const tr = e.op != null && e.op < 1 ? Math.round((1 - e.op) * 100) : 0;
+      const tr = e.op != null && e.op < 1 ? Math.round((1 - e.op) * 100) : 0, shd = pptShadow(e, sv);
       const txtOpts = st => ({fontFace:fontOf(st.f, sv), fontSize:pxPt(st.fs || 24), color:hx(realCol(st.fc || 't:ink', sv)), bold:!!st.b, italic:!!st.i, underline:st.u ? {style:'sng'} : undefined,
         align:{l:'left', c:'center', r:'right', j:'justify'}[st.ha || 'l'], valign:{t:'top', m:'middle', b:'bottom'}[st.va || 't'], lineSpacingMultiple:st.lh || 1.3, charSpacing:st.ls ? pxPt(st.ls * st.fs) : undefined, margin:0, paraSpaceAfter:0, fit:'none'});
       try {
-        if (e.t === 'text'){ const st = e.st || {}; const o = {...pos, ...txtOpts(st)}; if (st.bg){ o.fill = {color:hx(realCol(st.bg, sv))}; o.margin = pxPt(st.pad ?? 16); o.rectRadius = pxIn(st.r ?? 10); o.shape = p.ShapeType.roundRect; } if (tr) o.transparency = tr; sl.addText(htmlRuns(e.html, st, sv), o); }
+        if (e.t === 'text'){ const st = e.st || {}; const o = {...pos, ...txtOpts(st), shadow:shd}; if (st.bg){ o.fill = {color:hx(realCol(st.bg, sv))}; o.margin = pxPt(st.pad ?? 16); o.rectRadius = pxIn(st.r ?? 10); o.shape = p.ShapeType.roundRect; } if (tr) o.transparency = tr; sl.addText(htmlRuns(e.html, st, sv), o); }
         else if (e.t === 'shape'){
           const st = e.st || {}, fill = e.fill ? {color:hx(realCol(e.fill, sv)), transparency:tr} : {type:'none'}, line = e.sw && e.stroke ? {color:hx(realCol(e.stroke, sv)), width:pxPt(e.sw)} : {type:'none'};
           const prst = PPT_SHAPES[e.k];
-          if (prst && !e.g2){ const o = {...pos, fill, line, shape:p.ShapeType[prst] || prst, rectRadius:e.k === 'pill' ? pxIn(Math.min(e.w, e.h) / 2) : e.k === 'round' ? pxIn(e.r ?? 18) : undefined};
+          if (prst && !e.g2){ const o = {...pos, fill, line, shadow:shd, shape:p.ShapeType[prst] || prst, rectRadius:e.k === 'pill' ? pxIn(Math.min(e.w, e.h) / 2) : e.k === 'round' ? pxIn(e.r ?? 18) : undefined};
             if (e.html) sl.addText(htmlRuns(e.html, st, sv), {...o, ...txtOpts({ha:'c', va:'m', fc:'t:on', fs:22, ...st}), margin:4}); else sl.addShape(o.shape, o); }
           else { const png = await svgToPng(shapeSVG(e, sv), e.w, e.h);
             if (png) sl.addImage({data:png, ...pos, transparency:tr || undefined}); if (e.html) sl.addText(htmlRuns(e.html, st, sv), {...pos, ...txtOpts({ha:'c', va:'m', fc:'t:on', fs:22, ...st})}); }
@@ -126,17 +137,24 @@ async function exportPptx(){
 /* ---------- Page web autonome : la présentation se lit dans n'importe quel navigateur ---------- */
 async function exportHTML(){
   const [W, H] = dims(), th = dtheme(D.theme), list = visibleSlides();
-  const css = [...document.querySelectorAll('style')].map(s => s.textContent).join('\n').match(/\/\* @slide-css \*\/[^]*?\/\* @end-slide-css \*\//)?.[0] || '';
+  const css = [...document.querySelectorAll('style')].map(s => s.textContent).join('\n').match(/\/\* @slide-css \*\/[^]*?\/\* @end-slide-css \*\//g)?.join('\n') || '';
   const fonts = [th.fh, th.fb].filter(f => FONT_Q[f]).map(f => `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=${encodeURIComponent(f).replace(/%20/g, '+')}:${FONT_Q[f]}&display=swap">`).join('');
-  const slides = list.map(i => { const s = D.slides[i]; return `<section class="pv-slide" data-tr="${s.tr || ''}"><div class="anchor">${renderSlide(s, {present:true})}</div></section>`; }).join('');
+  const slides = list.map(i => { const s = D.slides[i]; return `<section class="pv-slide" data-tr="${s.tr || ''}" data-trd="${s.trd || ''}"><div class="anchor">${renderSlide(s, {present:true})}</div></section>`; }).join('');
+  const plans = list.map(i => { const s = D.slides[i]; return [...s.els].sort((a, b) => (a.y - b.y) || (a.x - b.x)).map(e => { const a = e.an?.k ? e.an : (s.an && !isCoverEl(e, W, H) ? {k:s.an} : null); return a && ANIM_BY[a.k] ? {id:e.id, k:a.k, c:a.click ? 1 : 0, dur:a.dur, del:a.del, ease:a.ease, rep:a.rep, loop:a.loop} : null; }).filter(Boolean); });
+  const AN = Object.fromEntries(ANIM_LIST.map(a => [a[0], [a[3], a[4], a[5] || '', a[2]]])), EA = Object.fromEntries(Object.entries(EASES).map(([k, v]) => [k, v[1]])), ADV = list.map(i => D.slides[i].adv || 0);
   const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escH(D.title)}</title>${fonts}<style>${css}
-html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:system-ui,sans-serif}.deck{position:fixed;inset:0}.pv-slide{position:absolute;display:none}.pv-slide.on{display:block}.pv-slide .sl{transform-origin:0 0}
+html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:system-ui,sans-serif}.deck{position:fixed;inset:0}.pv-slide{position:absolute;display:none;overflow:hidden}.pv-slide.on{display:block}.pv-slide .sl{transform-origin:0 0}
 .bar{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:6px;align-items:center;padding:6px 10px;border-radius:99px;background:rgb(20 16 40 / .7);color:#fff;font:600 13px system-ui;opacity:0;transition:opacity .3s}body:hover .bar{opacity:1}.bar button{border:0;background:none;color:#fff;font-size:16px;cursor:pointer;padding:4px 8px}.made{position:fixed;right:12px;bottom:10px;font:500 11px system-ui;color:#fff8}</style></head>
-<body><div class="deck">${slides}</div><div class="bar"><button onclick="go(i-1)" aria-label="Précédente">‹</button><span id="n"></span><button onclick="go(i+1)" aria-label="Suivante">›</button><button onclick="document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen()" aria-label="Plein écran">⤢</button></div><span class="made">SPECTRA Slide · Studio Prism</span>
-<script>var S=[].slice.call(document.querySelectorAll('.pv-slide')),i=0,W=${W},H=${H};function fit(){var k=Math.min(innerWidth/W,innerHeight/H);S.forEach(function(s){s.style.width=W*k+'px';s.style.height=H*k+'px';s.style.left=(innerWidth-W*k)/2+'px';s.style.top=(innerHeight-H*k)/2+'px';s.firstChild.firstChild.style.transform='scale('+k+')'})}
-function go(n){if(n<0||n>=S.length)return;S[i].classList.remove('on');i=n;var s=S[i];s.classList.add('on');[].forEach.call(s.querySelectorAll('.el'),function(e,j){e.classList.remove('an-run');void e.offsetWidth});var t=s.dataset.tr;s.className='pv-slide on'+(t?' tr-in tr-'+t:'');s.style.setProperty('--dir',1);document.getElementById('n').textContent=(i+1)+' / '+S.length}
-addEventListener('keydown',function(e){if(['ArrowRight','ArrowDown',' ','PageDown','Enter'].indexOf(e.key)>=0)go(i+1);if(['ArrowLeft','ArrowUp','PageUp','Backspace'].indexOf(e.key)>=0)go(i-1);if(e.key==='Home')go(0);if(e.key==='End')go(S.length-1)});
-addEventListener('click',function(e){if(!e.target.closest('.bar'))go(i+1)});addEventListener('resize',fit);fit();go(0);<\/script></body></html>`;
+<body><div class="deck">${slides}</div><div class="bar"><button onclick="go(i-1)" aria-label="Précédente">‹</button><span id="n"></span><button onclick="nx()" aria-label="Suivante">›</button><button onclick="document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen()" aria-label="Plein écran">⤢</button></div><span class="made">SPECTRA Slide · Studio Prism</span>
+<script>var S=[].slice.call(document.querySelectorAll('.pv-slide')),i=0,W=${W},H=${H},P=${JSON.stringify(plans)},AN=${JSON.stringify(AN)},EA=${JSON.stringify(EA)},ADV=${JSON.stringify(ADV)},LOOP=${D.loop ? 1 : 0},steps=[],tm=0;
+function fit(){var k=Math.min(innerWidth/W,innerHeight/H);S.forEach(function(s){s.style.width=W*k+'px';s.style.height=H*k+'px';s.style.left=(innerWidth-W*k)/2+'px';s.style.top=(innerHeight-H*k)/2+'px';s.firstChild.firstChild.style.transform='scale('+k+')'})}
+function sa(n,a,d){var f=AN[a.k];if(!f)return 0;n.dataset.an=a.k;n.style.setProperty('--an',f[0]);n.style.setProperty('--dur',(a.dur||f[1])+'s');n.style.setProperty('--ease',EA[a.ease]||f[2]||EA.soft);n.style.setProperty('--rep',a.loop?'infinite':(a.rep||1));n.style.setProperty('--d',Math.round(d+(a.del||0)*1000)+'ms');return 1}
+function go(n){if(n<0||n>=S.length)return;S[i].classList.remove('on');i=n;var s=S[i],t=s.dataset.tr;s.className='pv-slide on'+(t?' tr-in tr-'+t:'');s.style.setProperty('--dir',1);if(s.dataset.trd)s.style.setProperty('--trd',s.dataset.trd+'s');document.getElementById('n').textContent=(i+1)+' / '+S.length;
+steps=[];var auto=0;clearTimeout(tm);(P[i]||[]).forEach(function(a){var e=s.querySelector('[data-id="'+a.id+'"]');if(!e)return;e.classList.remove('an-run','an-wait');void e.offsetWidth;if(a.c){if(AN[a.k][3]==='in')e.classList.add('an-wait');steps.push([e,a])}else{if(sa(e,a,auto*110+250))e.classList.add('an-run');auto++}});
+if(ADV[i])tm=setTimeout(function(){if(i<S.length-1)go(i+1);else if(LOOP)go(0)},ADV[i]*1000)}
+function nx(){if(steps.length){var q=steps.shift();q[0].classList.remove('an-wait','an-run');void q[0].offsetWidth;if(sa(q[0],q[1],0))q[0].classList.add('an-run');return}if(i<S.length-1)go(i+1);else if(LOOP)go(0)}
+addEventListener('keydown',function(e){if(['ArrowRight','ArrowDown',' ','PageDown','Enter'].indexOf(e.key)>=0)nx();if(['ArrowLeft','ArrowUp','PageUp','Backspace'].indexOf(e.key)>=0)go(i-1);if(e.key==='Home')go(0);if(e.key==='End')go(S.length-1)});
+addEventListener('click',function(e){if(e.target.closest('.bar'))return;var l=e.target.closest('[data-lk]');if(l){var u=l.dataset.lk;if(/^#\d+$/.test(u))go(+u.slice(1)-1);else if(/^https?:/i.test(u))window.open(u,'_blank','noopener');return}nx()});addEventListener('resize',fit);fit();go(0);<\/script></body></html>`;
   await window.SWDownload(fileBase() + '.html', new Blob([html], {type:'text/html'})); toast('Page web prête : elle s\'ouvre dans n\'importe quel navigateur');
 }
 async function doExport(kind){
@@ -304,12 +322,13 @@ async function importPptx(file){
 /* présentation chargée depuis l'extérieur : HTML assaini, valeurs vérifiées */
 function cleanDeck(j){
   const d = {v:1, app:'spectraslide', title:String(j.title || 'Présentation sans titre').slice(0, 120), theme:j.theme && typeof j.theme === 'object' ? j.theme : {id:'spectra'}, size:SIZES[j.size] ? j.size : '16:9', slides:[], media:{}};
+  if (j.loop) d.loop = true;
   for (const [k, v] of Object.entries(j.media || {})) if (/^data:image\/(png|jpe?g|gif|webp|svg\+xml);base64,/.test(String(v))) d.media[k] = v;
   const okCol = c => c == null || c === '' || /^t:[a-z0-9]+$/.test(c) || /^#[0-9a-f]{3,8}$/i.test(c) ? c : undefined;
   for (const s0 of (j.slides || []).slice(0, 400)){
     if (!s0 || !Array.isArray(s0.els)) continue;
     const s = {id:String(s0.id || sid()), v:['title', 'section', 'content', 'end'].includes(s0.v) ? s0.v : 'content', lay:String(s0.lay || ''), els:[], notes:String(s0.notes || '').slice(0, 20000), tr:s0.tr ? String(s0.tr) : undefined, an:s0.an ? String(s0.an) : undefined, hide:!!s0.hide || undefined, nodeco:!!s0.nodeco || undefined};
-    if (s0.bg && typeof s0.bg === 'object'){ const b = {}; if (okCol(s0.bg.c)) b.c = s0.bg.c; if (Array.isArray(s0.bg.g)) b.g = s0.bg.g.map(okCol).filter(Boolean).slice(0, 2); if (/^m:\w+$/.test(s0.bg.img || '')) b.img = s0.bg.img; if (+s0.bg.dim) b.dim = clamp(+s0.bg.dim, 0, .9); if (b.g && b.g.length < 2) delete b.g; if (Object.keys(b).length) s.bg = b; }
+    if (s0.bg && typeof s0.bg === 'object'){ const b = {}; if (okCol(s0.bg.c)) b.c = s0.bg.c; if (Array.isArray(s0.bg.g)) b.g = s0.bg.g.map(okCol).filter(Boolean).slice(0, 2); if (/^m:\w+$/.test(s0.bg.img || '')) b.img = s0.bg.img; if (+s0.bg.dim) b.dim = clamp(+s0.bg.dim, 0, .9); if (b.g && b.g.length < 2) delete b.g; if (b.g && ['rad', 'con'].includes(s0.bg.gt)) b.gt = s0.bg.gt; if (b.g && isFinite(+s0.bg.a)) b.a = numIn(s0.bg.a, -720, 720); if (Array.isArray(s0.bg.mesh) && s0.bg.mesh.length === 4 && s0.bg.mesh.every(isCol)) b.mesh = s0.bg.mesh; if (PATS[s0.bg.pat]){ b.pat = s0.bg.pat; if (isCol(s0.bg.pc)) b.pc = s0.bg.pc; b.po = numIn(s0.bg.po, .03, 1, .12); b.ps = numIn(s0.bg.ps, .5, 4, 1); } if (s0.adv) s.adv = numIn(s0.adv, 1, 600); if (s0.trd) s.trd = numIn(s0.trd, .2, 3); if (Object.keys(b).length) s.bg = b; }
     for (const e0 of s0.els.slice(0, 300)){
       if (!e0 || !['text', 'shape', 'line', 'img', 'icon', 'table', 'chart'].includes(e0.t)) continue;
       const e = {...e0}; e.id = String(e.id || nid()); for (const k of ['x', 'y', 'w', 'h']) e[k] = +e[k] || 0; e.w = Math.max(1, e.w); e.h = Math.max(1, e.h);
@@ -317,7 +336,7 @@ function cleanDeck(j){
       for (const k of ['fill', 'g2', 'stroke', 'fc', 'hc']) if (k in e && okCol(e[k]) === undefined) delete e[k];
       if (e.st){ e.st = {...e.st}; for (const k of ['fc', 'bg', 'hl']) if (k in e.st && okCol(e.st[k]) === undefined) delete e.st[k]; if (e.st.f && !['h', 'b'].includes(e.st.f) && !FONTS.some(f => f[0] === e.st.f)) e.st.f = 'b'; }
       if (e.t === 'img' && e.src && !/^m:\w+$/.test(e.src)){ if (/^data:image\/(png|jpe?g|gif|webp);base64,/.test(e.src)){ const id = uidS(); d.media[id] = e.src; e.src = 'm:' + id; } else e.src = ''; }
-      if (e.t === 'icon' && !ICONS[e.n]) e.n = 'star'; if (e.t === 'shape' && !SHAPES[e.k]) e.k = 'rect';
+      if (e.t === 'icon' && !ICONS[e.n]) e.n = 'star'; if (e.t === 'shape' && !SHAPES[e.k]) e.k = 'rect'; cleanFx(e);
       if (e.t === 'chart'){ e.labels = (e.labels || []).map(String).slice(0, 60); e.series = (e.series || []).slice(0, 12).map(x => ({n:String(x.n || ''), v:(x.v || []).slice(0, 60).map(v => v == null || isNaN(+v) ? null : +v)})); }
       s.els.push(e);
     }
