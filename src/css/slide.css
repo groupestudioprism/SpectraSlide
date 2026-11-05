@@ -1,8 +1,6 @@
 /* ===== SPECTRA Slide : le film des diapositives à gauche, la scène au centre, la barre Prisme en bas ===== */
-.ap-ic.w{background:linear-gradient(135deg,#8B3CF7,#3D63FF 30%,#14C2EC 48%,#78DD6A 62%,#FFD43F 76%,#FF8A3D 88%,#FF3F86);border-radius:9px}
-/* logo : la diapositive inclinée, sans cadre, une ombre qui suit la forme */
+/* logo : icône de la gamme, une ombre qui suit la forme */
 .sp-mark{border-radius:0;box-shadow:none;overflow:visible;filter:drop-shadow(0 18px 40px rgb(61 99 255 / .45))}
-.sp-mark .sp-shine{clip-path:polygon(7% 13%,93% 1%,93% 87%,7% 99%)}
 .ap-brand svg{border-radius:0;box-shadow:none;filter:drop-shadow(0 12px 30px rgb(61 99 255 / .5))}
 .hm-brand svg,.ed-home svg{border-radius:0;filter:drop-shadow(0 3px 6px rgb(61 99 255 / .3))}
 

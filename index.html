@@ -210,7 +210,7 @@ kbd{display:inline-block;min-width:22px;padding:1px 6px;border:1px solid var(--l
 .ap-aurora i:nth-child(4){width:22vmax;height:22vmax;right:10%;bottom:6%;background:radial-gradient(circle,#FFC83D,transparent 60%);opacity:.6;animation-delay:-7s}
 .ap-side>*:not(.ap-aurora){position:relative}
 .ap-brand{display:flex;align-items:center;gap:14px}
-.ap-brand svg{width:56px;height:56px;border-radius:14px;box-shadow:0 12px 40px rgb(123 47 247 / .5)}
+.ap-brand svg{width:56px;height:56px;border-radius:0;box-shadow:0 12px 40px rgb(123 47 247 / .5)}
 .ap-brand b{display:block;font:800 26px/1 var(--f-disp);letter-spacing:.06em}
 .ap-brand span{display:block;font:500 22px/1.15 var(--f-disp);background:var(--prism);-webkit-background-clip:text;background-clip:text;color:transparent}
 .ap-pitch{max-width:46ch}
@@ -220,9 +220,7 @@ kbd{display:inline-block;min-width:22px;padding:1px 6px;border:1px solid var(--l
 .ap-apps{list-style:none;margin:0;padding:0;display:grid;gap:10px;max-width:440px}
 .ap-apps li{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:0 12px;align-items:center;padding:10px 12px;border-radius:14px;background:rgb(255 255 255 / .06);border:1px solid rgb(255 255 255 / .1);backdrop-filter:blur(8px)}
 .ap-ic{grid-row:1 / span 2;grid-column:1;width:40px;height:40px;border-radius:11px;display:block}
-.ap-ic svg{width:40px;height:40px;border-radius:11px;display:block}
-.ap-ic.c{background:conic-gradient(from 210deg,#FF8A3D,#FFC83D,#45D69A,#14C2EC,#7B2FF7,#FF3F86,#FF8A3D);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
-.ap-ic.s{background:linear-gradient(120deg,#3D63FF,#14C2EC 40%,#FFC83D 70%,#FF3F86);transform:skewY(-8deg) scale(.86);border-radius:6px}
+.ap-ic svg{width:40px;height:40px;border-radius:0;display:block}
 .ap-apps b{grid-column:2;grid-row:1;font:700 14px var(--f-disp)}
 .ap-apps span:not(.ap-ic){grid-column:2;grid-row:2;font-size:12.5px;color:rgb(255 255 255 / .6)}
 .ap-apps em{grid-row:1 / span 2;grid-column:3;font:600 11.5px var(--f-ui);font-style:normal;padding:3px 9px;border-radius:99px;border:1px solid rgb(255 255 255 / .25);color:rgb(255 255 255 / .75);white-space:nowrap}
@@ -344,7 +342,7 @@ kbd{display:inline-block;min-width:22px;padding:1px 6px;border:1px solid var(--l
 #home{position:fixed;inset:0;z-index:20;display:grid;grid-template-rows:auto minmax(0,1fr);grid-template-columns:minmax(0,1fr);background:var(--bg)}
 .hm-top{display:flex;align-items:center;gap:22px;height:64px;padding:0 clamp(16px,3vw,40px);background:var(--panel);border-bottom:1px solid var(--line)}
 .hm-brand{display:flex;align-items:center;gap:10px;font:800 17px/1 var(--f-disp);letter-spacing:.01em;white-space:nowrap}
-.hm-brand svg{width:32px;height:32px;border-radius:9px}
+.hm-brand svg{width:32px;height:32px;border-radius:0}
 .hm-brand em{font-style:normal;font-weight:500;color:var(--ink2)}
 .hm-tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
 .hm-tabs button{position:relative;height:64px;padding:0 12px;border:0;background:none;color:var(--ink2);font-weight:550;white-space:nowrap}
@@ -920,10 +918,8 @@ body.ro .ray:not([data-panel="outline"]):not([data-panel="templates"]){opacity:.
 
 [data-theme="dark"] .prism,[data-theme="dark"] .ctx-bar{box-shadow:0 18px 50px -12px rgb(0 0 0 / .7),0 0 0 1px rgb(255 255 255 / .12)}
 /* ===== SPECTRA Slide : le film des diapositives à gauche, la scène au centre, la barre Prisme en bas ===== */
-.ap-ic.w{background:linear-gradient(135deg,#8B3CF7,#3D63FF 30%,#14C2EC 48%,#78DD6A 62%,#FFD43F 76%,#FF8A3D 88%,#FF3F86);border-radius:9px}
-/* logo : la diapositive inclinée, sans cadre, une ombre qui suit la forme */
+/* logo : icône de la gamme, une ombre qui suit la forme */
 .sp-mark{border-radius:0;box-shadow:none;overflow:visible;filter:drop-shadow(0 18px 40px rgb(61 99 255 / .45))}
-.sp-mark .sp-shine{clip-path:polygon(7% 13%,93% 1%,93% 87%,7% 99%)}
 .ap-brand svg{border-radius:0;box-shadow:none;filter:drop-shadow(0 12px 30px rgb(61 99 255 / .5))}
 .hm-brand svg,.ed-home svg{border-radius:0;filter:drop-shadow(0 3px 6px rgb(61 99 255 / .3))}
 
@@ -1383,10 +1379,7 @@ body.ro .ray:not([data-panel="outline"]):not([data-panel="templates"]){opacity:.
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <linearGradient id="swg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8B3CF7"/><stop offset=".28" stop-color="#3D63FF"/><stop offset=".46" stop-color="#14C2EC"/><stop offset=".6" stop-color="#78DD6A"/><stop offset=".72" stop-color="#FFD43F"/><stop offset=".85" stop-color="#FF8A3D"/><stop offset="1" stop-color="#FF3F86"/></linearGradient>
-    <radialGradient id="swg2" cx=".22" cy=".18" r=".75"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".55" stop-color="#fff" stop-opacity=".06"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
-    <linearGradient id="swg3" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF3F86" stop-opacity=".0"/><stop offset=".6" stop-color="#7B2FF7" stop-opacity=".22"/><stop offset="1" stop-color="#2D1A6E" stop-opacity=".35"/></linearGradient>
-    <linearGradient id="ssg" x1="0" y1=".2" x2="1" y2=".8"><stop offset="0" stop-color="#3D63FF"/><stop offset=".4" stop-color="#14C2EC"/><stop offset=".7" stop-color="#FFC83D"/><stop offset="1" stop-color="#FF3F86"/></linearGradient><linearGradient id="ssh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".38"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient><symbol id="swMark" viewBox="0 0 64 64"><g transform="translate(32 32) skewY(-8) scale(.86) translate(-32 -32)"><rect width="64" height="64" rx="10" fill="url(#ssg)"/><rect width="64" height="64" rx="10" fill="url(#ssh)"/><rect x="12" y="15" width="26" height="5" rx="2.5" fill="#fff" opacity=".92"/><rect x="12" y="25" width="40" height="3.4" rx="1.7" fill="#fff" opacity=".6"/><rect x="12" y="32" width="33" height="3.4" rx="1.7" fill="#fff" opacity=".6"/></g></symbol>
+    <linearGradient id="ssg" x1="0" y1=".2" x2="1" y2=".8"><stop offset="0" stop-color="#3D63FF"/><stop offset=".4" stop-color="#14C2EC"/><stop offset=".7" stop-color="#FFC83D"/><stop offset="1" stop-color="#FF3F86"/></linearGradient><linearGradient id="ssh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".38"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient><linearGradient id="ibg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7B2FF7"/><stop offset=".3" stop-color="#3D63FF"/><stop offset=".5" stop-color="#14C2EC"/><stop offset=".68" stop-color="#45D69A"/><stop offset=".84" stop-color="#FFC83D"/><stop offset="1" stop-color="#FF3F86"/></linearGradient><linearGradient id="igl" x1="0" y1="0" x2=".7" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/></linearGradient><clipPath id="icc"><path d="M20 12H44Q48 12 48 16V48Q48 52 44 52H20Q16 52 16 48V16Q16 12 20 12Z"/></clipPath><symbol id="icW" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="url(#ibg)"/><rect width="64" height="64" rx="14" fill="url(#igl)" opacity=".6"/><g transform="translate(2.5 2.5)"><path d="M20 11H35L46 22V49Q46 52 43 52H20Q17 52 17 49V14Q17 11 20 11Z" fill="#B9C3E6"/></g><path d="M20 11H35L46 22V49Q46 52 43 52H20Q17 52 17 49V14Q17 11 20 11Z" fill="#fff"/><path d="M35 11V19Q35 22 38 22H46Z" fill="#B9C3E6"/><rect x="23" y="29" width="17" height="3.4" rx="1.7" fill="#14C2EC"/><rect x="23" y="36" width="17" height="3.4" rx="1.7" fill="#14C2EC" opacity=".8"/><rect x="23" y="43" width="11" height="3.4" rx="1.7" fill="#14C2EC" opacity=".6"/></symbol><symbol id="icC" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="url(#ibg)"/><rect width="64" height="64" rx="14" fill="url(#igl)" opacity=".6"/><g transform="translate(2.5 2.5)"><path d="M20 12H44Q48 12 48 16V48Q48 52 44 52H20Q16 52 16 48V16Q16 12 20 12Z" fill="#B9C3E6"/></g><path d="M20 12H44Q48 12 48 16V48Q48 52 44 52H20Q16 52 16 48V16Q16 12 20 12Z" fill="#fff"/><g clip-path="url(#icc)"><rect x="16" y="12" width="32" height="10" fill="#3D63FF"/></g><rect x="20" y="15.5" width="14" height="3" rx="1.5" fill="#fff"/><rect x="20" y="28" width="11" height="6" rx="2" fill="#14C2EC" opacity="0.95"/><rect x="33" y="28" width="11" height="6" rx="2" fill="#14C2EC" opacity="0.7"/><rect x="20" y="36.5" width="11" height="6" rx="2" fill="#14C2EC" opacity="0.7"/><rect x="33" y="36.5" width="11" height="6" rx="2" fill="#14C2EC" opacity="0.95"/><rect x="20" y="45" width="11" height="6" rx="2" fill="#14C2EC" opacity="0.95"/><rect x="33" y="45" width="11" height="6" rx="2" fill="#14C2EC" opacity="0.7"/></symbol><symbol id="icS" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="url(#ibg)"/><rect width="64" height="64" rx="14" fill="url(#igl)" opacity=".6"/><rect x="12" y="15" width="34" height="24" rx="4.5" fill="#fff" opacity=".5"/><g transform="translate(2.5 2.5)"><rect x="18" y="23" width="34" height="26" rx="4.5" fill="#B9C3E6"/></g><rect x="18" y="23" width="34" height="26" rx="4.5" fill="#fff"/><rect x="23" y="28" width="13" height="3.4" rx="1.7" fill="#3D63FF"/><rect x="24" y="38" width="5" height="7" rx="1.5" fill="#14C2EC" opacity=".6"/><rect x="31" y="35" width="5" height="10" rx="1.5" fill="#14C2EC" opacity=".8"/><rect x="38" y="32" width="5" height="13" rx="1.5" fill="#14C2EC"/></symbol>
   </defs>
 </svg>
 <div id="splash" role="status" aria-live="polite">
@@ -1395,7 +1388,7 @@ body.ro .ray:not([data-panel="outline"]):not([data-panel="templates"]){opacity:.
   <div class="sp-center">
     <div class="sp-markbox">
       <div class="sp-scene" aria-hidden="true"><svg viewBox="0 0 640 360" focusable="false"><g class="sl sl-c"><rect class="fr" width="320" height="180" rx="8"/><g class="bc-in"><rect x="24" y="26" width="140" height="12" rx="6" fill="#fff" fill-opacity=".9"/><rect x="40" y="122" width="40" height="34" rx="4" fill="#14C2EC" fill-opacity=".9"/><rect x="100" y="94" width="40" height="62" rx="4" fill="#FFC83D" fill-opacity=".9"/><rect x="160" y="70" width="40" height="86" rx="4" fill="#FF3F86" fill-opacity=".9"/><rect x="220" y="104" width="76" height="6" rx="3" fill="#fff" fill-opacity=".45"/><rect x="220" y="116" width="56" height="6" rx="3" fill="#fff" fill-opacity=".45"/></g></g><g class="sl sl-b"><rect class="fr" width="320" height="180" rx="8"/><g class="bc-in"><rect x="24" y="26" width="110" height="12" rx="6" fill="#fff" fill-opacity=".9"/><rect x="24" y="52" width="120" height="6" rx="3" fill="#fff" fill-opacity=".45"/><rect x="24" y="64" width="96" height="6" rx="3" fill="#fff" fill-opacity=".45"/><rect x="24" y="76" width="108" height="6" rx="3" fill="#fff" fill-opacity=".45"/><rect x="170" y="52" width="126" height="104" rx="5" fill="url(#ssg)" fill-opacity=".85"/></g></g><g class="sl sl-a"><rect class="fr" width="320" height="180" rx="8"/><line class="gd gd-v" x1="24" y1="-16" x2="24" y2="196"/><line class="gd gd-h" x1="-16" y1="124" x2="336" y2="124"/><rect class="a-in a-title" x="24" y="26" width="150" height="14" rx="7" fill="#fff" fill-opacity=".92"/><rect class="a-in a-l1" x="24" y="50" width="250" height="6" rx="3" fill="#fff" fill-opacity=".5"/><rect class="a-in a-l2" x="24" y="62" width="196" height="6" rx="3" fill="#fff" fill-opacity=".5"/><rect class="a-in a-img" x="24" y="92" width="140" height="64" rx="5" fill="url(#ssg)"/><circle class="a-in a-dot" cx="244" cy="124" r="24" fill="#7B2FF7" fill-opacity=".9"/><rect class="a-in a-bar" x="196" y="160" width="100" height="6" rx="3" fill="#FFC83D" fill-opacity=".9"/></g><rect class="ring" x="36" y="126.5" width="184" height="107" rx="8"/></svg></div>
-      <div class="sp-mark" role="img" aria-label="SPECTRA Slide"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#swMark"/></svg></div>
+      <div class="sp-mark" role="img" aria-label="SPECTRA Slide"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#icS"/></svg></div>
     </div>
     <div class="sp-word"><b>SPECTRA</b><span>Slide</span></div>
     <p class="sp-tag">Raconter, montrer, convaincre.</p>
@@ -1435,12 +1428,12 @@ body.ro .ray:not([data-panel="outline"]):not([data-panel="templates"]){opacity:.
 <div id="auth" hidden>
   <aside class="ap-side">
     <div class="ap-aurora" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-    <div class="ap-brand"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#swMark"/></svg><div><b>SPECTRA</b><span>Slide</span></div></div>
+    <div class="ap-brand"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#icS"/></svg><div><b>SPECTRA</b><span>Slide</span></div></div>
     <div class="ap-pitch"><h1>Des présentations qui marquent.</h1><p>Choisissez un thème, écrivez vos idées : SPECTRA Slide met en page, anime et présente. Ouverture et export PowerPoint, et une IA qui construit vos diapositives avec vous.</p></div>
     <ul class="ap-apps">
-      <li><a class="ap-ic w" href="https://groupestudioprism.github.io/SpectraWriter/" aria-label="SPECTRA Writer"></a><b>SPECTRA Writer</b><span>Traitement de texte</span><em>Disponible</em></li>
-      <li><a class="ap-ic c" href="https://groupestudioprism.github.io/SpectraCalc/" aria-label="SPECTRA Calc"></a><b>SPECTRA Calc</b><span>Tableur</span><em>Disponible</em></li>
-      <li><span class="ap-ic s"></span><b>SPECTRA Slide</b><span>Présentations</span><em>Vous êtes ici</em></li>
+      <li><a class="ap-ic" href="https://groupestudioprism.github.io/SpectraWriter/" aria-label="SPECTRA Writer"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#icW"/></svg></a><b>SPECTRA Writer</b><span>Traitement de texte</span><em>Disponible</em></li>
+      <li><a class="ap-ic" href="https://groupestudioprism.github.io/SpectraCalc/" aria-label="SPECTRA Calc"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#icC"/></svg></a><b>SPECTRA Calc</b><span>Tableur</span><em>Disponible</em></li>
+      <li><span class="ap-ic"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#icS"/></svg></span><b>SPECTRA Slide</b><span>Présentations</span><em>Vous êtes ici</em></li>
     </ul>
     <p class="ap-foot">Un seul compte Studio Prism pour SPECTRA, ARCHIPLAN, Archi Vision et toutes les apps du studio.</p>
   </aside>
@@ -1450,7 +1443,7 @@ body.ro .ray:not([data-panel="outline"]):not([data-panel="templates"]){opacity:.
 
 <section id="home" hidden aria-label="Accueil SPECTRA Slide">
   <header class="hm-top">
-    <div class="hm-brand"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#swMark"/></svg><span>SPECTRA <em>Slide</em></span></div>
+    <div class="hm-brand"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#icS"/></svg><span>SPECTRA <em>Slide</em></span></div>
     <nav class="hm-tabs" id="homeNav" aria-label="Navigation">
       <button type="button" data-htab="home">Accueil</button>
       <button type="button" data-htab="mine">Mes présentations</button>
@@ -1487,7 +1480,7 @@ body.ro .ray:not([data-panel="outline"]):not([data-panel="templates"]){opacity:.
 
 <div id="app" hidden>
   <header class="ed-top">
-    <button type="button" class="ed-home" id="homeBtn" title="Retour à l'accueil" aria-label="Retour à l'accueil"><svg viewBox="0 0 64 64"><use href="#swMark"/></svg></button>
+    <button type="button" class="ed-home" id="homeBtn" title="Retour à l'accueil" aria-label="Retour à l'accueil"><svg viewBox="0 0 64 64"><use href="#icS"/></svg></button>
     <div class="ed-doc"><input id="docTitle" class="ed-title" value="Présentation sans titre" aria-label="Titre de la présentation" spellcheck="false" maxlength="120"><div class="ed-meta"><button type="button" class="ed-menu" id="fileBtn" aria-haspopup="true">Fichier</button><span id="docSub" hidden></span><span id="cloudState" class="cs" hidden></span></div></div>
     <span class="ed-sp"></span>
     <button type="button" class="ed-spectre" id="spectreBtn" aria-haspopup="dialog"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><span>Demander ou chercher…</span><kbd id="spectreKbd">Ctrl K</kbd></button>

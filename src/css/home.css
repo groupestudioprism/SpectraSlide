@@ -2,7 +2,7 @@
 #home{position:fixed;inset:0;z-index:20;display:grid;grid-template-rows:auto minmax(0,1fr);grid-template-columns:minmax(0,1fr);background:var(--bg)}
 .hm-top{display:flex;align-items:center;gap:22px;height:64px;padding:0 clamp(16px,3vw,40px);background:var(--panel);border-bottom:1px solid var(--line)}
 .hm-brand{display:flex;align-items:center;gap:10px;font:800 17px/1 var(--f-disp);letter-spacing:.01em;white-space:nowrap}
-.hm-brand svg{width:32px;height:32px;border-radius:9px}
+.hm-brand svg{width:32px;height:32px;border-radius:0}
 .hm-brand em{font-style:normal;font-weight:500;color:var(--ink2)}
 .hm-tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
 .hm-tabs button{position:relative;height:64px;padding:0 12px;border:0;background:none;color:var(--ink2);font-weight:550;white-space:nowrap}
